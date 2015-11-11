@@ -100,7 +100,6 @@ class MainApp (QtGui.QMainWindow):
         else:
             self.unLoadVfkLayer('BUD')
 
-
     # for debug
     def printMsg(self,msg):
         QMessageBox.information(self.iface.mainWindow(),"Debug", msg)
@@ -138,7 +137,6 @@ class MainApp (QtGui.QMainWindow):
 
         return True
 
-
     def openDatabase(self, dbPath):
         connectionName = QUuid.createUuid().toString()
         db = QSqlDatabase.addDatabase("QSQLITE", connectionName)
@@ -148,7 +146,6 @@ class MainApp (QtGui.QMainWindow):
         else:
             #setProperty("connectionName", connectionName)
             return True
-
 
     def loadVfkFile(self, fileName, errorMsg):
 
@@ -182,15 +179,6 @@ class MainApp (QtGui.QMainWindow):
         progress.hide()
 
         return True
-
-
-
-
-
-
-
-
-
 
     def createToolbarsAndConnect(self):
         self.ui.browseButton.clicked.connect(self.browseButton_clicked)
