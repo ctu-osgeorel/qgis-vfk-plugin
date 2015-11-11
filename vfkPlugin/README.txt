@@ -1,7 +1,7 @@
 Plugin Builder Results
 
 Your plugin vfkPlugin was created in:
-    /home/stepan/Dokumenty/CVUT/FSG/projekt/vfkPlugin
+    /home/stepan/Documents/qgis-vfk-plugin
 
 Your QGIS plugin directory is located at:
     /home/stepan/.qgis2/python/plugins

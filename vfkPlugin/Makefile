@@ -5,8 +5,8 @@
 #							 -------------------
 #		begin				: 2015-06-11
 #		git sha				: $Format:%H$
-#		copyright			: (C) 2015 by Stepan Bambula, Adam Dlesk, Jaroslav Urik
-#		email				: stepan.bambula@fsv.cvut.cz, adam.dlesk@fsv.cvut.cz, jaroslav.urik@fsv.cvut.cz
+#		copyright			: (C) 2015 by Stepan Bambula
+#       email               : stepan.bambula@gmail.com
 # ***************************************************************************/
 #
 #/***************************************************************************
