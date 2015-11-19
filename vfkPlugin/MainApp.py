@@ -22,25 +22,22 @@
 """
 
 # Import the PyQt, QGIS libraries and classes
-import os
 
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup
-from PyQt4.QtCore import QUuid, QFileInfo, QDir, QSignalMapper
+from PyQt4.QtCore import QUuid, QFileInfo, QDir, QObject, QSignalMapper
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import *
 from qgis.gui import *
 from ui_MainApp import Ui_MainApp
 import ogr, gdal
 
+import htmlDocument
+import domains
+from vfkTextBrowser import *
+
 
 class MainApp (QtGui.QMainWindow):
-
-    mLastVfkFile = None
-    mOgrDataSource = None # Check!!!
-    mDataSourceName = None
-    fileName = None
-    mLoadedLayers = {}
 
     def __init__(self, iface, parent=None):
         QtGui.QMainWindow.__init__(self)
@@ -49,6 +46,14 @@ class MainApp (QtGui.QMainWindow):
         # Set up the user interface from Designer.
         self.ui = Ui_MainApp()
         self.ui.setupUi(self)
+        
+        # variables
+        self.mLastVfkFile = ""
+        self.mOgrDataSource = None
+        self.mDataSourceName = ""
+        self.fileName = ""
+        self.mLoadedLayers = {}
+        self.mSearchController = None
 
         # Connect ui with functions
         self.createToolbarsAndConnect()
@@ -57,17 +62,72 @@ class MainApp (QtGui.QMainWindow):
         title = u'Načti soubor VFK'
         lastUsedDir = ''
         self.fileName = QFileDialog.getOpenFileName(self, title, lastUsedDir, 'Soubor VFK (*.vfk)')
-        if self.fileName is None:
+        if self.fileName == "":
             return
         else:
             self.ui.vfkFileLineEdit.setText(self.fileName)
             self.ui.loadVfkButton.setEnabled(True)
 
+    def browserGoBack(self):
+        vfkTextBrowser.goBack()
+
+    def browserGoForward(self):
+        vfkTextBrowser.goForth()
+
+    def latexExport(self):
+        fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", "", "LaTeX (*.tex)")
+        if fileName is None:
+            #vfkTextBrowser.exportDocument(vfkTextBrowser.currentUrl(), fileName, vfkTextBrowser.)
+            pass
+
+    def htmlExport(self):
+        fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", "", "HTML (*.html)")
+        if fileName is None:
+            pass
+
+    def showInMap(self, ids, layerName):
+        if  self.mLoadedLayers.has_key(layerName):
+            id = self.mLoadedLayers[layerName]
+            vectorLayer = QgsVectorLayer(QgsMapLayerRegistry.instance().mapLayer(id))
+            searchString = "ID IN ('{}')".format(ids.join("','"))
+
+            error = ""
+            fIds = self.search(vectorLayer, searchString, error)
+            if error != "":
+                print(error)
+                return
+            else:
+                vectorLayer.setSelectedFeatures(fIds)
+
+    def search(self, layer, searchString, error):
+        layer = QgsVectorLayer(layer)
+        search = QgsExpression(searchString)
+        rect = QgsRectangle()
+        fIds = []
+
+        if search.hasParserError():
+            error += "Parsing error:" + search.parserErrorString()
+            return fIds
+        if search.prepare(layer.pendingFields()) is False:
+            error + "Evaluation error:" + search.evalErrorString()
+
+        layer.select(rect, False)
+        fit = QgsFeatureIterator(layer.getFeatures())
+        f = QgsFeature()
+
+        while fit.nextFeature(f):
+            if int(search.evaluate(f)) != 0:
+                fIds.append(f.id())
+            if search.hasEvalError():
+                break
+
+        return fIds
+
     def loadVfkButton_clicked(self):
         fileName = self.ui.vfkFileLineEdit.text()
 
         if self.mLastVfkFile != fileName:
-            errorMsg = None
+            errorMsg = ""
             fInfo = QFileInfo(fileName)
             self.mDataSourceName = QDir(fInfo.absolutePath()).filePath(fInfo.baseName() + '.db')
 
@@ -81,13 +141,14 @@ class MainApp (QtGui.QMainWindow):
                 msg1 = u'Nepodařilo se otevřít databázi.'
                 if QSqlDatabase.isDriverAvailable('QSQLITE') is False:
                     msg1 += u'\nDatabázový ovladač QSQLITE není dostupný.'
-                QMessageBox.critical(self,u'Chyba', msg1)
+                QMessageBox.critical(self, u'Chyba', msg1)
 
                 # emit enableSearch( false )
                 return
 
-            # vfkBrowser->setConnectionName( property( "connectionName" ).toString() );
-            # mSearchController->setConnectionName( property( "connectionName" ).toString() );
+            #vfkTextBrowser.setConnectionName(str(self.property("connectionName")))
+
+            #self.mSearchController.setConnectionName( property( "connectionName" ).toString() );
             # emit enableSearch( true );
 
         if self.ui.parCheckBox.isChecked():
@@ -101,20 +162,27 @@ class MainApp (QtGui.QMainWindow):
             self.unLoadVfkLayer('BUD')
 
     # for debug
-    def printMsg(self,msg):
-        QMessageBox.information(self.iface.mainWindow(),"Debug", msg)
+    def printMsg(self, msg):
+        QMessageBox.information(self.iface.mainWindow(), "Debug", msg)
 
+    def loadVfkLayer(self, vfkLayerName):
+        if vfkLayerName in self.mLoadedLayers:
+            print("Vfk layer {} is already loaded".format(vfkLayerName))
+            return
 
-    def loadVfkLayer( self, vfkLayerName):
-        composedURI = self.fileName
-        layer = QgsVectorLayer(composedURI, vfkLayerName, 'ogr')
+        uri = self.fileName
+        #composedURI = self.fileName
+        layer = QgsVectorLayer(uri, vfkLayerName, 'ogr')
+        if not layer.isValid():
+            print "Layer failed to load!"
+
         self.mLoadedLayers[vfkLayerName] = layer.id()
         self.setSymbology(layer)
-        QgsMapLayerRegistry.instance().addMapLayer(layer, True)
+        QgsMapLayerRegistry.instance().addMapLayer(layer)
 
     def unLoadVfkLayer(self, vfkLayerName):
         if vfkLayerName in self.mLoadedLayers:
-            QgsMapLayerRegistry.instance().removeMapLayer(self.mLoadedLayers[vfkLayerName])
+            QgsMapLayerRegistry.instance().removeMapLayer(self.mLoadedLayers[vfkLayerName].id())
             del self.mLoadedLayers[vfkLayerName]
 
     def setSymbology(self, layer):
@@ -144,13 +212,16 @@ class MainApp (QtGui.QMainWindow):
         if db.open() is False:
             return False
         else:
-            #setProperty("connectionName", connectionName)
+            self.setProperty("connectionName", connectionName)
             return True
 
     def loadVfkFile(self, fileName, errorMsg):
 
-        if self.mOgrDataSource:
-            self.mOgrDataSource = 0
+        if self.mOgrDataSource is not None:
+            self.mOgrDataSource.Destroy()
+            self.mOgrDataSource = None
+
+        QgsApplication.registerOgrDrivers()
 
         progress = QProgressDialog(self)
         progress.setWindowTitle(u'Načítám VFK data...')
@@ -159,29 +230,45 @@ class MainApp (QtGui.QMainWindow):
         progress.setModal(True)
         progress.show()
 
-        self.mOgrDataSource = ogr.Open(self.fileName)
-        if self.mOgrDataSource is False:
+        progress.setValue(1)
+
+        self.mOgrDataSource = ogr.Open(self.fileName, 0)
+        if self.mOgrDataSource is None:
             errorMsg = u'Unable to set open OGR data source'
             return False
+        else:
+            layerCount = self.mOgrDataSource.GetLayerCount()
+            progress.setRange(0, layerCount -1)
 
-        layerCount = self.mOgrDataSource.GetLayerCount()
-        progress.setRange(0, layerCount-1)
+            if self.mOgrDataSource.GetLayer().TestCapability('IsPreProcessed') is False:
+                extraMsg = u'Načítám data do SQLite databáze (může nějaký čas trvat...)'
 
-        if self.mOgrDataSource.TestCapability('IsPreProcessed') is False:
-            extraMsg = u'Načítám data do SQLite databáze (může nějaký čas trvat...)'
+            for i in xrange(layerCount):
+                if progress.wasCanceled():
+                    errorMsg = u'Opening database stopped'
+                    return False
 
-        for i in xrange(layerCount):
-            if progress.wasCanceled():
-                errorMsg = u'Opening database stopped'
-                return False
-            progress.setValue(i)
+                progress.setValue(i)
 
-        progress.hide()
+                theLayerName = self.mOgrDataSource.GetLayer(i).GetLayerDefn().GetName()
 
-        return True
+                progress.setLabelText(u"VFK data {}/{}: {}\n{}".format(i, layerCount, theLayerName, extraMsg))
+                self.mOgrDataSource.GetLayer(i).GetFeatureCount(1)
+
+            progress.hide()
+
+            return True
+
+    def showOnCuzk(self):
+        x = vfkTextBrowser.currentDefinitionPoint['x']
+        y = vfkTextBrowser.currentDefinitionPoint['y']
+        url = "http://nahlizenidokn.cuzk.cz/MapaIdentifikace.aspx?&x=-{}&y=-{}".format(y, x)
+        QDesktopServices.openUrl(QUrl(url, QUrl.TolerantMode))
 
     def createToolbarsAndConnect(self):
         self.ui.browseButton.clicked.connect(self.browseButton_clicked)
         self.ui.loadVfkButton.clicked.connect(self.loadVfkButton_clicked)
 
-        self.ui.loadVfkButton.setEnabled(False)
+
+
+        #self.ui.loadVfkButton.setEnabled(False)

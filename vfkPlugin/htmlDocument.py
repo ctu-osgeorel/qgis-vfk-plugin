@@ -37,12 +37,12 @@ class HtmlDocument(VfkDocument):
         page = '<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">'
         page += self.mPage
         page.replace("&", "&amp;")
-        page.replace( QRegExp( "<a[^>]*>([^<]*)</a>" ), "\\1" )
+        page.replace(QRegExp( "<a[^>]*>([^<]*)</a>" ), "\\1")
         
         return page
     
     def header(self):
-        mPage += '''
+        self.mPage += '''
           <html><head>
           <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">
           <meta http-equiv=\"content-language\" content=\"cs\">
@@ -76,7 +76,7 @@ class HtmlDocument(VfkDocument):
           </style>
           </head><body>'''
 
-        self.titleIsSet = False;
+        self.titleIsSet = False
     
     def footer(self):
         self.mPage += "</body></html>"
@@ -84,8 +84,8 @@ class HtmlDocument(VfkDocument):
     def heading1(self, text):
         self.mPage += "<h1>{}</h1>".format(text)
 
-        if titleIsSet is False:
-          title( text );
+        if self.titleIsSet is False:
+          self.title( text )
           
     def heading2(self, text):
         self.mPage += "<h2>{}</h2>".format(text)
@@ -134,7 +134,6 @@ class HtmlDocument(VfkDocument):
         self.mPage += "<td colspan=\"{}\">{}</td>".format(mLastColumnNumber, text)
         self.mPage += "</tr>"
         
-        
     def link(self, href, text):
         return "<a href=\"{}\">{}</a>".format(href, text)
         
@@ -153,13 +152,13 @@ class HtmlDocument(VfkDocument):
           self.mPage += "<td>{}</td>".format(i[1])
           self.mPage += "</tr>"
         
-        self.mPage += QString( "</table>" )
+        self.mPage += "</table>"
     
     def paragraph(self, text):
         self.mPage += "<p>{}</p>".format(text)
         
     def table(self, content, header):        
-        self.beginTable();
+        self.beginTable()
         
         for i, cont in enumerate(content):
             if i == 0 and header and content != "":
@@ -167,7 +166,7 @@ class HtmlDocument(VfkDocument):
             
             self.tableRow(content[i])        
         
-        endTable()
+        self.endTable()
         
     def text(self, text):
         self.mPage += text
@@ -175,8 +174,7 @@ class HtmlDocument(VfkDocument):
 #     def discardLastBeginTable(self):
 #         index = self.mPage.lastIndexOf("<table")
 #         self.mPage.chop( mPage.size() - index )
-        
-        
+
     def isLastTableEmpty(self):
         if self.mPage.find("<table[^>]*>$") != -1:
             return True
