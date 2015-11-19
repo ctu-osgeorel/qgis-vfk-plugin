@@ -25,7 +25,7 @@
 
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup
-from PyQt4.QtCore import QUuid, QFileInfo, QDir, QObject, QSignalMapper
+from PyQt4.QtCore import QUuid, QFileInfo, QDir, QObject, QSignalMapper, SIGNAL, SLOT
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import *
 from qgis.gui import *
@@ -38,7 +38,6 @@ from vfkTextBrowser import *
 
 
 class MainApp (QtGui.QMainWindow):
-
     def __init__(self, iface, parent=None):
         QtGui.QMainWindow.__init__(self)
         self.iface = iface
@@ -69,24 +68,32 @@ class MainApp (QtGui.QMainWindow):
             self.ui.loadVfkButton.setEnabled(True)
 
     def browserGoBack(self):
-        vfkTextBrowser.goBack()
+        self.ui.vfkBrowser.goBack()
 
     def browserGoForward(self):
-        vfkTextBrowser.goForth()
+        pass
+        self.ui.vfkBrowser.goForth()
+
+    def selectParInMap(self):
+        pass
+
+    def selectBudInMap(self):
+        pass
 
     def latexExport(self):
         fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", "", "LaTeX (*.tex)")
         if fileName is None:
-            #vfkTextBrowser.exportDocument(vfkTextBrowser.currentUrl(), fileName, vfkTextBrowser.)
+            self.ui.vfkBrowser.exportDocument(self.ui.vfkBrowser.currentUrl(), fileName, vfkTextBrowser.Latex)
             pass
 
     def htmlExport(self):
         fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", "", "HTML (*.html)")
         if fileName is None:
+            self.ui.vfkBrowser.exportDocument(self.ui.vfkBrowser.currentUrl(), fileName, vfkTextBrowser.Html)
             pass
 
     def showInMap(self, ids, layerName):
-        if  self.mLoadedLayers.has_key(layerName):
+        if self.mLoadedLayers.has_key(layerName):
             id = self.mLoadedLayers[layerName]
             vectorLayer = QgsVectorLayer(QgsMapLayerRegistry.instance().mapLayer(id))
             searchString = "ID IN ('{}')".format(ids.join("','"))
@@ -146,7 +153,7 @@ class MainApp (QtGui.QMainWindow):
                 # emit enableSearch( false )
                 return
 
-            #vfkTextBrowser.setConnectionName(str(self.property("connectionName")))
+            #self.ui.vfkBrowser.setConnectionName(str(self.property("connectionName")))
 
             #self.mSearchController.setConnectionName( property( "connectionName" ).toString() );
             # emit enableSearch( true );
@@ -259,16 +266,43 @@ class MainApp (QtGui.QMainWindow):
 
             return True
 
+    def selectedIds(self, layer):
+        ids = []
+        flist = layer.selectedFeatures()
+
+        for it in flist:
+            f = QgsFeature(it)
+            ids.append(str(f.attribute("ID")))
+        return ids
+
+    def showInfoAboutSelection(self):
+        layers = ["PAR", "BUD"]
+        layerIds = {}
+
+        for layer in layers:
+            if self.mLoadedLayers.has_key(layer):
+                id = str(self.mLoadedLayers[layer])
+                vectorLayer = QgsVectorLayer(QgsMapLayerRegistry.instance().mapLayer(id))
+                layerIds[layer] = self.selectedIds(vectorLayer)
+        self.ui.vfkBrowser.showInfoAboutSelection(layerIds["PAR"], layerIds["BUD"])
+
     def showOnCuzk(self):
-        x = vfkTextBrowser.currentDefinitionPoint['x']
-        y = vfkTextBrowser.currentDefinitionPoint['y']
+        #x = .currentDefinitionPoint.definitionPoint.x
+        #y = self.textBrowser.currentDefinitionPoint.definitionPoint.x
+        x = 1136942.185
+        y = 671128.312
         url = "http://nahlizenidokn.cuzk.cz/MapaIdentifikace.aspx?&x=-{}&y=-{}".format(y, x)
-        QDesktopServices.openUrl(QUrl(url, QUrl.TolerantMode))
+        QDesktopServices.openUrl(QUrl(url))
 
     def createToolbarsAndConnect(self):
         self.ui.browseButton.clicked.connect(self.browseButton_clicked)
         self.ui.loadVfkButton.clicked.connect(self.loadVfkButton_clicked)
 
+        self.ui.actionCuzkPage.triggered.connect(self.showOnCuzk)
+        self.ui.actionSelectBudInMap.triggered.connect(self.selectBudInMap)
+        self.ui.actionSelectParInMap.triggered.connect(self.selectParInMap)
+        self.ui.actionExportLatex.triggered.connect(self.latexExport)
+        self.ui.actionExportHtml.triggered.connect(self.htmlExport)
+        self.ui.actionShowInfoaboutSelection.toggled.connect(self.showInfoAboutSelection)
 
-
-        #self.ui.loadVfkButton.setEnabled(False)
+        self.ui.loadVfkButton.setEnabled(False)

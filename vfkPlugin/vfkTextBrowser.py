@@ -6,12 +6,20 @@ from PyQt4.QtCore import QFile, QIODevice, QUrl
 from PyQt4.QtSql import QSqlDatabase
 
 
+class Coordinates:
+    x = 0.0
+    y = 0.0
+
+    def __init__(self):
+        pass
+
+
 class HistoryRecord:
-        def __init__(self):
-            self.html = ""
-            self.parIds = []
-            self.budIds = []
-            self.definitionPoint = {'x': 0, 'y': 0}
+    def __init__(self):
+        self.html = ""
+        self.parIds = []
+        self.budIds = []
+        self.definitionPoint = Coordinates()
 
 
 class vfkTextBrowser(QTextBrowser):
@@ -27,7 +35,6 @@ class vfkTextBrowser(QTextBrowser):
             return False
 
         taskMap = {}
-
 
     def parseTask(self, task):
         task = QUrl(task)
