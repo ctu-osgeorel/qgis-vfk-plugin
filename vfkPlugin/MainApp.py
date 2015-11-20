@@ -289,8 +289,8 @@ class MainApp (QtGui.QMainWindow):
     def showOnCuzk(self):
         #x = .currentDefinitionPoint.definitionPoint.x
         #y = self.textBrowser.currentDefinitionPoint.definitionPoint.x
-        x = 1136942.185
-        y = 671128.312
+        x = 1136942
+        y = 671128
         url = "http://nahlizenidokn.cuzk.cz/MapaIdentifikace.aspx?&x=-{}&y=-{}".format(y, x)
         QDesktopServices.openUrl(QUrl(url))
 

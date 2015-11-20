@@ -22,64 +22,31 @@
  ***************************************************************************/
 """
 
-from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import *
-from PyQt4.QtCore import QFile, QIODevice, QUrl
-from PyQt4.QtSql import QSqlDatabase
+from PyQt4.QtCore import QAbstractItemModel, QModelIndex
+
+from ui_budovysearchform import *
 
 
-class Coordinates:
-    x = 0.0
-    y = 0.0
-
+class BudovySearchForm(QWidget, Ui_BudovySearchForm):
     def __init__(self):
-        pass
+        self.__mZpusobVyuzitiModel = QAbstractItemModel()
 
+    def domovniCislo(self):
+        return str(self.cisloDomovniLineEdit.text()).strip()
 
-class HistoryRecord:
-    def __init__(self):
-        self.html = ""
-        self.parIds = []
-        self.budIds = []
-        self.definitionPoint = Coordinates()
+    def naParcele(self):
+        return str(self.naParceleLineEdit.text()).strip()
 
+    def lv(self):
+        return str(self.lvBudovyLineEdit.text()).strip()
 
-class vfkTextBrowser(QTextBrowser):
+    def setZpusobVyuzitiModel(self, model):
+        self.__mZpusobVyuzitiModel = QAbstractItemModel(model)
+        self.mZpVyuzitiCombo.setModel(model)
+        self.mZpVyuzitiCombo.setModelColumn(1)
 
-    def __init__(self):
-        self.mCurrentUrl = QUrl()
-        self.mCurrentRecord = HistoryRecord()
-
-    def exportDocument(self, task, fileName, format):
-        fileOut = QFile(fileName)
-
-        if fileOut.open(QIODevice.WriteOnly | QIODevice.Text) is False:
-            return False
-
-        taskMap = {}
-
-    def parseTask(self, task):
-        task = QUrl(task)
-        taskList = []
-        taskList.append(task.encodedQueryItems())
-
-        taskMap = {}
-        taskMap['action'] = task.path()
-
-        for i in taskList:
-            taskMap['']
-
-    def goBack(self):
-        pass
-
-    def goForth(self):
-        pass
-
-    def currentUrl(self):
-        return self.mCurrentUrl
-
-    def currentDefinitionPoint(self):
-        return self.mCurrentRecord.definitionPoint
-
-    def setConnectionName(self, connectionName):
-        pass
+    def zpusobVyuzitiKod(self):
+        row = self.mZpVyuzitiCombo.currentIndex()
+        index = QModelIndex(self.mZpVyuzitiCombo.model().index(row, 0))
+        return str(self.mZpVyuzitiCombo.model().data(index))
