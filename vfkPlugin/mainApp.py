@@ -22,19 +22,23 @@
 """
 
 # Import the PyQt, QGIS libraries and classes
-
+import this
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup
-from PyQt4.QtCore import QUuid, QFileInfo, QDir, QObject, QSignalMapper, SIGNAL, SLOT
+from PyQt4.QtCore import QUuid, QFileInfo, QDir, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import *
 from qgis.gui import *
-from ui_MainApp import Ui_MainApp
-import ogr, gdal
+import ogr
 
+from ui_MainApp import Ui_MainApp
 import htmlDocument
 import domains
 from vfkTextBrowser import *
+from searchFormController import *
+from budovySearchForm import *
+from jednotkySearchForm import *
+from parcelySearchForm import *
 
 
 class MainApp (QtGui.QMainWindow):
@@ -45,17 +49,46 @@ class MainApp (QtGui.QMainWindow):
         # Set up the user interface from Designer.
         self.ui = Ui_MainApp()
         self.ui.setupUi(self)
-        
+
         # variables
         self.mLastVfkFile = ""
         self.mOgrDataSource = None
         self.mDataSourceName = ""
         self.fileName = ""
         self.mLoadedLayers = {}
-        self.mSearchController = None
 
         # Connect ui with functions
         self.createToolbarsAndConnect()
+
+        # settings
+        self.ui.loadVfkButton.setDisabled(True)
+        self.mDefaultPalette = self.ui.vfkFileLineEdit.palette()
+
+        self.searchFormMainControls = SearchFormController.MainControls
+        self.searchFormMainControls.formCombobox = self.ui.searchCombo
+        self.searchFormMainControls.searchForms = self.ui.searchForms
+        self.searchFormMainControls.searchButton = self.ui.searchButton
+
+        self.searchForms = SearchFormController.SearchForms
+        self.searchForms.vlastnici = self.ui.vlastniciSearchForm
+        self.searchForms.parcely = self.ui.parcelySearchForm
+        self.searchForms.budovy = self.ui.budovySearchForm
+        self.searchForms.jednotky = self.ui.jednotkySearchForm
+
+        self.mSearchController = SearchFormController(self.searchFormMainControls, self.searchForms, self)
+
+        self.connect(self.mSearchController, SIGNAL("actionTriggered(QUrl)"), self.ui.vfkBrowser, SLOT("processAction(QUrl)"))
+        self.connect(self, SIGNAL("enableSearch(bool)"), self.ui.searchButton, SLOT("setEnabled(bool)"))
+
+    # signals
+    @staticmethod
+    def goBack(): pass
+    @staticmethod
+    def searchOpsubByName(string): pass
+    @staticmethod
+    def enableSearch(enable): pass
+    @staticmethod
+    def refreshLegend(layer): pass
 
     def browseButton_clicked(self):
         title = u'Načti soubor VFK'
@@ -71,7 +104,6 @@ class MainApp (QtGui.QMainWindow):
         self.ui.vfkBrowser.goBack()
 
     def browserGoForward(self):
-        pass
         self.ui.vfkBrowser.goForth()
 
     def selectParInMap(self):
@@ -92,6 +124,15 @@ class MainApp (QtGui.QMainWindow):
             self.ui.vfkBrowser.exportDocument(self.ui.vfkBrowser.currentUrl(), fileName, vfkTextBrowser.Html)
             pass
 
+    def setSelectionChangedConnected(self, connected):
+        for i, id in enumerate(self.mLoadedLayers):
+            vectorLayer = QgsVectorLayer(QgsMapLayerRegistry.instance().mapLayer(i))
+
+            if connected is True:
+                self.connect(vectorLayer, SIGNAL("selectionChanged()"), self, SLOT("self.showInfoAboutSelection()"))
+            else:
+                self.disconnect(vectorLayer, SIGNAL("selectionChanged()"), self, SLOT("self.showInfoAboutSelection()"))
+
     def showInMap(self, ids, layerName):
         if self.mLoadedLayers.has_key(layerName):
             id = self.mLoadedLayers[layerName]
@@ -101,7 +142,7 @@ class MainApp (QtGui.QMainWindow):
             error = ""
             fIds = self.search(vectorLayer, searchString, error)
             if error != "":
-                print(error)
+                QgsLogger.debug(error)
                 return
             else:
                 vectorLayer.setSelectedFeatures(fIds)
@@ -141,7 +182,6 @@ class MainApp (QtGui.QMainWindow):
             if self.loadVfkFile(fileName, errorMsg) is False:
                 msg2 = u'Nepodařilo se získat OGR provider'
                 QMessageBox.critical(self, u'Nepodařilo se získat data provider', msg2)
-                # emit enableSearch( false )
                 return
 
             if self.openDatabase(self.mDataSourceName) is False:
@@ -149,14 +189,14 @@ class MainApp (QtGui.QMainWindow):
                 if QSqlDatabase.isDriverAvailable('QSQLITE') is False:
                     msg1 += u'\nDatabázový ovladač QSQLITE není dostupný.'
                 QMessageBox.critical(self, u'Chyba', msg1)
-
-                # emit enableSearch( false )
+                self.ui.loadVfkButton.emit(self.enableSearch(False))
                 return
 
             #self.ui.vfkBrowser.setConnectionName(str(self.property("connectionName")))
 
             #self.mSearchController.setConnectionName( property( "connectionName" ).toString() );
-            # emit enableSearch( true );
+            self.mLastVfkFile = fileName
+            self.mLoadedLayers.clear()
 
         if self.ui.parCheckBox.isChecked():
             self.loadVfkLayer('PAR')
@@ -168,29 +208,43 @@ class MainApp (QtGui.QMainWindow):
         else:
             self.unLoadVfkLayer('BUD')
 
-    # for debug
-    def printMsg(self, msg):
-        QMessageBox.information(self.iface.mainWindow(), "Debug", msg)
+    def vfkFileLineEdit_textChanged(self, arg1):
+        info = QFileInfo(arg1)
+
+        if info.isFile():
+            self.ui.loadVfkButton.setEnabled(True)
+            self.ui.vfkFileLineEdit.setPalette(self.mDefaultPalette)
+        else:
+            self.ui.loadVfkButton.setEnabled(False)
+            pal = QPalette(self.ui.vfkFileLineEdit.palette())
+            pal.setColor(QPalette.text(), QtCore.Qt.red)
+            self.ui.vfkFileLineEdit.setPalette(pal)
 
     def loadVfkLayer(self, vfkLayerName):
+        QgsLogger.debug("Loading vfk layer {}".format(vfkLayerName))
         if vfkLayerName in self.mLoadedLayers:
-            print("Vfk layer {} is already loaded".format(vfkLayerName))
+            QgsLogger.debug("Vfk layer {} is already loaded".format(vfkLayerName))
             return
 
-        uri = self.fileName
-        #composedURI = self.fileName
-        layer = QgsVectorLayer(uri, vfkLayerName, 'ogr')
+        composedURI = self.mLastVfkFile + "|layername=" + vfkLayerName
+        layer = QgsVectorLayer(composedURI, vfkLayerName, "ogr")
         if not layer.isValid():
-            print "Layer failed to load!"
+            QgsLogger.debug("Layer failed to load!")
 
         self.mLoadedLayers[vfkLayerName] = layer.id()
         self.setSymbology(layer)
+
         QgsMapLayerRegistry.instance().addMapLayer(layer)
 
     def unLoadVfkLayer(self, vfkLayerName):
-        if vfkLayerName in self.mLoadedLayers:
-            QgsMapLayerRegistry.instance().removeMapLayer(self.mLoadedLayers[vfkLayerName].id())
-            del self.mLoadedLayers[vfkLayerName]
+        QgsLogger.debug("Unloading vfk layer {}".format(vfkLayerName))
+
+        if vfkLayerName not in self.mLoadedLayers:
+            QgsLogger.debug("Vfk layer {} is already unloaded".format(vfkLayerName))
+            return
+
+        QgsMapLayerRegistry.instance().removeMapLayer(self.mLoadedLayers[vfkLayerName])
+        del self.mLoadedLayers[vfkLayerName]
 
     def setSymbology(self, layer):
         name = layer.name()
@@ -207,14 +261,14 @@ class MainApp (QtGui.QMainWindow):
             QMessageBox.information(self, 'Load Style', errorMsg)
 
         layer.triggerRepaint()
-
-        # emit refreshLegend( layer )
+        self.refreshLegend(layer) #############################
 
         return True
 
     def openDatabase(self, dbPath):
         connectionName = QUuid.createUuid().toString()
         db = QSqlDatabase.addDatabase("QSQLITE", connectionName)
+        QgsLogger.debug(dbPath)
         db.setDatabaseName(dbPath)
         if db.open() is False:
             return False
@@ -226,7 +280,7 @@ class MainApp (QtGui.QMainWindow):
 
         if self.mOgrDataSource is not None:
             self.mOgrDataSource.Destroy()
-            self.mOgrDataSource = None
+            self.mOgrDataSource = 0
 
         QgsApplication.registerOgrDrivers()
 
@@ -239,6 +293,7 @@ class MainApp (QtGui.QMainWindow):
 
         progress.setValue(1)
 
+        QgsLogger.debug("Open OGR datasource (using DB: {})".format(self.mDataSourceName))
         self.mOgrDataSource = ogr.Open(self.fileName, 0)
         if self.mOgrDataSource is None:
             errorMsg = u'Unable to set open OGR data source'
@@ -280,11 +335,30 @@ class MainApp (QtGui.QMainWindow):
         layerIds = {}
 
         for layer in layers:
-            if self.mLoadedLayers.has_key(layer):
+            if layer in self.mLoadedLayers:
                 id = str(self.mLoadedLayers[layer])
                 vectorLayer = QgsVectorLayer(QgsMapLayerRegistry.instance().mapLayer(id))
                 layerIds[layer] = self.selectedIds(vectorLayer)
-        self.ui.vfkBrowser.showInfoAboutSelection(layerIds["PAR"], layerIds["BUD"])
+
+        vfkTextBrowser.showInfoAboutSelection(layerIds["PAR"], layerIds["BUD"])
+
+    def showParInMap(self, ids):
+        if self.ui.actionShowInfoaboutSelection.isChecked():
+            self.setSelectionChangedConnected(False)
+            self.showInMap(ids, "PAR")
+            self.setSelectionChangedConnected(True)
+        else:
+            self.showInMap(ids, "PAR")
+
+    def showBudInMap(self, ids):
+        if self.ui.actionShowInfoaboutSelection.isChecked():
+            self.setSelectionChangedConnected(False)
+            self.showInMap(ids, "BUD")
+            self.setSelectionChangedConnected(True)
+        else:
+            self.showInMap(ids, "BUD")
+
+
 
     def showOnCuzk(self):
         #x = .currentDefinitionPoint.definitionPoint.x
@@ -294,15 +368,87 @@ class MainApp (QtGui.QMainWindow):
         url = "http://nahlizenidokn.cuzk.cz/MapaIdentifikace.aspx?&x=-{}&y=-{}".format(y, x)
         QDesktopServices.openUrl(QUrl(url))
 
+    def switchToImport(self):
+        self.ui.actionImport.trigger()
+
+    def switchToSearch(self, searchType):
+        self.ui.actionVyhledavani.trigger()
+        self.ui.searchCombo.setCurrentIndex(searchType)
+        self.ui.searchForms.setCurrentIndex(searchType)
+
     def createToolbarsAndConnect(self):
+
+        # Main toolbar
+        # ------------
+        self.ui.mainToolBar = QToolBar(self)
+        self.ui.mainToolBar.addAction(self.ui.actionImport)
+        self.ui.mainToolBar.addAction(self.ui.actionVyhledavani)
+        self.ui.mainToolBar.setOrientation(QtCore.Qt.Vertical)
+        self.addToolBar(QtCore.Qt.LeftToolBarArea, self.ui.mainToolBar)
+
+        actionGroup = QActionGroup(self)
+        actionGroup.addAction(self.ui.actionImport)
+        actionGroup.addAction(self.ui.actionVyhledavani)
+
+        # QSignalMapper
+        # -------------
+        self.ui.signalMapper = QSignalMapper(self)
+
+        # connect to 'clicked' on all buttons
+        self.connect(self.ui.actionVyhledavani, SIGNAL("triggered()"), self.ui.signalMapper, SLOT("map()"))
+        self.connect(self.ui.actionImport, SIGNAL("triggered()"), self.ui.signalMapper, SLOT("map()"))
+
+        # setMapping on each button to the QStackedWidget index we'd like to switch to
+        self.ui.signalMapper.setMapping(self.ui.actionImport, 0)
+        self.ui.signalMapper.setMapping(self.ui.actionVyhledavani, 1)
+
+        # connect mapper to stackedWidget
+        self.connect(self.ui.signalMapper, SIGNAL("mapped(int)"), self.ui.stackedWidget, SLOT("setCurrentIndex( int )"))
+        self.ui.actionImport.trigger()
+
+        self.connect(self.ui.vfkBrowser, SIGNAL("switchToPanelImport()"), self, SLOT("switchToImport()"))
+        self.connect(self.ui.vfkBrowser, SIGNAL("switchToPanelSearch(int)"), self, SLOT("switchToSearch(int)"))
+
+        # Browser toolbar
+        # ---------------
+        mBrowserToolbar = QToolBar(self)
+        self.connect(self.ui.actionBack, SIGNAL("triggered()"), self.ui.vfkBrowser, SLOT("goBack()"))
+        self.connect(self.ui.actionForward, SIGNAL("triggered()"), self.ui.vfkBrowser, SLOT("goForth()"))
+        self.ui.actionSelectBudInMap.triggered.connect(self.selectBudInMap)
+        self.ui.actionSelectParInMap.triggered.connect(self.selectParInMap)
+        self.ui.actionCuzkPage.triggered.connect(self.showOnCuzk)
+        self.ui.actionExportLatex.triggered.connect(self.latexExport)
+        self.ui.actionExportHtml.triggered.connect(self.htmlExport)
+        self.connect(self.ui.actionShowInfoaboutSelection, SIGNAL("toggled(bool)"), self, SLOT("setSelectionChangedConnected(bool)"))
+
         self.ui.browseButton.clicked.connect(self.browseButton_clicked)
         self.ui.loadVfkButton.clicked.connect(self.loadVfkButton_clicked)
 
-        self.ui.actionCuzkPage.triggered.connect(self.showOnCuzk)
-        self.ui.actionSelectBudInMap.triggered.connect(self.selectBudInMap)
-        self.ui.actionSelectParInMap.triggered.connect(self.selectParInMap)
-        self.ui.actionExportLatex.triggered.connect(self.latexExport)
-        self.ui.actionExportHtml.triggered.connect(self.htmlExport)
-        self.ui.actionShowInfoaboutSelection.toggled.connect(self.showInfoAboutSelection)
+        bt = QToolButton(mBrowserToolbar)
+        bt.setPopupMode(QToolButton.InstantPopup)
+        bt.setText("Export ")
 
-        self.ui.loadVfkButton.setEnabled(False)
+        menu = QMenu(bt)
+        menu.addAction(self.ui.actionExportLatex)
+        menu.addAction(self.ui.actionExportHtml)
+        bt.setMenu(menu)
+
+        mBrowserToolbar.addAction(self.ui.actionBack)
+        mBrowserToolbar.addAction(self.ui.actionForward)
+        mBrowserToolbar.addAction(self.ui.actionSelectParInMap)
+        mBrowserToolbar.addAction(self.ui.actionSelectBudInMap)
+        mBrowserToolbar.addSeparator()
+        mBrowserToolbar.addAction(self.ui.actionShowInfoaboutSelection)
+        mBrowserToolbar.addSeparator()
+        mBrowserToolbar.addWidget(bt)
+        mBrowserToolbar.addSeparator()
+        mBrowserToolbar.addAction(self.ui.actionShowHelpPage)
+
+        self.ui.rightWidgetLayout.insertWidget(0, mBrowserToolbar)
+
+
+        #self.ui.loadVfkButton.setEnabled(False)
+
+
+
+

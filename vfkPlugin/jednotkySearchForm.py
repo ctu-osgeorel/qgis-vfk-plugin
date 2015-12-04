@@ -25,28 +25,31 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import QAbstractItemModel, QModelIndex
 
-from ui_budovysearchform import *
+from ui_jednotkysearchform import *
 
 
-class BudovySearchForm(QWidget):
+class JednotkySearchForm(QWidget):
     def __init__(self):
         # Set up the user interface from Designer.
-        self.ui = Ui_BudovySearchForm()
+        self.ui = Ui_JednotkySearchForm()
         self.ui.setupUi(self)
 
         self.__mZpusobVyuzitiModel = QAbstractItemModel()
 
+    def cisloJednotky(self):
+        return str(self.ui.mCisloJednotkyLineEdit.text()).strip()
+
     def domovniCislo(self):
-        return str(self.ui.cisloDomovniLineEdit.text()).strip()
+        return str(self.ui.mCisloDomovniLineEdit.text()).strip()
 
     def naParcele(self):
-        return str(self.ui.naParceleLineEdit.text()).strip()
+        return str(self.ui.mNaParceleLineEdit.text()).strip()
 
     def lv(self):
-        return str(self.ui.lvBudovyLineEdit.text()).strip()
+        return str(self.ui.mLvJednotkyLineEdit.text()).strip()
 
     def setZpusobVyuzitiModel(self, model):
-        self.__mZpusobVyuzitiModel = QAbstractItemModel(model)
+        self.__mZpusobVyuzitiModel = model
         self.ui.mZpVyuzitiCombo.setModel(model)
         self.ui.mZpVyuzitiCombo.setModelColumn(1)
 

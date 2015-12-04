@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>745</width>
-    <height>352</height>
+    <width>924</width>
+    <height>348</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -48,8 +48,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>349</width>
-              <height>274</height>
+              <width>406</width>
+              <height>310</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_11">
@@ -206,7 +206,7 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
+                  <width>64</width>
                   <height>28</height>
                  </rect>
                 </property>
@@ -232,7 +232,7 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
+                  <width>62</width>
                   <height>28</height>
                  </rect>
                 </property>
@@ -258,7 +258,7 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
+                  <width>64</width>
                   <height>28</height>
                  </rect>
                 </property>
@@ -284,7 +284,7 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
+                  <width>64</width>
                   <height>28</height>
                  </rect>
                 </property>
@@ -343,31 +343,6 @@
      </widget>
     </item>
    </layout>
-  </widget>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionVyhledavani"/>
-   <addaction name="actionImport"/>
-   <addaction name="separator"/>
-   <addaction name="actionBack"/>
-   <addaction name="actionForward"/>
-   <addaction name="separator"/>
-   <addaction name="actionSelectParInMap"/>
-   <addaction name="actionSelectBudInMap"/>
-   <addaction name="actionCuzkPage"/>
-   <addaction name="separator"/>
-   <addaction name="actionShowInfoaboutSelection"/>
-   <addaction name="actionShowHelpPage"/>
-   <addaction name="actionExportLatex"/>
-   <addaction name="actionExportHtml"/>
   </widget>
   <action name="actionVyhledavani">
    <property name="checkable">

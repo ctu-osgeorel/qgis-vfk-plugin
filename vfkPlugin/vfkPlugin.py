@@ -26,7 +26,7 @@ from PyQt4.QtGui import QAction, QIcon
 # Initialize Qt resources from file resources.py
 import resources_rc
 # Import the code for the dialog
-from MainApp import MainApp
+from mainApp import MainApp
 import os.path
 
 

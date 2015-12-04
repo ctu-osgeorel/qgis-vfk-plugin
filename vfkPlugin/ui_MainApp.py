@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_MainApp.ui'
 #
-# Created: Fri Jun 12 11:26:30 2015
+# Created: Thu Dec  3 19:46:36 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_MainApp(object):
     def setupUi(self, MainApp):
         MainApp.setObjectName(_fromUtf8("MainApp"))
-        MainApp.resize(745, 352)
+        MainApp.resize(924, 348)
         MainApp.setLayoutDirection(QtCore.Qt.LeftToRight)
         MainApp.setTabShape(QtGui.QTabWidget.Rounded)
         self.centralWidget = QtGui.QWidget(MainApp)
@@ -51,7 +51,7 @@ class Ui_MainApp(object):
         self.scrollArea_5.setWidgetResizable(True)
         self.scrollArea_5.setObjectName(_fromUtf8("scrollArea_5"))
         self.scrollAreaWidgetContents_5 = QtGui.QWidget()
-        self.scrollAreaWidgetContents_5.setGeometry(QtCore.QRect(0, 0, 349, 274))
+        self.scrollAreaWidgetContents_5.setGeometry(QtCore.QRect(0, 0, 406, 310))
         self.scrollAreaWidgetContents_5.setObjectName(_fromUtf8("scrollAreaWidgetContents_5"))
         self.gridLayout_11 = QtGui.QGridLayout(self.scrollAreaWidgetContents_5)
         self.gridLayout_11.setObjectName(_fromUtf8("gridLayout_11"))
@@ -138,7 +138,7 @@ class Ui_MainApp(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName(_fromUtf8("scrollArea"))
         self.scrollAreaWidgetContents = QtGui.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 64, 28))
         self.scrollAreaWidgetContents.setObjectName(_fromUtf8("scrollAreaWidgetContents"))
         self.gridLayout_5 = QtGui.QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_5.setObjectName(_fromUtf8("gridLayout_5"))
@@ -156,7 +156,7 @@ class Ui_MainApp(object):
         self.scrollArea_3.setWidgetResizable(True)
         self.scrollArea_3.setObjectName(_fromUtf8("scrollArea_3"))
         self.scrollAreaWidgetContents_2 = QtGui.QWidget()
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 62, 28))
         self.scrollAreaWidgetContents_2.setObjectName(_fromUtf8("scrollAreaWidgetContents_2"))
         self.gridLayout_7 = QtGui.QGridLayout(self.scrollAreaWidgetContents_2)
         self.gridLayout_7.setObjectName(_fromUtf8("gridLayout_7"))
@@ -174,7 +174,7 @@ class Ui_MainApp(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollArea_2.setObjectName(_fromUtf8("scrollArea_2"))
         self.scrollAreaWidgetContents_3 = QtGui.QWidget()
-        self.scrollAreaWidgetContents_3.setGeometry(QtCore.QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents_3.setGeometry(QtCore.QRect(0, 0, 64, 28))
         self.scrollAreaWidgetContents_3.setObjectName(_fromUtf8("scrollAreaWidgetContents_3"))
         self.gridLayout_3 = QtGui.QGridLayout(self.scrollAreaWidgetContents_3)
         self.gridLayout_3.setObjectName(_fromUtf8("gridLayout_3"))
@@ -192,7 +192,7 @@ class Ui_MainApp(object):
         self.scrollArea_4.setWidgetResizable(True)
         self.scrollArea_4.setObjectName(_fromUtf8("scrollArea_4"))
         self.scrollAreaWidgetContents_4 = QtGui.QWidget()
-        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, 0, 64, 28))
         self.scrollAreaWidgetContents_4.setObjectName(_fromUtf8("scrollAreaWidgetContents_4"))
         self.gridLayout_9 = QtGui.QGridLayout(self.scrollAreaWidgetContents_4)
         self.gridLayout_9.setObjectName(_fromUtf8("gridLayout_9"))
@@ -227,9 +227,6 @@ class Ui_MainApp(object):
         self.rightWidgetLayout.addWidget(self.vfkBrowser)
         self.gridLayout_4.addWidget(self.splitter, 0, 0, 1, 1)
         MainApp.setCentralWidget(self.centralWidget)
-        self.toolBar = QtGui.QToolBar(MainApp)
-        self.toolBar.setObjectName(_fromUtf8("toolBar"))
-        MainApp.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
         self.actionVyhledavani = QtGui.QAction(MainApp)
         self.actionVyhledavani.setCheckable(True)
         icon = QtGui.QIcon()
@@ -283,20 +280,6 @@ class Ui_MainApp(object):
         icon8.addPixmap(QtGui.QPixmap(_fromUtf8(":/vfkPlugin.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionShowHelpPage.setIcon(icon8)
         self.actionShowHelpPage.setObjectName(_fromUtf8("actionShowHelpPage"))
-        self.toolBar.addAction(self.actionVyhledavani)
-        self.toolBar.addAction(self.actionImport)
-        self.toolBar.addSeparator()
-        self.toolBar.addAction(self.actionBack)
-        self.toolBar.addAction(self.actionForward)
-        self.toolBar.addSeparator()
-        self.toolBar.addAction(self.actionSelectParInMap)
-        self.toolBar.addAction(self.actionSelectBudInMap)
-        self.toolBar.addAction(self.actionCuzkPage)
-        self.toolBar.addSeparator()
-        self.toolBar.addAction(self.actionShowInfoaboutSelection)
-        self.toolBar.addAction(self.actionShowHelpPage)
-        self.toolBar.addAction(self.actionExportLatex)
-        self.toolBar.addAction(self.actionExportHtml)
 
         self.retranslateUi(MainApp)
         self.stackedWidget.setCurrentIndex(0)
@@ -313,7 +296,6 @@ class Ui_MainApp(object):
         self.loadVfkButton.setText(_translate("MainApp", "Načíst", None))
         self.label_3.setText(_translate("MainApp", "Vyhledat:", None))
         self.searchButton.setText(_translate("MainApp", "Hledej", None))
-        self.toolBar.setWindowTitle(_translate("MainApp", "toolBar", None))
         self.actionVyhledavani.setText(_translate("MainApp", "Vyhledávání", None))
         self.actionVyhledavani.setToolTip(_translate("MainApp", "Vyhledávání", None))
         self.actionVyhledavani.setShortcut(_translate("MainApp", "Ctrl+F", None))

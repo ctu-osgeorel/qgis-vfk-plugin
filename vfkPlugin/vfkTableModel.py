@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """
 /***************************************************************************
  vfkPluginDialog
@@ -22,35 +21,8 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtGui import *
-from PyQt4.QtCore import QAbstractItemModel, QModelIndex
-
-from ui_budovysearchform import *
+from PyQt4.QtSql import QSqlQueryModel
 
 
-class BudovySearchForm(QWidget):
-    def __init__(self):
-        # Set up the user interface from Designer.
-        self.ui = Ui_BudovySearchForm()
-        self.ui.setupUi(self)
-
-        self.__mZpusobVyuzitiModel = QAbstractItemModel()
-
-    def domovniCislo(self):
-        return str(self.ui.cisloDomovniLineEdit.text()).strip()
-
-    def naParcele(self):
-        return str(self.ui.naParceleLineEdit.text()).strip()
-
-    def lv(self):
-        return str(self.ui.lvBudovyLineEdit.text()).strip()
-
-    def setZpusobVyuzitiModel(self, model):
-        self.__mZpusobVyuzitiModel = QAbstractItemModel(model)
-        self.ui.mZpVyuzitiCombo.setModel(model)
-        self.ui.mZpVyuzitiCombo.setModelColumn(1)
-
-    def zpusobVyuzitiKod(self):
-        row = self.ui.mZpVyuzitiCombo.currentIndex()
-        index = QModelIndex(self.ui.mZpVyuzitiCombo.model().index(row, 0))
-        return str(self.ui.mZpVyuzitiCombo.model().data(index))
+class VfkTableModel(QSqlQueryModel):
+    pass
