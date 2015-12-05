@@ -91,13 +91,145 @@ class SearchFormController(QObject):
         self.__controls.searchButton.setEnabled(False)
 
     def setConnectionName(self, connectionName):
-        self.mConnectionName = connectionName
+        """
+
+        :param connectionName:
+        """
+        self.__mConnectionName = connectionName
         self.initComboBoxModels()
-        self.controls.searchButton.setEnabled(True)
+        self.__controls.searchButton.setEnabled(True)
 
     def initComboBoxModels(self):
-        mDruhParcely = VfkTableModel(self.mConnectionName)
-        pass
+        """
+
+        """
+        self.__mDruhParcely = VfkTableModel(self.__mConnectionName)
+        self.__mDruhParcely.druhyPozemku()
+
+        self.__mDruhPozemkoveParcely = VfkTableModel(self.__mConnectionName)
+        self.__mDruhPozemkoveParcely.druhyPozemku(True, False)
+
+        self.__mDruhStavebniParcely = VfkTableModel(self.__mConnectionName)
+        self.__mDruhStavebniParcely.druhyPozemku(False, True)
+
+        self.__mZpusobVyuzitiBudovy = VfkTableModel(self.__mConnectionName)
+        self.__mZpusobVyuzitiBudovy.zpusobVyuzitiBudov()
+
+        self.__mZpusobVyuzitiJednotek = VfkTableModel(self.__mConnectionName)
+        self.__mZpusobVyuzitiJednotek.zpusobVyuzitiJednotek()
+
+        falseKodForDefaultDruh = ""
+        text = u'libovolný'
+        fakeRow = [falseKodForDefaultDruh, text]
+
+        self.__forms.parcely.setDruhPozemkuModel(self.addFirstRowToModel(self.__mDruhParcely, fakeRow))
+        self.__forms.parcely.setDruhPozemkuPozemkovaModel(self.addFirstRowToModel(self.__mDruhPozemkoveParcely, fakeRow))
+        self.__forms.parcely.setDruhPozemkuStavebniModel(self.__mDruhStavebniParcely)
+        self.__forms.budovy.setZpusobVyuzitiModel(self.addFirstRowToModel(self.__mZpusobVyuzitiBudovy, fakeRow))
+        self.__forms.jednotky.setZpusobVyuzitiModel(self.addFirstRowToModel(self.__mZpusobVyuzitiJednotek, fakerow))
 
     def search(self):
-        form = self.Form()
+        """
+
+        """
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.processEvents()
+
+        if int(self.__controls.formCombobox.itemData(self.__controls.formCombobox.currentIndex())) == self.Form.Parcely:
+            self.searchParcely()
+        elif int(self.__controls.formCombobox.itemData(self.__controls.formCombobox.currentIndex())) == self.Form.Budovy:
+            self.searchBudovy()
+        elif int(self.__controls.formCombobox.itemData(self.__controls.formCombobox.currentIndex())) == self.Form.Jednotky:
+            self.searchJednotky()
+        elif int(self.__controls.formCombobox.itemData(self.__controls.formCombobox.currentIndex())) == self.Form.Vlastnici:
+            self.searchVlastnici()
+        else:
+            pass
+
+        QApplication.restoreOverrideCursor()
+
+    def searchVlastnici(self):
+        """
+
+        """
+        jmeno = self.__forms.vlastnici.jmeno()
+        rcIco = self.__forms.vlastnici.rcIco()
+        lv = self.__forms.vlastnici.lv()
+        sjm = self.__forms.vlastnici.isSjm()
+        opo = self.__forms.vlastnici.isOpo()
+        ofo = self.__forms.vlastnici.isOfo()
+
+        url = QUrl("showText?page=search&type=vlastnici&jmeno={}&rcIco={}&sjm={}&opo={}&ofo={}&lv={}"
+                   .format(jmeno, rcIco, 1 if sjm is not None else 0, 1 if opo is not None else 0,
+                           1 if ofo is not None else 0, lv))
+        self.actionTriggered.emit(url)
+
+    def searchParcely(self):
+        """
+
+        """
+        parcelniCislo = self.__forms.parcely.parcelniCislo()
+        typ = int(self.__forms.parcely.typParcely())
+        druh = self.__forms.parcely.druhPozemkuKod()
+        lv = self.__forms.parcely.lv()
+
+        url = QUrl("showText?page=search&type=parcely&parcelniCislo={}&typ={}&druh={}&lv={}"
+                   .format(parcelniCislo, typ, druh, lv))
+        self.actionTriggered.emit(url)
+
+    def searchBudovy(self):
+        """
+
+        """
+        domovniCislo = self.__forms.budovy.domovniCislo()
+        naParcele = self.__forms.budovy.naParcele()
+        zpusobVyuziti = self.__forms.budovy.zpusobVyuzitiKod()
+        lv = self.__forms.budovy.lv()
+
+        url = QUrl("showText?page=search&type=budovy&domovniCislo={}&naParcele={}&zpusobVyuziti={}&lv={}"
+                   .format(domovniCislo, naParcele, zpusobVyuziti, lv))
+        self.actionTriggered.emit(url)
+
+    def searchJednotky(self):
+        """
+
+        """
+        cisloJednotky = self.__forms.jednotky.cisloJednotky()
+        domovniCislo = self.__forms.jednotky.domovniCislo()
+        naParcele = self.__forms.jednotky.naParcele()
+        zpusobVyuziti = self.__forms.jednotky.zpusobVyuzitiKod()
+        lv = self.__forms.jednotky.lv()
+
+        url = QUrl("showText?page=search&type=jednotky&cisloJednotky={}&domovniCislo={}&naParcele={}&zpusobVyuziti={}&lv={}"
+                   .format(cisloJednotky, domovniCislo, naParcele, zpusobVyuziti, lv))
+        self.actionTriggered.emit(url)
+
+    def addFirstRowToModel(self, oldModel, newRow):
+        """
+
+        :param oldModel: QAbstractItemModel
+        :param newRow:
+        :return:
+        """
+        oldModel = QAbstractItemModel(oldModel)
+
+        model = QStandardItemModel()
+        items = []
+
+        for str in newRow:
+            items.append(QStandardItem(str))
+
+        model.appendRow(items)
+
+        for i, row in enumerate(oldModel):
+            items = []
+
+            for j, column in enumerate(row):
+                index = oldModel.index(i, j)
+                data = oldModel.data(index)
+                item = QStandardItem(str(data))
+                items.append(item)
+
+            model.appendRow(items)
+
+        return model
