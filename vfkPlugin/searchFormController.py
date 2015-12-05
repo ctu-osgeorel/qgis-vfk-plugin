@@ -208,8 +208,8 @@ class SearchFormController(QObject):
         """
 
         :param oldModel: QAbstractItemModel
-        :param newRow:
-        :return:
+        :param newRow: []
+        :return: QStandardItemModel
         """
         oldModel = QAbstractItemModel(oldModel)
 
