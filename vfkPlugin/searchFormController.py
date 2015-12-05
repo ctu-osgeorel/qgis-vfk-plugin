@@ -21,7 +21,7 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtCore import QObject, QUrl, QRegExp, SIGNAL, SLOT
+from PyQt4.QtCore import QObject, QUrl, QRegExp, SIGNAL, SLOT, Qt, pyqtSignal
 from PyQt4.QtGui import QStandardItemModel, QComboBox, QPushButton, QStackedWidget
 
 from vlastniciSearchForm import *
@@ -62,35 +62,33 @@ class SearchFormController(QObject):
         Budovy = 2
         Jednotky = 3
 
+    # signals
+    actionTriggered = pyqtSignal(QUrl)
+
     def __init__(self, mainControls, searchForms, parent):
 
         super(SearchFormController, self).__init__()
 
-        self.controls = self.MainControls
-        self.forms = self.SearchForms
-        self.mConnectionName = ""
+        self.__controls = self.MainControls()
+        self.__forms = self.SearchForms()
+        self.__mConnectionName = ""
 
-        self.mDruhParcely = VfkTableModel()
-        self.mDruhPozemkoveParcely = VfkTableModel()
-        self.mDruhStavebniParcely = VfkTableModel()
-        self.mZpusobVyuzitiBudovy = VfkTableModel()
-        self.mZpusobVyuzitiJednotek = VfkTableModel()
+        self.__mDruhParcely = VfkTableModel()
+        self.__mDruhPozemkoveParcely = VfkTableModel()
+        self.__mDruhStavebniParcely = VfkTableModel()
+        self.__mZpusobVyuzitiBudovy = VfkTableModel()
+        self.__mZpusobVyuzitiJednotek = VfkTableModel()
 
-        vla = QObject().trUtf8("vlastniky")
-        par = QObject().trUtf8("parcely")
-        bud = QObject().trUtf8("budovy")
-        jed = QObject().trUtf8("jednotky")
+        self.__controls.formCombobox.addItem(QObject.trUtf8(self, "vlastníky" ), self.Form.Vlastnici)
+        self.__controls.formCombobox.addItem(QObject.trUtf8(self, "parcely"), self.Form.Parcely)
+        self.__controls.formCombobox.addItem(QObject.trUtf8(self, "budovy"), self.Form.Budovy)
+        self.__controls.formCombobox.addItem(QObject.trUtf8(self, "jednotky"), self.Form.Jednotky)
 
-        # self.controls.formCombobox.addItem(QIcon(), self.Form.Vlastnici)
-        # self.controls.formCombobox.addItem(par, self.Form.Parcely)
-        # self.controls.formCombobox.addItem(bud, self.Form.Budovy)
-        # self.controls.formCombobox.addItem(jed, self.Form.Jednotky)
+        self.connect(self.__controls.formCombobox, SIGNAL("activated(int)"), self.__controls.searchForms, SLOT("setCurrentIndex(int)"))
+        self.connect(self.__controls.searchButton, SIGNAL("clicked()"), self, SLOT("search()"))
 
-        #self.connect(self.controls.formCombobox, SIGNAL("activated(int)"), self.controls.searchForms, SLOT("setCurrentIndex(int)"))
-        #self.connect(self.controls.searchButton, SIGNAL("clicked()"), self, SLOT("search()"))
-
-        #self.controls.searchForms.setCurrentIndex(0)
-        #self.controls.searchButton.setEnabled(False)
+        self.__controls.searchForms.setCurrentIndex(0)
+        self.__controls.searchButton.setEnabled(False)
 
     def setConnectionName(self, connectionName):
         self.mConnectionName = connectionName
@@ -100,3 +98,6 @@ class SearchFormController(QObject):
     def initComboBoxModels(self):
         mDruhParcely = VfkTableModel(self.mConnectionName)
         pass
+
+    def search(self):
+        form = self.Form()

@@ -25,7 +25,7 @@
 import this
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup
-from PyQt4.QtCore import QUuid, QFileInfo, QDir, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal
+from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import *
 from qgis.gui import *
@@ -42,6 +42,12 @@ from parcelySearchForm import *
 
 
 class MainApp (QtGui.QMainWindow):
+    # signals
+    goBack = pyqtSignal()
+    searchOpsubByName = pyqtSignal(str)
+    enableSearch = pyqtSignal(bool)
+    refreshLegend = pyqtSignal(QgsMapLayer)
+
     def __init__(self, iface, parent=None):
         QtGui.QMainWindow.__init__(self)
         self.iface = iface
@@ -79,16 +85,6 @@ class MainApp (QtGui.QMainWindow):
 
         self.connect(self.mSearchController, SIGNAL("actionTriggered(QUrl)"), self.ui.vfkBrowser, SLOT("processAction(QUrl)"))
         self.connect(self, SIGNAL("enableSearch(bool)"), self.ui.searchButton, SLOT("setEnabled(bool)"))
-
-    # signals
-    @staticmethod
-    def goBack(): pass
-    @staticmethod
-    def searchOpsubByName(string): pass
-    @staticmethod
-    def enableSearch(enable): pass
-    @staticmethod
-    def refreshLegend(layer): pass
 
     def browseButton_clicked(self):
         title = u'Načti soubor VFK'
@@ -182,6 +178,7 @@ class MainApp (QtGui.QMainWindow):
             if self.loadVfkFile(fileName, errorMsg) is False:
                 msg2 = u'Nepodařilo se získat OGR provider'
                 QMessageBox.critical(self, u'Nepodařilo se získat data provider', msg2)
+                self.enableSearch.emit(False)
                 return
 
             if self.openDatabase(self.mDataSourceName) is False:
@@ -189,12 +186,13 @@ class MainApp (QtGui.QMainWindow):
                 if QSqlDatabase.isDriverAvailable('QSQLITE') is False:
                     msg1 += u'\nDatabázový ovladač QSQLITE není dostupný.'
                 QMessageBox.critical(self, u'Chyba', msg1)
-                self.ui.loadVfkButton.emit(self.enableSearch(False))
+                self.enableSearch.emit(False)
                 return
 
             #self.ui.vfkBrowser.setConnectionName(str(self.property("connectionName")))
 
             #self.mSearchController.setConnectionName( property( "connectionName" ).toString() );
+            self.enableSearch.emit(True)
             self.mLastVfkFile = fileName
             self.mLoadedLayers.clear()
 
@@ -217,7 +215,7 @@ class MainApp (QtGui.QMainWindow):
         else:
             self.ui.loadVfkButton.setEnabled(False)
             pal = QPalette(self.ui.vfkFileLineEdit.palette())
-            pal.setColor(QPalette.text(), QtCore.Qt.red)
+            pal.setColor(QPalette.text(), Qt.red)
             self.ui.vfkFileLineEdit.setPalette(pal)
 
     def loadVfkLayer(self, vfkLayerName):
@@ -261,7 +259,7 @@ class MainApp (QtGui.QMainWindow):
             QMessageBox.information(self, 'Load Style', errorMsg)
 
         layer.triggerRepaint()
-        self.refreshLegend(layer) #############################
+        self.refreshLegend.emit(layer)
 
         return True
 
@@ -383,8 +381,8 @@ class MainApp (QtGui.QMainWindow):
         self.ui.mainToolBar = QToolBar(self)
         self.ui.mainToolBar.addAction(self.ui.actionImport)
         self.ui.mainToolBar.addAction(self.ui.actionVyhledavani)
-        self.ui.mainToolBar.setOrientation(QtCore.Qt.Vertical)
-        self.addToolBar(QtCore.Qt.LeftToolBarArea, self.ui.mainToolBar)
+        self.ui.mainToolBar.setOrientation(Qt.Vertical)
+        self.addToolBar(Qt.LeftToolBarArea, self.ui.mainToolBar)
 
         actionGroup = QActionGroup(self)
         actionGroup.addAction(self.ui.actionImport)
@@ -445,10 +443,4 @@ class MainApp (QtGui.QMainWindow):
         mBrowserToolbar.addAction(self.ui.actionShowHelpPage)
 
         self.ui.rightWidgetLayout.insertWidget(0, mBrowserToolbar)
-
-
-        #self.ui.loadVfkButton.setEnabled(False)
-
-
-
 
