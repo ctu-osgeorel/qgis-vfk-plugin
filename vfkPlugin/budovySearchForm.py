@@ -30,11 +30,12 @@ from ui_budovysearchform import *
 
 class BudovySearchForm(QWidget):
     def __init__(self):
+        super(BudovySearchForm, self).__init__()
         # Set up the user interface from Designer.
         self.ui = Ui_BudovySearchForm()
         self.ui.setupUi(self)
 
-        self.__mZpusobVyuzitiModel = QAbstractItemModel()
+        self.__mZpusobVyuzitiModel = QAbstractItemModel
 
     def domovniCislo(self):
         return str(self.ui.cisloDomovniLineEdit.text()).strip()

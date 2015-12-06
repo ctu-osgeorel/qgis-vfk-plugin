@@ -31,30 +31,30 @@ from jednotkySearchForm import *
 from vfkTableModel import *
 
 
-class VlastniciSearchForm:
-    pass
-
-class ParcelySearchForm:
-    pass
-
-class BudovySearchForm:
-    pass
-
-class JednotkySearchForm:
-    pass
+# class VlastniciSearchForm:
+#     pass
+#
+# class ParcelySearchForm:
+#     pass
+#
+# class BudovySearchForm:
+#     pass
+#
+# class JednotkySearchForm:
+#     pass
 
 
 class SearchFormController(QObject):
     class SearchForms:
-        vlastnici = VlastniciSearchForm
-        parcely = ParcelySearchForm
-        budovy = BudovySearchForm
-        jednotky = JednotkySearchForm
+        vlastnici = VlastniciSearchForm()
+        parcely = ParcelySearchForm()
+        budovy = BudovySearchForm()
+        jednotky = JednotkySearchForm()
 
     class MainControls:
-        formCombobox = QComboBox
-        searchForms = QStackedWidget
-        searchButton = QPushButton
+        formCombobox = QComboBox()
+        searchForms = QStackedWidget()
+        searchButton = QPushButton()
 
     class Form(object):
         Vlastnici = 0

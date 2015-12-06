@@ -30,17 +30,18 @@ from ui_parcelysearchform import *
 
 class ParcelySearchForm(QWidget):
     def __init__(self):
+        super(ParcelySearchForm, self).__init__()
         # Set up the user interface from Designer.
         self.ui = Ui_ParcelySearchForm()
         self.ui.setupUi(self)
 
-        self.__defaultModel = QAbstractItemModel()
-        self.__stavebniModel = QAbstractItemModel()
-        self.__pozemkovaModel = QAbstractItemModel()
+        self.__defaultModel = QAbstractItemModel
+        self.__stavebniModel = QAbstractItemModel
+        self.__pozemkovaModel = QAbstractItemModel
 
-        self.ui.typParcelyCombo.currentIndexChanged[str].connect(self.setDruhModel)
+        self.ui.typParcelyCombo.currentIndexChanged[str].connect(self.__setDruhModel)
         self.rx = QRegExp("[0-9]*/?[0-9]*")
-        self.validator = QValidator(QRegExpValidator(self.rx, self))
+        self.validator = QRegExpValidator(self.rx, self)
         self.ui.parCisloLineEdit.setValidator(self.validator)
 
     def parcelniCislo(self):
@@ -54,7 +55,7 @@ class ParcelySearchForm(QWidget):
         self.ui.druhPozemkuCombo.setModel(model)
         self.ui.druhPozemkuCombo.setModelColumn(1)
 
-    def setDruhModel(self):
+    def __setDruhModel(self):
         if self.ui.typParcelyCombo.currentIndex() == 1:
             self.ui.druhPozemkuCombo.setModel(self.__pozemkovaModel)
         elif self.ui.typParcelyCombo.currentIndex() == 2:

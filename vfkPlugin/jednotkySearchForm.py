@@ -30,11 +30,12 @@ from ui_jednotkysearchform import *
 
 class JednotkySearchForm(QWidget):
     def __init__(self):
+        super(JednotkySearchForm, self).__init__()
         # Set up the user interface from Designer.
         self.ui = Ui_JednotkySearchForm()
         self.ui.setupUi(self)
 
-        self.__mZpusobVyuzitiModel = QAbstractItemModel()
+        self.__mZpusobVyuzitiModel = QAbstractItemModel
 
     def cisloJednotky(self):
         return str(self.ui.mCisloJednotkyLineEdit.text()).strip()

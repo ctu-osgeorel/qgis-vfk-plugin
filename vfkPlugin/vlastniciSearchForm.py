@@ -23,24 +23,27 @@
 """
 
 from PyQt4.QtGui import *
+from PyQt4.QtCore import pyqtSignal, SIGNAL, SLOT
 
 from ui_vlastnicisearchform import *
 
 
 class VlastniciSearchForm(QWidget):
+    # signals
+    searchEnabled = pyqtSignal(bool)
+
     def __init__(self):
+        super(VlastniciSearchForm, self).__init__()
         # Set up the user interface from Designer.
         self.ui = Ui_VlastniciSearchForm()
         self.ui.setupUi(self)
 
-        self.searchEnabled = False
+        self.connect(self.ui.ofoCheckBox, SIGNAL("clicked()"), self, SLOT("self.__vlastniciSetRcIcoEnabled"))
+        self.connect(self.ui.opoCheckBox, SIGNAL("clicked()"), self, SLOT("self.__vlastniciSetRcIcoEnabled"))
 
-        self.ui.ofoCheckBox.clicked().connect(self.vlastniciSetRcIcoEnabled())
-        self.ui.opoCheckBox.clicked().connect(self.vlastniciSetRcIcoEnabled())
-
-        self.ui.ofoCheckBox.clicked().connect(self.vlastniciSearchEnabled())
-        self.ui.opoCheckBox.clicked().connect(self.vlastniciSearchEnabled())
-        self.ui.sjmCheckBox.clicked().connect(self.vlastniciSearchEnabled())
+        self.connect(self.ui.ofoCheckBox, SIGNAL("clicked()"), self, SLOT("self.__vlastniciSearchEnabled"))
+        self.connect(self.ui.opoCheckBox, SIGNAL("clicked()"), self, SLOT("self.__vlastniciSearchEnabled"))
+        self.connect(self.ui.sjmCheckBox, SIGNAL("clicked()"), self, SLOT("self.__vlastniciSearchEnabled"))
 
     def jmeno(self):
         return str(self.ui.jmenoLineEdit.text()).strip()
@@ -60,13 +63,13 @@ class VlastniciSearchForm(QWidget):
     def lv(self):
         return str(self.ui.lvVlastniciLineEdit.text()).strip()
 
-    def vlastniciSearchEnabled(self):
+    def __vlastniciSearchEnabled(self):
         if self.ui.ofoCheckBox.isChecked() or self.ui.opoCheckBox.isChecked() or self.ui.sjmCheckBox.isChecked():
-            self.searchEnabled = True
+            self.searchEnabled.emit(True)
         else:
-            self.searchEnabled = False
+            self.searchEnabled.emit(False)
 
-    def vlastniciSetRcIcoEnabled(self):
+    def __vlastniciSetRcIcoEnabled(self):
         if self.ui.ofoCheckBox.isChecked() or self.ui.opoCheckBox.isChecked():
             self.ui.rcIcoLineEdit.setEnabled(True)
         else:
