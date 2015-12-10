@@ -27,6 +27,7 @@ from PyQt4.Qt import QTableWidget
 
 from vfkDocument import VfkDocument
 
+
 class HtmlDocument(VfkDocument):
     def __init__(self):
         self.mPage = ''
@@ -104,6 +105,9 @@ class HtmlDocument(VfkDocument):
         
     def endItem(self):
         self.mPage += "</li>"
+
+    def item(self, text):
+        self.mPage += "<li>{}</li>".format(text)
         
     def beginTable(self):
         self.mPage += "<table>"    
@@ -137,7 +141,7 @@ class HtmlDocument(VfkDocument):
     def link(self, href, text):
         return "<a href=\"{}\">{}</a>".format(href, text)
         
-    def superscript(self, text):
+    def superScript(self, text):
         return "<sup><small>{}</small></sup>".format(text)
     
     def newLine(self):
@@ -171,18 +175,18 @@ class HtmlDocument(VfkDocument):
     def text(self, text):
         self.mPage += text
         
-#     def discardLastBeginTable(self):
-#         index = self.mPage.lastIndexOf("<table")
-#         self.mPage.chop( mPage.size() - index )
+    def discardLastBeginTable(self):
+        index = self.mPage.rfind("<table")
+        self.mPage = self.mPage[:(len(self.mPage) - index)]
 
     def isLastTableEmpty(self):
-        if self.mPage.find("<table[^>]*>$") != -1:
+        if self.mPage.find(QRegExp("<table[^>]*>$")) != -1:
             return True
         else:
             return False
     
     def title(self, text):
-        self.mPage.replace("<title>.*</title>", "<title>{}</title>".format(text))
+        self.mPage.replace(QRegExp("<title>.*</title>"), "<title>{}</title>".format(text))
         self.titleIsSet = True
         
         

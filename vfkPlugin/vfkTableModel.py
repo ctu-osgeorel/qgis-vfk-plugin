@@ -47,6 +47,10 @@ class VfkTableModel(QSqlQueryModel):
         self.__mConnectionName = connectionName
 
     def telesa(self):
+        """
+
+        :return: bool
+        """
         query = "SELECT tel.id tel_id, " \
                     "tel.katuze_kod tel_katuze_kod, " \
                     "tel.cislo_tel tel_cislo_tel " \

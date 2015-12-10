@@ -24,20 +24,18 @@
 
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import *
-from PyQt4.QtCore import QFile, QIODevice, QUrl, SIGNAL, SLOT
+from PyQt4.QtCore import QFile, QIODevice, QUrl, QObject, SIGNAL, SLOT, pyqtSlot, pyqtSignal, QByteArray
 from PyQt4.QtSql import QSqlDatabase
+from collections import namedtuple
 
 from vfkDocument import *
 from documentBuilder import *
 
 
-class Coordinates:
-    def __init__(self):
-        self.x = 0.0
-        self.y = 0.0
+TaskList = namedtuple('TaskList', ['a', 'b'])
 
 
-class HistoryRecord:
+class HistoryRecord(object):
     def __init__(self):
         self.html = ""
         self.parIds = []
@@ -45,7 +43,7 @@ class HistoryRecord:
         self.definitionPoint = Coordinates()
 
 
-class vfkTextBrowser(QTextBrowser):
+class VfkTextBrowser(QTextBrowser):
 
     class ExportFormat(object):
         Html = 0
@@ -53,18 +51,24 @@ class vfkTextBrowser(QTextBrowser):
         Latex = 2
 
     def __init__(self):
-        super(vfkTextBrowser, self).__init__()
+        super(VfkTextBrowser, self).__init__()
 
-        self.mCurrentUrl = QUrl()
-        self.mCurrentRecord = HistoryRecord()
+        self.__mCurrentUrl = QUrl()
+        self.__mCurrentRecord = HistoryRecord()
+        self.__mDocumentBuilder = DocumentBuilder()
+
 
     # signals
-    @staticmethod
-    def updateHistory(HistoryRecord): pass
-    @staticmethod
-    def showParcely(QStringList): pass
-    @staticmethod
-    def showBudovy(QStringList): pass
+    updateHistory = pyqtSignal(HistoryRecord)
+    showParcely = pyqtSignal(QObject)
+    showBudovy = pyqtSignal(QObject)
+    currentParIdsChanged = pyqtSignal(bool)
+    currentBudIdsChanged = pyqtSignal(bool)
+    historyBefore = pyqtSignal(bool)
+    historyAfter = pyqtSignal(bool)
+    definitionPointAvailable = pyqtSignal(bool)
+    switchToPanelImport = pyqtSignal()
+    switchToPanelSearch = pyqtSignal(int)
 
     def startPage(self):
         self.processAction(QUrl("showText?page=allTEL"))
@@ -78,34 +82,36 @@ class vfkTextBrowser(QTextBrowser):
             pass
 
 
-
+    @pyqtSlot(QUrl)
     def processAction(self, task):
-        self.mCurrentUrl = task
-        taskMap = {self.parseTask(task)}
-
-        if taskMap["action"] == "showText":
-            QApplication.setOverrideCursor(QCursor(QtCore.Qt.WaitCursor))
-            html  = self.documentContent(taskMap, self.ExportFormat.RichText)
-            QApplication.restoreOverrideCursor()
-            self.setHtml(html)
-
-            record = HistoryRecord()
-            record.html = html
-            record.parIds = DocumentBuilder.currentParIds()
-            record.budIds = DocumentBuilder.currentBudIds()
-            record.definitionPoint = DocumentBuilder.currentDefinitionPoint()
-
-            self.emit(SIGNAL("self.updateHistory(record)"))
-        elif taskMap["action"] == "selectInMap":
-            self.emit(SIGNAL("self.showParcely(taskMap['ids'].split( ',' ))"))
-        elif taskMap["action"] == "switchPanel":
-            if taskMap["panel"] == "import":
-                self.emit(SIGNAL("self.switchToPanelImport()"))
-            elif taskMap["panel"] == "search":
-                self.emit(SIGNAL("self.switchToPanelSearch(int(taskMap['type'])"))
-            self.setHtml(self.mCurrentRecord.html)
-        else:
-            pass
+        # self.mCurrentUrl = task
+        #
+        # taskMap = {self.parseTask(task)}
+        #
+        # if taskMap["action"] == "showText":
+        #     QApplication.setOverrideCursor(QCursor(QtCore.Qt.WaitCursor))
+        #     html  = self.documentContent(taskMap, self.ExportFormat.RichText)
+        #     QApplication.restoreOverrideCursor()
+        #     self.setHtml(html)
+        #
+        #     record = HistoryRecord()
+        #     record.html = html
+        #     record.parIds = DocumentBuilder.currentParIds()
+        #     record.budIds = DocumentBuilder.currentBudIds()
+        #     record.definitionPoint = DocumentBuilder.currentDefinitionPoint()
+        #
+        #     self.emit(SIGNAL("self.updateHistory(record)"))
+        # elif taskMap["action"] == "selectInMap":
+        #     self.emit(SIGNAL("self.showParcely(taskMap['ids'].split( ',' ))"))
+        # elif taskMap["action"] == "switchPanel":
+        #     if taskMap["panel"] == "import":
+        #         self.emit(SIGNAL("self.switchToPanelImport()"))
+        #     elif taskMap["panel"] == "search":
+        #         self.emit(SIGNAL("self.switchToPanelSearch(int(taskMap['type'])"))
+        #     self.setHtml(self.mCurrentRecord.html)
+        # else:
+        #     pass
+        pass
 
     def documentContent(self, taskMap, format):
         format = self.exportFormat()
@@ -127,18 +133,22 @@ class vfkTextBrowser(QTextBrowser):
         taskMap = {}
 
     def parseTask(self, task):
-        task = QUrl(task)
-        taskList = [task.encodedQueryItems()]
-        taskMap = {'action': task.path()}
+        # task = QUrl(task)
+        # taskList = TaskList(task.encodedQueryItems())
+        #
+        # taskMap = {'action': task.path()}
+        #
+        # for i in xrange(len(taskList)):
+        #     taskMap[i[0]] = QUrl.fromPercentEncoding(i[1])
+        #
+        # return taskMap
+        pass
 
-        for i, value in enumerate(taskList):
-            taskMap[value[0]] = QUrl.fromPercentEncoding(value[1])
-
-        return taskMap
-
+    @pyqtSlot()
     def goBack(self):
         pass
 
+    @pyqtSlot()
     def goForth(self):
         pass
 
@@ -153,3 +163,7 @@ class vfkTextBrowser(QTextBrowser):
 
     def showInfoAboutSelection(self, parIds, budIds):
         pass
+
+    def showHelpPage(self):
+        url = QUrl("showText?page=help")
+        self.processAction(url)
