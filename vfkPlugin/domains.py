@@ -23,16 +23,16 @@
 
 
 class Domains:
-    def __init__(self):
-        pass
 
-    def anoNe(self, an):
+    @staticmethod
+    def anoNe(an):
         if an == "a":
             return True
         else:
             return False
 
-    def cpCe(self, kod):
+    @staticmethod
+    def cpCe(kod):
         if kod == 1:
             return "Číslo popisné"
         elif kod == 2:
@@ -40,7 +40,8 @@ class Domains:
         else:
             return ""
 
-    def druhUcastnika(self, kod):
+    @staticmethod
+    def druhUcastnika(kod):
         if kod == 1:
             return "právnická osoba"
         elif kod == 2:
@@ -52,7 +53,8 @@ class Domains:
         else:
             return ""
 
-    def rodinnyStav(self, kod):
+    @staticmethod
+    def rodinnyStav(kod):
         if kod == 1:
             return "svobodný/svobodná"
         elif kod == 2:
