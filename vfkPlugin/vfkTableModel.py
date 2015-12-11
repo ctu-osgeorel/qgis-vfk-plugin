@@ -655,7 +655,8 @@ class VfkTableModel(QSqlQueryModel):
                 "{} {};".format(join, where)
         return self.__evaluate(query)
 
-    def parColumns(self, extended):
+    @staticmethod
+    def parColumns(extended):
         """
 
         :param extended: bool
@@ -681,7 +682,8 @@ class VfkTableModel(QSqlQueryModel):
 
         return columns
 
-    def budColumns(self, extended):
+    @staticmethod
+    def budColumns(extended):
         """
 
         :param extended: bool
@@ -701,7 +703,8 @@ class VfkTableModel(QSqlQueryModel):
 
         return columns
 
-    def jedColumns(self, extended):
+    @staticmethod
+    def jedColumns(extended):
         """
 
         :param extended: bool
@@ -727,7 +730,8 @@ class VfkTableModel(QSqlQueryModel):
 
         return columns
 
-    def opsubColumns(self, extended):
+    @staticmethod
+    def opsubColumns(extended):
         """
 
         :param extended: bool
@@ -751,7 +755,8 @@ class VfkTableModel(QSqlQueryModel):
             columns.append("opsub.mestska_cast opsub_mestska_cast")
         return columns
 
-    def jpvColumns(self, extended):
+    @staticmethod
+    def jpvColumns(extended):
         """
 
         :param extended: bool
@@ -766,7 +771,8 @@ class VfkTableModel(QSqlQueryModel):
             pass
         return columns
 
-    def listinyColumns(self):
+    @staticmethod
+    def listinyColumns():
         """
 
         :return: []
@@ -776,7 +782,8 @@ class VfkTableModel(QSqlQueryModel):
 
         return columns
 
-    def bpejColumns(self):
+    @staticmethod
+    def bpejColumns():
         """
 
         :return: []
@@ -916,7 +923,8 @@ class VfkTableModel(QSqlQueryModel):
 
         return True
 
-    def value(sefl, row, column):
+    @staticmethod
+    def value(row, column):
         """
 
         :param row:
