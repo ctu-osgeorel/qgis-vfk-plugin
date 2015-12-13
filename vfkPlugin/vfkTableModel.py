@@ -454,9 +454,9 @@ class VfkTableModel(QSqlQueryModel):
         :return: bool
         """
         query = "SELECT 1 from FROM where druh_cislovani_par = 1"
-        QSqlQueryModel.setQuery(query, QSqlDatabase.database(self.__mConnectionName))
+        self.setQuery(query, QSqlDatabase.database(self.__mConnectionName))
 
-        if QSqlQueryModel.rowCount() > 0:
+        if self.rowCount() > 0:
             return True
         else:
             return False
@@ -913,22 +913,21 @@ class VfkTableModel(QSqlQueryModel):
         :param query: str
         :return: bool
         """
-        QSqlQueryModel.setQuery(query, QSqlDatabase.database(self.__mConnectionName))
+        self.setQuery(query, QSqlDatabase.database(self.__mConnectionName))
 
-        while QSqlQueryModel.canFetchMore(self):
-            QSqlQueryModel.fetchMore(self)
+        while self.canFetchMore():
+            self.fetchMore()
 
         if self.lastError().isValid():
             return False
 
         return True
 
-    @staticmethod
-    def value(row, column):
+    def value(self, row, column):
         """
 
         :param row:
         :param column:
         :return: str
         """
-        return str(QSqlQueryModel.record(row).field(column).value())
+        return str(self.record(row).field(column).value())

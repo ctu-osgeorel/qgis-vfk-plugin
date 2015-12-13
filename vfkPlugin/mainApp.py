@@ -65,6 +65,8 @@ class MainApp (QtGui.QMainWindow):
         self.__mDataSourceName = ""
         self.__fileName = ""
         self.__mLoadedLayers = {}
+        self.__mBrowserToolbar = QToolBar()
+        self.__mainToolBar = QToolBar()
 
         # settings of custom widgets
         self.ui.vfkBrowser = VfkTextBrowser()
@@ -94,14 +96,13 @@ class MainApp (QtGui.QMainWindow):
         # search form controller
         self.__mSearchController = SearchFormController(self.searchFormMainControls, self.searchForms, self)
 
-        self.connect(self.__mSearchController, SIGNAL("actionTriggered(QUrl)"), self.ui.vfkBrowser.processAction)
-        self.connect(self, SIGNAL("enableSearch(bool)"), self.ui.searchButton.setEnabled)
-        self.connect(self.ui.vfkBrowser, SIGNAL("showParcely(QObject)"), self.showParInMap)
-        self.connect(self.ui.vfkBrowser, SIGNAL("showBudovy(QObject)"), self.showBudInMap)
+        self.connect(self.__mSearchController, SIGNAL("actionTriggered(QUrl)"), self.ui.vfkBrowser, SLOT("processAction(QUrl)"))
+        self.connect(self, SIGNAL("enableSearch(bool)"), self.ui.searchButton, SLOT("setEnabled(bool)"))
+        self.ui.vfkBrowser.connect(self, SIGNAL("showParcely(list)"), self, SLOT("showParInMap(list)"))
+        self.ui.vfkBrowser.connect(self, SIGNAL("showBudovy(list)"), self, SLOT("showBudInMap(list)"))
 
         self.ui.vfkBrowser.showHelpPage()
 
-    @pyqtSlot()
     def browseButton_clicked(self):
         title = u'Načti soubor VFK'
         lastUsedDir = ''
@@ -112,35 +113,28 @@ class MainApp (QtGui.QMainWindow):
             self.ui.vfkFileLineEdit.setText(self.__fileName)
             self.ui.loadVfkButton.setEnabled(True)
 
-    @pyqtSlot()
     def browserGoBack(self):
         self.ui.vfkBrowser.goBack()
 
-    @pyqtSlot()
     def browserGoForward(self):
         self.ui.vfkBrowser.goForth()
 
-    @pyqtSlot()
     def selectParInMap(self):
         self.showInMap(self.ui.vfkBrowser.currentParIds(), "PAR")
 
-    @pyqtSlot()
     def selectBudInMap(self):
         self.showInMap(self.ui.vfkBrowser.currentBudIds(), "BUD")
 
-    @pyqtSlot()
     def latexExport(self):
         fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", "", "LaTeX (*.tex)")
         if fileName is not None:
             VfkTextBrowser.exportDocument(VfkTextBrowser.currentUrl(), fileName, VfkTextBrowser.Latex)
 
-    @pyqtSlot()
     def htmlExport(self):
         fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", "", "HTML (*.html)")
         if fileName is not None:
             VfkTextBrowser.exportDocument(VfkTextBrowser.currentUrl(), fileName, VfkTextBrowser.Html)
 
-    @pyqtSlot(bool)
     def setSelectionChangedConnected(self, connected):
         for i, id in enumerate(self.__mLoadedLayers):
             vectorLayer = QgsVectorLayer(QgsMapLayerRegistry.instance().mapLayer(id))
@@ -152,12 +146,11 @@ class MainApp (QtGui.QMainWindow):
             else:
                 self.disconnect(vectorLayer, SIGNAL("selectionChanged()"), self, SLOT("showInfoAboutSelection()"))
 
-    @pyqtSlot(list, str)
     def showInMap(self, ids, layerName):
         if self.__mLoadedLayers.has_key(layerName):
             id = self.__mLoadedLayers[layerName]
-            vectorLayer = QgsVectorLayer(QgsMapLayerRegistry.instance().mapLayer(id))
-            searchString = "ID IN ('{}')".format(ids.join("','"))
+            vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
+            searchString = "ID IN ('{}')".format("','".join(ids))
 
             error = ""
             fIds = self.__search(vectorLayer, searchString, error)
@@ -168,7 +161,13 @@ class MainApp (QtGui.QMainWindow):
                 vectorLayer.setSelectedFeatures(fIds)
 
     def __search(self, layer, searchString, error):
-        layer = QgsVectorLayer(layer)
+        """
+
+        :param layer: QgsVectorLayer
+        :param searchString: str
+        :param error: str
+        :return:
+        """
         search = QgsExpression(searchString)
         rect = QgsRectangle()
         fIds = []
@@ -191,7 +190,6 @@ class MainApp (QtGui.QMainWindow):
 
         return fIds
 
-    @pyqtSlot()
     def loadVfkButton_clicked(self):
         fileName = self.ui.vfkFileLineEdit.text()
 
@@ -214,9 +212,9 @@ class MainApp (QtGui.QMainWindow):
                 self.enableSearch.emit(False)
                 return
 
-            #self.ui.vfkBrowser.setConnectionName(str(self.property("connectionName")))
+            self.ui.vfkBrowser.setConnectionName(str(self.property("connectionName")))
+            self.__mSearchController.setConnectionName(str(self.property("connectionName")))
 
-            #self.__mSearchController.setConnectionName( property( "connectionName" ).toString() );
             self.enableSearch.emit(True)
             self.__mLastVfkFile = fileName
             self.__mLoadedLayers.clear()
@@ -231,7 +229,6 @@ class MainApp (QtGui.QMainWindow):
         else:
             self.__unLoadVfkLayer('BUD')
 
-    @pyqtSlot()
     def vfkFileLineEdit_textChanged(self, arg1):
         info = QFileInfo(arg1)
 
@@ -355,20 +352,19 @@ class MainApp (QtGui.QMainWindow):
             ids.append(str(f.attribute("ID")))
         return ids
 
-    @pyqtSlot()
     def showInfoAboutSelection(self):
         layers = ["PAR", "BUD"]
         layerIds = {}
 
         for layer in layers:
             if layer in self.__mLoadedLayers:
+                qWarning("Vrstva {} obsazena..".format(layer))
                 id = str(self.__mLoadedLayers[layer])
-                vectorLayer = QgsVectorLayer(QgsMapLayerRegistry.instance().mapLayer(id))
+                vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
                 layerIds[layer] = self.__selectedIds(vectorLayer)
 
-        VfkTextBrowser.showInfoAboutSelection(layerIds["PAR"], layerIds["BUD"])
+        self.ui.vfkBrowser.showInfoAboutSelection(layerIds["PAR"], layerIds["BUD"])
 
-    @pyqtSlot()
     def showParInMap(self, ids):
         if self.ui.actionShowInfoaboutSelection.isChecked():
             self.setSelectionChangedConnected(False)
@@ -377,7 +373,6 @@ class MainApp (QtGui.QMainWindow):
         else:
             self.showInMap(ids, "PAR")
 
-    @pyqtSlot()
     def showBudInMap(self, ids):
         if self.ui.actionShowInfoaboutSelection.isChecked():
             self.setSelectionChangedConnected(False)
@@ -386,14 +381,12 @@ class MainApp (QtGui.QMainWindow):
         else:
             self.showInMap(ids, "BUD")
 
-    @pyqtSlot()
     def showOnCuzk(self):
-        #x = .currentDefinitionPoint.definitionPoint.x
-        #y = self.textBrowser.currentDefinitionPoint.definitionPoint.x
-        x = 1136942
-        y = 671128
+        x = self.ui.vfkBrowser.currentDefinitionPoint().first.split(".")[0]
+        y= self.ui.vfkBrowser.currentDefinitionPoint().second.split(".")[0]
+
         url = "http://nahlizenidokn.cuzk.cz/MapaIdentifikace.aspx?&x=-{}&y=-{}".format(y, x)
-        QDesktopServices.openUrl(QUrl(url))
+        QDesktopServices.openUrl(QUrl(url, QUrl.TolerantMode))
 
     @pyqtSlot()
     def switchToImport(self):
@@ -412,11 +405,11 @@ class MainApp (QtGui.QMainWindow):
 
         # Main toolbar
         # ------------
-        __mainToolBar = QToolBar(self)
-        __mainToolBar.addAction(self.ui.actionImport)
-        __mainToolBar.addAction(self.ui.actionVyhledavani)
-        __mainToolBar.setOrientation(Qt.Vertical)
-        self.addToolBar(Qt.LeftToolBarArea, __mainToolBar)
+        self.__mainToolBar = QToolBar(self)
+        self.__mainToolBar.addAction(self.ui.actionImport)
+        self.__mainToolBar.addAction(self.ui.actionVyhledavani)
+        self.__mainToolBar.setOrientation(Qt.Vertical)
+        self.addToolBar(Qt.LeftToolBarArea, self.__mainToolBar)
 
         actionGroup = QActionGroup(self)
         actionGroup.addAction(self.ui.actionImport)
@@ -427,8 +420,8 @@ class MainApp (QtGui.QMainWindow):
         self.ui.signalMapper = QSignalMapper(self)
 
         # connect to 'clicked' on all buttons
-        self.connect(self.ui.actionVyhledavani, SIGNAL("triggered()"), self.ui.signalMapper, SLOT("map()"))
         self.connect(self.ui.actionImport, SIGNAL("triggered()"), self.ui.signalMapper, SLOT("map()"))
+        self.connect(self.ui.actionVyhledavani, SIGNAL("triggered()"), self.ui.signalMapper, SLOT("map()"))
 
         # setMapping on each button to the QStackedWidget index we'd like to switch to
         self.ui.signalMapper.setMapping(self.ui.actionImport, 0)
@@ -439,11 +432,11 @@ class MainApp (QtGui.QMainWindow):
         self.ui.actionImport.trigger()
 
         self.connect(self.ui.vfkBrowser, SIGNAL("switchToPanelImport()"), self.switchToImport)
-        self.connect(self.ui.vfkBrowser, SIGNAL("switchToPanelSearch(int)"), SLOT("switchToSearch(int)"))
+        self.connect(self.ui.vfkBrowser, SIGNAL("switchToPanelSearch(int)"), self, SLOT("switchToSearch(int)"))
 
         # Browser toolbar
         # ---------------
-        __mBrowserToolbar = QToolBar(self)
+        self.__mBrowserToolbar = QToolBar(self)
         self.connect(self.ui.actionBack, SIGNAL("triggered()"), self.ui.vfkBrowser.goBack)
         self.connect(self.ui.actionForward, SIGNAL("triggered()"), self.ui.vfkBrowser.goForth)
         self.ui.actionSelectBudInMap.triggered.connect(self.selectBudInMap)
@@ -451,14 +444,14 @@ class MainApp (QtGui.QMainWindow):
         self.ui.actionCuzkPage.triggered.connect(self.showOnCuzk)
         self.ui.actionExportLatex.triggered.connect(self.latexExport)
         self.ui.actionExportHtml.triggered.connect(self.htmlExport)
-        self.connect(self.ui.actionShowInfoaboutSelection, SIGNAL("toggled(bool)"),
-                     self.setSelectionChangedConnected)
+        self.connect(self.ui.actionShowInfoaboutSelection, SIGNAL("toggled(bool)"), self,
+                     SLOT("setSelectionChangedConnected(bool)"))
         self.connect(self.ui.actionShowHelpPage, SIGNAL("triggered()"), self.ui.vfkBrowser.showHelpPage)
 
         self.ui.browseButton.clicked.connect(self.browseButton_clicked)
         self.ui.loadVfkButton.clicked.connect(self.loadVfkButton_clicked)
 
-        bt = QToolButton(__mBrowserToolbar)
+        bt = QToolButton(self.__mBrowserToolbar)
         bt.setPopupMode(QToolButton.InstantPopup)
         bt.setText("Export ")
 
@@ -467,16 +460,27 @@ class MainApp (QtGui.QMainWindow):
         menu.addAction(self.ui.actionExportHtml)
         bt.setMenu(menu)
 
-        __mBrowserToolbar.addAction(self.ui.actionBack)
-        __mBrowserToolbar.addAction(self.ui.actionForward)
-        __mBrowserToolbar.addAction(self.ui.actionSelectParInMap)
-        __mBrowserToolbar.addAction(self.ui.actionSelectBudInMap)
-        __mBrowserToolbar.addAction(self.ui.actionCuzkPage)
-        __mBrowserToolbar.addSeparator()
-        __mBrowserToolbar.addAction(self.ui.actionShowInfoaboutSelection)
-        __mBrowserToolbar.addSeparator()
-        __mBrowserToolbar.addWidget(bt)
-        __mBrowserToolbar.addSeparator()
-        __mBrowserToolbar.addAction(self.ui.actionShowHelpPage)
+        # add actions to toolbar icons
+        self.__mBrowserToolbar.addAction(self.ui.actionBack)
+        self.__mBrowserToolbar.addAction(self.ui.actionForward)
+        self.__mBrowserToolbar.addAction(self.ui.actionSelectParInMap)
+        self.__mBrowserToolbar.addAction(self.ui.actionSelectBudInMap)
+        self.__mBrowserToolbar.addAction(self.ui.actionCuzkPage)
+        self.__mBrowserToolbar.addSeparator()
+        self.__mBrowserToolbar.addAction(self.ui.actionShowInfoaboutSelection)
+        self.__mBrowserToolbar.addSeparator()
+        self.__mBrowserToolbar.addWidget(bt)
+        self.__mBrowserToolbar.addSeparator()
+        self.__mBrowserToolbar.addAction(self.ui.actionShowHelpPage)
 
-        self.ui.rightWidgetLayout.insertWidget(0, __mBrowserToolbar)
+        self.ui.rightWidgetLayout.insertWidget(0, self.__mBrowserToolbar)
+
+        # connect signals from vfkbrowser when changing history
+        self.connect(self.ui.vfkBrowser, SIGNAL("currentParIdsChanged(bool)"),
+                     self.ui.actionSelectParInMap, SLOT("setEnabled(bool)"))
+        self.connect(self.ui.vfkBrowser, SIGNAL("currentBudIdsChanged(bool)"),
+                     self.ui.actionSelectBudInMap, SLOT("setEnabled(bool)"))
+        self.connect(self.ui.vfkBrowser, SIGNAL("historyBefore(bool)"), self.ui.actionBack, SLOT("setEnabled(bool)"))
+        self.connect(self.ui.vfkBrowser, SIGNAL("historyAfter(bool)"), self.ui.actionForward, SLOT("setEnabled(bool)"))
+        self.connect(self.ui.vfkBrowser, SIGNAL("definitionPointAvailable(bool)"),
+                     self.ui.actionCuzkPage, SLOT("setEnabled(bool)"))

@@ -215,11 +215,9 @@ class SearchFormController(QObject):
         """
 
         :param oldModel: QAbstractItemModel
-        :param newRow: []
+        :param newRow: list
         :return: QStandardItemModel
         """
-        oldModel = QAbstractItemModel(oldModel)
-
         model = QStandardItemModel()
         items = []
 
@@ -228,13 +226,13 @@ class SearchFormController(QObject):
 
         model.appendRow(items)
 
-        for i, row in enumerate(oldModel):
+        for i in xrange(oldModel.rowCount()):
             items = []
 
-            for j, column in enumerate(row):
+            for j in xrange(oldModel.columnCount()):
                 index = oldModel.index(i, j)
                 data = oldModel.data(index)
-                item = QStandardItem(str(data))
+                item = QStandardItem(data)
                 items.append(item)
 
             model.appendRow(items)

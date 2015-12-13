@@ -87,6 +87,18 @@ class VfkTextBrowser(QTextBrowser):
         self.historyBefore.emit(False)
         self.historyAfter.emit(False)
 
+    def currentUrl(self):
+        return self.__mCurrentUrl
+
+    def currentParIds(self):
+        return self.__mCurrentRecord.parIds
+
+    def currentBudIds(self):
+        return self.__mCurrentRecord.budIds
+
+    def currentDefinitionPoint(self):
+        return self.__mCurrentRecord.definitionPoint
+
     def startPage(self):
         self.processAction(QUrl("showText?page=allTEL"))
 

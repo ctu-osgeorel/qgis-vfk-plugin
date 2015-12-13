@@ -23,7 +23,7 @@
 """
 
 from PyQt4.QtGui import *
-from PyQt4.QtCore import QAbstractItemModel, QModelIndex, QRegExp
+from PyQt4.QtCore import QAbstractItemModel, QModelIndex, QRegExp, SIGNAL, SLOT
 
 from ui_parcelysearchform import *
 
@@ -39,7 +39,7 @@ class ParcelySearchForm(QWidget):
         self.__stavebniModel = QAbstractItemModel
         self.__pozemkovaModel = QAbstractItemModel
 
-        self.ui.typParcelyCombo.currentIndexChanged[str].connect(self.__setDruhModel)
+        self.connect(self.ui.typParcelyCombo, SIGNAL("currentIndexChanged(int)"), self.__setDruhModel)
         self.rx = QRegExp("[0-9]*/?[0-9]*")
         self.validator = QRegExpValidator(self.rx, self)
         self.ui.parCisloLineEdit.setValidator(self.validator)
@@ -51,6 +51,10 @@ class ParcelySearchForm(QWidget):
         return str(self.ui.lvParcelyLineEdit.text()).strip()
 
     def setDruhPozemkuModel(self, model):
+        """
+
+        :param model: QAbstractItemModel
+        """
         self.__defaultModel = self.__pozemkovaModel = self.__stavebniModel = model
         self.ui.druhPozemkuCombo.setModel(model)
         self.ui.druhPozemkuCombo.setModelColumn(1)
@@ -64,9 +68,17 @@ class ParcelySearchForm(QWidget):
             self.ui.druhPozemkuCombo.setModel(self.__defaultModel)
 
     def setDruhPozemkuStavebniModel(self, model):
+        """
+
+        :param model: QAbstractItemModel
+        """
         self.__stavebniModel = model
 
     def setDruhPozemkuPozemkovaModel(self, model):
+        """
+
+        :param model: QAbstractItemModel
+        """
         self.__pozemkovaModel = model
 
     def typParcely(self):

@@ -48,7 +48,11 @@ class BudovySearchForm(QWidget):
         return str(self.ui.lvBudovyLineEdit.text()).strip()
 
     def setZpusobVyuzitiModel(self, model):
-        self.__mZpusobVyuzitiModel = QAbstractItemModel(model)
+        """
+
+        :param model: QAbstractItemModel
+        """
+        self.__mZpusobVyuzitiModel = model
         self.ui.mZpVyuzitiCombo.setModel(model)
         self.ui.mZpVyuzitiCombo.setModelColumn(1)
 
