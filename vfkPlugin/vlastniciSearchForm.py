@@ -39,12 +39,6 @@ class VlastniciSearchForm(QWidget):
         self.ui = Ui_VlastniciSearchForm()
         self.ui.setupUi(self)
 
-        self.layout = QVBoxLayout(self)
-        self.button1 = QPushButton("Button 1")
-        self.layout.addWidget(self.button1)
-
-        self.setLayout(self.layout)
-
         self.connect(self.ui.ofoCheckBox, SIGNAL("clicked()"), self.__vlastniciSetRcIcoEnabled)
         self.connect(self.ui.opoCheckBox, SIGNAL("clicked()"), self.__vlastniciSetRcIcoEnabled)
 
