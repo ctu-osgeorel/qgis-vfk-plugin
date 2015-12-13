@@ -188,8 +188,3 @@ class HtmlDocument(VfkDocument):
     def title(self, text):
         self.mPage.replace(QRegExp("<title>.*</title>"), "<title>{}</title>".format(text))
         self.titleIsSet = True
-        
-        
-        
-        
-        

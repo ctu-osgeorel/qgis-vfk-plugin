@@ -29,8 +29,9 @@ from ui_jednotkysearchform import *
 
 
 class JednotkySearchForm(QWidget):
-    def __init__(self):
-        super(JednotkySearchForm, self).__init__()
+    def __init__(self, parent=None):
+        super(JednotkySearchForm, self).__init__(parent)
+
         # Set up the user interface from Designer.
         self.ui = Ui_JednotkySearchForm()
         self.ui.setupUi(self)

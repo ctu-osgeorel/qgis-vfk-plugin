@@ -24,15 +24,17 @@
 
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import *
-from PyQt4.QtCore import QFile, QIODevice, QUrl, QObject, SIGNAL, SLOT, pyqtSlot, pyqtSignal, QByteArray
+from PyQt4.QtCore import QFile, QIODevice, QUrl, QObject, SIGNAL, SLOT, pyqtSlot, pyqtSignal, QTextStream, qWarning
 from PyQt4.QtSql import QSqlDatabase
 from collections import namedtuple
 
-from vfkDocument import *
 from documentBuilder import *
 
 
-TaskList = namedtuple('TaskList', ['a', 'b'])
+class TPair:
+    def __init__(self, first="", second=""):
+        self.first = first
+        self.second = second
 
 
 class HistoryRecord(object):
@@ -50,14 +52,6 @@ class VfkTextBrowser(QTextBrowser):
         RichText = 1
         Latex = 2
 
-    def __init__(self):
-        super(VfkTextBrowser, self).__init__()
-
-        self.__mCurrentUrl = QUrl()
-        self.__mCurrentRecord = HistoryRecord()
-        self.__mDocumentBuilder = DocumentBuilder()
-
-
     # signals
     updateHistory = pyqtSignal(HistoryRecord)
     showParcely = pyqtSignal(QObject)
@@ -70,6 +64,16 @@ class VfkTextBrowser(QTextBrowser):
     switchToPanelImport = pyqtSignal()
     switchToPanelSearch = pyqtSignal(int)
 
+    def __init__(self, parent=None):
+        super(VfkTextBrowser, self).__init__(parent)
+
+        self.__mCurrentUrl = QUrl()
+        self.__mCurrentRecord = HistoryRecord()
+        self.__mDocumentBuilder = DocumentBuilder()
+
+        #self.connect(self, SIGNAL("anchorClicked(QUrl)"), self.oLinkClicked)
+        #self.connect(self, SIGNAL("updateHistory(HistoryRecord)"), self.saveHistory(HistoryRecord))
+
     def startPage(self):
         self.processAction(QUrl("showText?page=allTEL"))
 
@@ -81,8 +85,7 @@ class VfkTextBrowser(QTextBrowser):
         if format == "Latex":
             pass
 
-
-    @pyqtSlot(QUrl)
+    @pyqtSlot(QUrl, name="oLinkClicked")
     def processAction(self, task):
         # self.mCurrentUrl = task
         #
@@ -114,6 +117,12 @@ class VfkTextBrowser(QTextBrowser):
         pass
 
     def documentContent(self, taskMap, format):
+        """
+
+        :param taskMap: dict
+        :param format: self.ExportFormat
+        :return:
+        """
         format = self.exportFormat()
 
         doc = VfkDocument(self.documentFactory(format))
@@ -125,31 +134,50 @@ class VfkTextBrowser(QTextBrowser):
         return text
 
     def exportDocument(self, task, fileName, format):
+        """
+
+        :param task: QUrl
+        :param fileName: str
+        :param format: self.ExportFormat
+        :return: bool
+        """
         fileOut = QFile(fileName)
 
         if fileOut.open(QIODevice.WriteOnly | QIODevice.Text) is False:
             return False
 
-        taskMap = {}
+        taskMap = self.parseTask(task)
+        text = self.documentContent(taskMap, format)
+        streamFileOut = QTextStream(fileOut)
+        streamFileOut.setCodec("UTF-8")
+        streamFileOut << text
+        streamFileOut.flush()
+
+        fileOut.close()
+
+        return True
 
     def parseTask(self, task):
-        # task = QUrl(task)
-        # taskList = TaskList(task.encodedQueryItems())
-        #
-        # taskMap = {'action': task.path()}
-        #
-        # for i in xrange(len(taskList)):
-        #     taskMap[i[0]] = QUrl.fromPercentEncoding(i[1])
-        #
-        # return taskMap
-        pass
+        """
+
+        :param task: QUrl
+        :return: dict
+        """
+        taskMap = {'action': task.path()}
+
+        for key, value in task.encodedQueryItems():
+            taskMap[key] = QUrl.fromPercentEncoding(value)
+
+        return taskMap
 
     @pyqtSlot()
     def goBack(self):
+        qWarning("...goBack")
         pass
 
     @pyqtSlot()
     def goForth(self):
+        qWarning("...goForth")
         pass
 
     def currentUrl(self):
@@ -164,6 +192,11 @@ class VfkTextBrowser(QTextBrowser):
     def showInfoAboutSelection(self, parIds, budIds):
         pass
 
+    @pyqtSlot(QUrl)
+    def onLinkClicked(self, task):
+        qWarning("..onLinkClicked")
+
     def showHelpPage(self):
         url = QUrl("showText?page=help")
         self.processAction(url)
+        qWarning("...showHelpPage")

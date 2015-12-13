@@ -21,7 +21,7 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtCore import QObject, QUrl, QRegExp, SIGNAL, SLOT, Qt, pyqtSignal
+from PyQt4.QtCore import QObject, QUrl, QRegExp, SIGNAL, SLOT, Qt, pyqtSignal, qWarning
 from PyQt4.QtGui import QStandardItemModel, QComboBox, QPushButton, QStackedWidget
 
 from vlastniciSearchForm import *
@@ -84,8 +84,9 @@ class SearchFormController(QObject):
         self.__controls.formCombobox.addItem(QObject.trUtf8(self, "budovy"), self.Form.Budovy)
         self.__controls.formCombobox.addItem(QObject.trUtf8(self, "jednotky"), self.Form.Jednotky)
 
-        self.connect(self.__controls.formCombobox, SIGNAL("activated(int)"), self.__controls.searchForms, SLOT("setCurrentIndex(int)"))
-        self.connect(self.__controls.searchButton, SIGNAL("clicked()"), self, SLOT("search()"))
+        self.connect(self.__controls.formCombobox, SIGNAL("activated(int)"), self.__controls.searchForms,
+                     SLOT("setCurrentIndex(int)"))
+        self.connect(self.__controls.searchButton, SIGNAL("clicked()"), self.search)
 
         self.__controls.searchForms.setCurrentIndex(0)
         self.__controls.searchButton.setEnabled(False)
@@ -126,22 +127,28 @@ class SearchFormController(QObject):
         self.__forms.parcely.setDruhPozemkuPozemkovaModel(self.addFirstRowToModel(self.__mDruhPozemkoveParcely, fakeRow))
         self.__forms.parcely.setDruhPozemkuStavebniModel(self.__mDruhStavebniParcely)
         self.__forms.budovy.setZpusobVyuzitiModel(self.addFirstRowToModel(self.__mZpusobVyuzitiBudovy, fakeRow))
-        self.__forms.jednotky.setZpusobVyuzitiModel(self.addFirstRowToModel(self.__mZpusobVyuzitiJednotek, fakerow))
+        self.__forms.jednotky.setZpusobVyuzitiModel(self.addFirstRowToModel(self.__mZpusobVyuzitiJednotek, fakeRow))
 
     def search(self):
         """
 
         """
+        qWarning("...SearchComboIndex = {}".format(self.__controls.formCombobox.itemData(self.__controls.formCombobox.currentIndex())))
+
         QApplication.setOverrideCursor(Qt.WaitCursor)
         QApplication.processEvents()
 
         if int(self.__controls.formCombobox.itemData(self.__controls.formCombobox.currentIndex())) == self.Form.Parcely:
+            qWarning("parcely")
             self.searchParcely()
         elif int(self.__controls.formCombobox.itemData(self.__controls.formCombobox.currentIndex())) == self.Form.Budovy:
+            qWarning("budovy")
             self.searchBudovy()
         elif int(self.__controls.formCombobox.itemData(self.__controls.formCombobox.currentIndex())) == self.Form.Jednotky:
+            qWarning("jednotky")
             self.searchJednotky()
         elif int(self.__controls.formCombobox.itemData(self.__controls.formCombobox.currentIndex())) == self.Form.Vlastnici:
+            qWarning("vlastnici")
             self.searchVlastnici()
         else:
             pass

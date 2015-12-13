@@ -32,18 +32,25 @@ class VlastniciSearchForm(QWidget):
     # signals
     searchEnabled = pyqtSignal(bool)
 
-    def __init__(self):
-        super(VlastniciSearchForm, self).__init__()
+    def __init__(self, parent=None):
+        super(VlastniciSearchForm, self).__init__(parent)
+
         # Set up the user interface from Designer.
         self.ui = Ui_VlastniciSearchForm()
         self.ui.setupUi(self)
 
-        self.connect(self.ui.ofoCheckBox, SIGNAL("clicked()"), self, SLOT("self.__vlastniciSetRcIcoEnabled"))
-        self.connect(self.ui.opoCheckBox, SIGNAL("clicked()"), self, SLOT("self.__vlastniciSetRcIcoEnabled"))
+        self.layout = QVBoxLayout(self)
+        self.button1 = QPushButton("Button 1")
+        self.layout.addWidget(self.button1)
 
-        self.connect(self.ui.ofoCheckBox, SIGNAL("clicked()"), self, SLOT("self.__vlastniciSearchEnabled"))
-        self.connect(self.ui.opoCheckBox, SIGNAL("clicked()"), self, SLOT("self.__vlastniciSearchEnabled"))
-        self.connect(self.ui.sjmCheckBox, SIGNAL("clicked()"), self, SLOT("self.__vlastniciSearchEnabled"))
+        self.setLayout(self.layout)
+
+        self.connect(self.ui.ofoCheckBox, SIGNAL("clicked()"), self.__vlastniciSetRcIcoEnabled)
+        self.connect(self.ui.opoCheckBox, SIGNAL("clicked()"), self.__vlastniciSetRcIcoEnabled)
+
+        self.connect(self.ui.ofoCheckBox, SIGNAL("clicked()"), self.__vlastniciSearchEnabled)
+        self.connect(self.ui.opoCheckBox, SIGNAL("clicked()"), self.__vlastniciSearchEnabled)
+        self.connect(self.ui.sjmCheckBox, SIGNAL("clicked()"), self.__vlastniciSearchEnabled)
 
     def jmeno(self):
         return str(self.ui.jmenoLineEdit.text()).strip()

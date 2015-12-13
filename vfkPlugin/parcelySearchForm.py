@@ -29,8 +29,8 @@ from ui_parcelysearchform import *
 
 
 class ParcelySearchForm(QWidget):
-    def __init__(self):
-        super(ParcelySearchForm, self).__init__()
+    def __init__(self, parent=None):
+        super(ParcelySearchForm, self).__init__(parent)
         # Set up the user interface from Designer.
         self.ui = Ui_ParcelySearchForm()
         self.ui.setupUi(self)

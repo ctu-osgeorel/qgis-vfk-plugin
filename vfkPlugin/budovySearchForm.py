@@ -29,8 +29,9 @@ from ui_budovysearchform import *
 
 
 class BudovySearchForm(QWidget):
-    def __init__(self):
-        super(BudovySearchForm, self).__init__()
+    def __init__(self, parent=None):
+        super(BudovySearchForm, self).__init__(parent)
+
         # Set up the user interface from Designer.
         self.ui = Ui_BudovySearchForm()
         self.ui.setupUi(self)

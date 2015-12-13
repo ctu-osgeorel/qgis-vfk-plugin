@@ -22,10 +22,9 @@
 """
 
 # Import the PyQt, QGIS libraries and classes
-import this
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup
-from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, pyqtSlot
+from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, pyqtSlot, qWarning
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import *
 from qgis.gui import *
@@ -34,7 +33,7 @@ import ogr
 from ui_MainApp import Ui_MainApp
 import htmlDocument
 import domains
-from VfkTextBrowser import *
+from vfkTextBrowser import *
 from searchFormController import *
 from budovySearchForm import *
 from jednotkySearchForm import *
@@ -144,7 +143,9 @@ class MainApp (QtGui.QMainWindow):
     @pyqtSlot(bool)
     def setSelectionChangedConnected(self, connected):
         for i, id in enumerate(self.__mLoadedLayers):
-            vectorLayer = QgsVectorLayer(QgsMapLayerRegistry.instance().mapLayer(i))
+            vectorLayer = QgsVectorLayer(QgsMapLayerRegistry.instance().mapLayer(id))
+
+            qWarning(".... setSelectionChangedConnected...........")
 
             if connected is True:
                 self.connect(vectorLayer, SIGNAL("selectionChanged()"), self, SLOT("showInfoAboutSelection()"))
@@ -161,7 +162,7 @@ class MainApp (QtGui.QMainWindow):
             error = ""
             fIds = self.__search(vectorLayer, searchString, error)
             if error != "":
-                QgsLogger.debug(error)
+                qWarning(error)
                 return
             else:
                 vectorLayer.setSelectedFeatures(fIds)
@@ -244,15 +245,15 @@ class MainApp (QtGui.QMainWindow):
             self.ui.vfkFileLineEdit.setPalette(pal)
 
     def __loadVfkLayer(self, vfkLayerName):
-        QgsLogger.debug("Loading vfk layer {}".format(vfkLayerName))
+        qWarning("Loading vfk layer {}".format(vfkLayerName))
         if vfkLayerName in self.__mLoadedLayers:
-            QgsLogger.debug("Vfk layer {} is already loaded".format(vfkLayerName))
+            qWarning("Vfk layer {} is already loaded".format(vfkLayerName))
             return
 
         composedURI = self.__mLastVfkFile + "|layername=" + vfkLayerName
         layer = QgsVectorLayer(composedURI, vfkLayerName, "ogr")
         if not layer.isValid():
-            QgsLogger.debug("Layer failed to load!")
+            qWarning("Layer failed to load!")
 
         self.__mLoadedLayers[vfkLayerName] = layer.id()
         self.__setSymbology(layer)
@@ -260,10 +261,10 @@ class MainApp (QtGui.QMainWindow):
         QgsMapLayerRegistry.instance().addMapLayer(layer)
 
     def __unLoadVfkLayer(self, vfkLayerName):
-        QgsLogger.debug("Unloading vfk layer {}".format(vfkLayerName))
+        qWarning("Unloading vfk layer {}".format(vfkLayerName))
 
         if vfkLayerName not in self.__mLoadedLayers:
-            QgsLogger.debug("Vfk layer {} is already unloaded".format(vfkLayerName))
+            qWarning("Vfk layer {} is already unloaded".format(vfkLayerName))
             return
 
         QgsMapLayerRegistry.instance().removeMapLayer(self.__mLoadedLayers[vfkLayerName])
@@ -291,7 +292,7 @@ class MainApp (QtGui.QMainWindow):
     def __openDatabase(self, dbPath):
         connectionName = QUuid.createUuid().toString()
         db = QSqlDatabase.addDatabase("QSQLITE", connectionName)
-        QgsLogger.debug(dbPath)
+        qWarning(dbPath)
         db.setDatabaseName(dbPath)
         if db.open() is False:
             return False
@@ -317,7 +318,7 @@ class MainApp (QtGui.QMainWindow):
         QgsApplication.processEvents()
         progress.setValue(1)
 
-        QgsLogger.debug("Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
+        qWarning("Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
         self.__mOgrDataSource = ogr.Open(self.__fileName, 0)
         if self.__mOgrDataSource is None:
             errorMsg = u'Unable to set open OGR data source'
@@ -400,6 +401,9 @@ class MainApp (QtGui.QMainWindow):
 
     @pyqtSlot(int)
     def switchToSearch(self, searchType):
+        """
+        :param searchType: int
+        """
         self.ui.actionVyhledavani.trigger()
         self.ui.searchCombo.setCurrentIndex(searchType)
         self.ui.searchForms.setCurrentIndex(searchType)
@@ -431,24 +435,25 @@ class MainApp (QtGui.QMainWindow):
         self.ui.signalMapper.setMapping(self.ui.actionVyhledavani, 1)
 
         # connect mapper to stackedWidget
-        self.connect(self.ui.signalMapper, SIGNAL("mapped(int)"), self.ui.stackedWidget, SLOT("setCurrentIndex( int )"))
+        self.connect(self.ui.signalMapper, SIGNAL("mapped(int)"), self.ui.stackedWidget, SLOT("setCurrentIndex(int)"))
         self.ui.actionImport.trigger()
 
         self.connect(self.ui.vfkBrowser, SIGNAL("switchToPanelImport()"), self.switchToImport)
-        self.connect(self.ui.vfkBrowser, SIGNAL("switchToPanelSearch(int)"), self.switchToSearch)
+        self.connect(self.ui.vfkBrowser, SIGNAL("switchToPanelSearch(int)"), SLOT("switchToSearch(int)"))
 
         # Browser toolbar
         # ---------------
         __mBrowserToolbar = QToolBar(self)
-        #self.connect(self.ui.actionBack, SIGNAL("triggered()"), VfkTextBrowser.goBack)
-        #self.connect(self.ui.actionForward, SIGNAL("triggered()"), VfkTextBrowser.goForth)
-
+        self.connect(self.ui.actionBack, SIGNAL("triggered()"), self.ui.vfkBrowser.goBack)
+        self.connect(self.ui.actionForward, SIGNAL("triggered()"), self.ui.vfkBrowser.goForth)
         self.ui.actionSelectBudInMap.triggered.connect(self.selectBudInMap)
         self.ui.actionSelectParInMap.triggered.connect(self.selectParInMap)
         self.ui.actionCuzkPage.triggered.connect(self.showOnCuzk)
         self.ui.actionExportLatex.triggered.connect(self.latexExport)
         self.ui.actionExportHtml.triggered.connect(self.htmlExport)
-        self.connect(self.ui.actionShowInfoaboutSelection, SIGNAL("toggled(bool)"), self, SLOT("setSelectionChangedConnected"))
+        self.connect(self.ui.actionShowInfoaboutSelection, SIGNAL("toggled(bool)"),
+                     self.setSelectionChangedConnected)
+        self.connect(self.ui.actionShowHelpPage, SIGNAL("triggered()"), self.ui.vfkBrowser.showHelpPage)
 
         self.ui.browseButton.clicked.connect(self.browseButton_clicked)
         self.ui.loadVfkButton.clicked.connect(self.loadVfkButton_clicked)
@@ -466,6 +471,7 @@ class MainApp (QtGui.QMainWindow):
         __mBrowserToolbar.addAction(self.ui.actionForward)
         __mBrowserToolbar.addAction(self.ui.actionSelectParInMap)
         __mBrowserToolbar.addAction(self.ui.actionSelectBudInMap)
+        __mBrowserToolbar.addAction(self.ui.actionCuzkPage)
         __mBrowserToolbar.addSeparator()
         __mBrowserToolbar.addAction(self.ui.actionShowInfoaboutSelection)
         __mBrowserToolbar.addSeparator()

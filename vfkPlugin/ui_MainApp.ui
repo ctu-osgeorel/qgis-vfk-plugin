@@ -34,7 +34,7 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="importPage">
         <layout class="QGridLayout" name="gridLayout_10">
@@ -48,8 +48,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>540</width>
-              <height>368</height>
+              <width>390</width>
+              <height>370</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_11">
@@ -192,7 +192,7 @@
          <item>
           <widget class="QStackedWidget" name="searchForms">
            <property name="currentIndex">
-            <number>1</number>
+            <number>0</number>
            </property>
            <widget class="QWidget" name="page">
             <layout class="QGridLayout" name="gridLayout">
@@ -206,13 +206,13 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>45</width>
-                  <height>28</height>
+                  <width>372</width>
+                  <height>282</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_5">
                  <item row="0" column="0">
-                  <widget class="QWidget" name="vlastniciSearchForm" native="true"/>
+                  <widget class="VlastniciSearchForm" name="vlastniciSearchForm" native="true"/>
                  </item>
                 </layout>
                </widget>
@@ -232,13 +232,13 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>63</width>
-                  <height>28</height>
+                  <width>372</width>
+                  <height>282</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_7">
                  <item row="0" column="0">
-                  <widget class="QWidget" name="parcelySearchForm" native="true"/>
+                  <widget class="ParcelySearchForm" name="parcelySearchForm" native="true"/>
                  </item>
                 </layout>
                </widget>
@@ -258,13 +258,13 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>63</width>
-                  <height>28</height>
+                  <width>372</width>
+                  <height>282</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_3">
                  <item row="0" column="0">
-                  <widget class="QWidget" name="budovySearchForm" native="true"/>
+                  <widget class="BudovySearchForm" name="budovySearchForm" native="true"/>
                  </item>
                 </layout>
                </widget>
@@ -284,13 +284,13 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>63</width>
-                  <height>28</height>
+                  <width>372</width>
+                  <height>282</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_9">
                  <item row="0" column="0">
-                  <widget class="QWidget" name="jednotkySearchForm" native="true"/>
+                  <widget class="JednotkySearchForm" name="jednotkySearchForm" native="true"/>
                  </item>
                 </layout>
                </widget>
@@ -336,7 +336,7 @@
        </property>
        <layout class="QVBoxLayout" name="rightWidgetLayout">
         <item>
-         <widget class="QTextBrowser" name="vfkBrowser"/>
+         <widget class="VfkTextBrowser" name="vfkBrowser"/>
         </item>
        </layout>
       </widget>
@@ -494,6 +494,37 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>VfkTextBrowser</class>
+   <extends>QTextBrowser</extends>
+   <header>vfktextbrowser.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ParcelySearchForm</class>
+   <extends>QWidget</extends>
+   <header>parcelysearchform.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>BudovySearchForm</class>
+   <extends>QWidget</extends>
+   <header>budovysearchform.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>JednotkySearchForm</class>
+   <extends>QWidget</extends>
+   <header>jednotkysearchform.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>VlastniciSearchForm</class>
+   <extends>QWidget</extends>
+   <header>vlastnicisearchform.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="resources.qrc"/>
  </resources>
