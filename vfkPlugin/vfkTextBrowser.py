@@ -29,6 +29,9 @@ from PyQt4.QtSql import QSqlDatabase
 from collections import namedtuple
 
 from documentBuilder import *
+from htmlDocument import *
+from latexDocument import *
+from richTextDocument import *
 
 
 class TPair:
@@ -37,7 +40,7 @@ class TPair:
         self.second = second
 
 
-class HistoryRecord(object):
+class HistoryRecord:
     def __init__(self):
         self.html = ""
         self.parIds = []
@@ -53,7 +56,7 @@ class VfkTextBrowser(QTextBrowser):
         Latex = 2
 
     # signals
-    updateHistory = pyqtSignal(HistoryRecord)
+    updateHistory = pyqtSignal(QObject)
     showParcely = pyqtSignal(QObject)
     showBudovy = pyqtSignal(QObject)
     currentParIdsChanged = pyqtSignal(bool)
@@ -65,73 +68,27 @@ class VfkTextBrowser(QTextBrowser):
     switchToPanelSearch = pyqtSignal(int)
 
     def __init__(self, parent=None):
+        """
+        Init function
+        """
         super(VfkTextBrowser, self).__init__(parent)
 
         self.__mCurrentUrl = QUrl()
         self.__mCurrentRecord = HistoryRecord()
         self.__mDocumentBuilder = DocumentBuilder()
+        self.__mUrlHistory = []     # list of history records
+        self.__mHistoryIt = 0      # saving current index in history list
 
-        #self.connect(self, SIGNAL("anchorClicked(QUrl)"), self.oLinkClicked)
+        self.connect(self, SIGNAL("anchorClicked(QUrl)"), self, SLOT("oLinkClicked(QUrl)"))
         #self.connect(self, SIGNAL("updateHistory(HistoryRecord)"), self.saveHistory(HistoryRecord))
+
+        self.currentParIdsChanged.emit(False)
+        self.currentBudIdsChanged.emit(False)
+        self.historyBefore.emit(False)
+        self.historyAfter.emit(False)
 
     def startPage(self):
         self.processAction(QUrl("showText?page=allTEL"))
-
-    def documentFactory(self, format):
-        format = self.ExportFormat()
-
-        doc = VfkDocument()
-
-        if format == "Latex":
-            pass
-
-    @pyqtSlot(QUrl, name="oLinkClicked")
-    def processAction(self, task):
-        # self.mCurrentUrl = task
-        #
-        # taskMap = {self.parseTask(task)}
-        #
-        # if taskMap["action"] == "showText":
-        #     QApplication.setOverrideCursor(QCursor(QtCore.Qt.WaitCursor))
-        #     html  = self.documentContent(taskMap, self.ExportFormat.RichText)
-        #     QApplication.restoreOverrideCursor()
-        #     self.setHtml(html)
-        #
-        #     record = HistoryRecord()
-        #     record.html = html
-        #     record.parIds = DocumentBuilder.currentParIds()
-        #     record.budIds = DocumentBuilder.currentBudIds()
-        #     record.definitionPoint = DocumentBuilder.currentDefinitionPoint()
-        #
-        #     self.emit(SIGNAL("self.updateHistory(record)"))
-        # elif taskMap["action"] == "selectInMap":
-        #     self.emit(SIGNAL("self.showParcely(taskMap['ids'].split( ',' ))"))
-        # elif taskMap["action"] == "switchPanel":
-        #     if taskMap["panel"] == "import":
-        #         self.emit(SIGNAL("self.switchToPanelImport()"))
-        #     elif taskMap["panel"] == "search":
-        #         self.emit(SIGNAL("self.switchToPanelSearch(int(taskMap['type'])"))
-        #     self.setHtml(self.mCurrentRecord.html)
-        # else:
-        #     pass
-        pass
-
-    def documentContent(self, taskMap, format):
-        """
-
-        :param taskMap: dict
-        :param format: self.ExportFormat
-        :return:
-        """
-        format = self.exportFormat()
-
-        doc = VfkDocument(self.documentFactory(format))
-
-        DocumentBuilder.buildHtml(doc, taskMap)
-        text = str(doc)
-
-        del doc
-        return text
 
     def exportDocument(self, task, fileName, format):
         """
@@ -146,8 +103,8 @@ class VfkTextBrowser(QTextBrowser):
         if fileOut.open(QIODevice.WriteOnly | QIODevice.Text) is False:
             return False
 
-        taskMap = self.parseTask(task)
-        text = self.documentContent(taskMap, format)
+        taskMap = self.__parseTask(task)
+        text = self.__documentContent(taskMap, format)
         streamFileOut = QTextStream(fileOut)
         streamFileOut.setCodec("UTF-8")
         streamFileOut << text
@@ -157,7 +114,14 @@ class VfkTextBrowser(QTextBrowser):
 
         return True
 
-    def parseTask(self, task):
+    def setConnectionName(self, connectionName):
+        """
+
+        :param connectionName: str
+        """
+        self.__mDocumentBuilder = DocumentBuilder(connectionName)
+
+    def __parseTask(self, task):
         """
 
         :param task: QUrl
@@ -172,31 +136,169 @@ class VfkTextBrowser(QTextBrowser):
 
     @pyqtSlot()
     def goBack(self):
-        qWarning("...goBack")
-        pass
+        qWarning("...goBack function")
+        # if self.__mHistoryIt != self.__mUrlHistory[0]:
+        #     qWarning("..podminka v goBack splnena")
+        #     #self.__mCurrentRecord = self.__mUrlHistory[self.__mHistoryIt]
+        #     self.setHtml(self.__mCurrentRecord.html)
+        #     self.updateButtonEnabledState()
 
     @pyqtSlot()
     def goForth(self):
-        qWarning("...goForth")
+        qWarning("...goForth function")
+        # if self.__mHistoryIt != self.__mUrlHistory[-2]:
+        #     qWarning("..podminka v goForth splnena")
+        #     #self.__mCurrentRecord = self.__mUrlHistory[self.__mHistoryIt]
+        #     self.setHtml(self.__mCurrentRecord.html)
+        #     self.updateButtonEnabledState()
+
+
+    def saveHistory(self, record):
         pass
 
-    def currentUrl(self):
-        return self.mCurrentUrl
 
-    def currentDefinitionPoint(self):
-        return self.mCurrentRecord.definitionPoint
 
-    def setConnectionName(self, connectionName):
-        pass
-
-    def showInfoAboutSelection(self, parIds, budIds):
-        pass
-
-    @pyqtSlot(QUrl)
-    def onLinkClicked(self, task):
-        qWarning("..onLinkClicked")
+# void VfkTextBrowser::saveHistory( HistoryRecord record )
+# {
+#   if ( mUrlHistory.isEmpty() )
+#   {
+#     mUrlHistory.append( record );
+#     mHistoryIt = mUrlHistory.begin();
+#   }
+#   else if ( mHistoryIt == --mUrlHistory.end() )
+#   {
+#     mUrlHistory.append( record );
+#     mHistoryIt = --(mUrlHistory.end());
+#   }
+#   else
+#   {
+#     mUrlHistory.erase( ++mHistoryIt, mUrlHistory.end() );
+#     mUrlHistory.append( record );
+#     mHistoryIt = --(mUrlHistory.end());
+#   }
+#   mCurrentRecord = *mHistoryIt;
+#   updateButtonEnabledState();
+# }
 
     def showHelpPage(self):
-        url = QUrl("showText?page=help")
-        self.processAction(url)
-        qWarning("...showHelpPage")
+        url = "showText?page=help"
+        self.processAction(QUrl(url))
+        qWarning("..Zobrazuji napovedu")
+
+    def showInfoAboutSelection(self, parIds, budIds):
+        """
+
+        :param parIds: list
+        :param budIds: list
+        :return:
+        """
+        url = ""
+        if len(parIds) + len(budIds) == 1:
+            if len(parIds) == 1:
+                url = "showText?page=par&id={}".format(parIds[0])
+            else:
+                url = "showText?page=bud&id={}".format(budIds[0])
+
+            self.processAction(QUrl(url))
+            return
+
+        urlPart = ""
+        if len(parIds) > 0:
+            urlPart = "&parcely={}".format(", ".join(parIds))
+        if len(budIds) > 0:
+            urlPart = "&budovy={}".format(", ".join(budIds))
+        if urlPart:
+            url = "showText?page=seznam&type=id{}".format(urlPart)
+            self.processAction(QUrl(url))
+
+    def postInit(self):
+        self.currentParIdsChanged.emit(False)
+        self.currentBudIdsChanged.emit(False)
+        self.historyBefore.emit(False)
+        self.historyAfter.emit(False)
+        self.definitionPointAvailable.emit(False)
+
+    def documentFactory(self, format):
+        """
+
+        :param format: VfkTextBrowser.ExportFormat
+        :rtype: VfkDocument
+        """
+        doc = VfkDocument()
+
+        if format == VfkTextBrowser.ExportFormat.Latex:
+            doc = LatexDocument()
+            return doc
+        elif format == VfkTextBrowser.ExportFormat.Html:
+            doc = HtmlDocument()
+            return doc
+        elif format == VfkTextBrowser.ExportFormat.RichText:
+            doc = RichTextDocument()
+            return doc
+        else:
+            qWarning("Nejsou podporovany jine formaty pro export")
+
+    def updateButtonEnabledState(self):
+        self.currentParIdsChanged.emit(True if self.__mCurrentRecord.parIds else False)
+        self.currentBudIdsChanged.emit(True if self.__mCurrentRecord.budIds else False)
+        self.historyBefore.emit() ##### dodelat
+        self.historyAfter.emit() ##### dodelat
+        self.definitionPointAvailable.emit(True if (self.__mCurrentRecord.definitionPoint.first
+                                                    and self.__mCurrentRecord.definitionPoint.second) else False)
+
+    def onLinkClicked(self, task):
+        """
+
+        :param task: QUrl
+        """
+        qWarning("..onLinkClicked")
+        self.processAction(task)
+
+    def processAction(self, task):
+        """
+
+        :param task: QUrl
+        """
+        self.__mCurrentUrl = task
+
+        # taskMap = {} ############### predelat mapu
+        #
+        # if taskMap["action"] == "showText":
+        #     QApplication.setOverrideCursor(QCursor(QtCore.Qt.WaitCursor))
+        #     html = self.documentContent(taskMap, self.ExportFormat.RichText)
+        #     QApplication.restoreOverrideCursor()
+        #     self.setHtml(html)
+        #
+        #     record = HistoryRecord()
+        #     record.html = html
+        #     record.parIds = DocumentBuilder.currentParIds()
+        #     record.budIds = DocumentBuilder.currentBudIds()
+        #     record.definitionPoint = DocumentBuilder.currentDefinitionPoint()
+        #
+        #     self.updateHistory.emit(record)
+        # elif taskMap["action"] == "selectInMap":
+        #     self.showParcely.emit(taskMap['ids'].split(','))
+        # elif taskMap["action"] == "switchPanel":
+        #     if taskMap["panel"] == "import":
+        #         self.switchToPanelImport.emit()
+        #     elif taskMap["panel"] == "search":
+        #         self.switchToPanelSearch.emit(int(taskMap['type']))
+        #     self.setHtml(self.__mCurrentRecord.html)
+        # else:
+        #     qWarning("..Jina akce")
+
+    def __documentContent(self, taskMap, format):
+        """
+
+        :param taskMap: dict
+        :param format: VfkTextBrowser.ExportFormat
+        :return:
+        """
+        doc = self.documentFactory(format)
+        if not doc:
+            return ""
+
+        self.__mDocumentBuilder.buildHtml(doc, taskMap)
+        text = str(doc)
+
+        return text
