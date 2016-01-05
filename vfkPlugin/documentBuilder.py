@@ -38,6 +38,15 @@ class DocumentBuilder:
         else:
             self.__mHasConnection = False
 
+    def currentParIds(self):
+        return self.__mCurrentPageParIds
+
+    def currentBudIds(self):
+        return self.__mCurrentPageBudIds
+
+    def currentDefinitionPoint(self):
+        return self.__mCurrentDefinitionPoint
+
     def buildHtml(self, document, taskMap):
         """
 
@@ -52,7 +61,11 @@ class DocumentBuilder:
         self.__mDocument = document
         self.__mDocument.header()
 
+        qWarning("snazim se vytvorit html document -- fce buildHtml()..")
+        print(taskMap)
+
         if taskMap["page"] == "help":
+            qWarning("vytvarim helpPage")
             self.pageHelp()
 
         if self.__mHasConnection:

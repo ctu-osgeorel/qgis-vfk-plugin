@@ -30,20 +30,21 @@ from vfkDocument import VfkDocument
 
 class HtmlDocument(VfkDocument):
     def __init__(self):
-        self.mPage = ''
-        self.mLastColumnNumber = -1
+        super(HtmlDocument, self).__init__()
+        self.__mPage = ''
+        self.__mLastColumnNumber = -1
         self.titleIsSet = False
     
     def toString(self):
         page = '<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">'
-        page += self.mPage
+        page += self.__mPage
         page.replace("&", "&amp;")
         page.replace(QRegExp( "<a[^>]*>([^<]*)</a>" ), "\\1")
         
         return page
     
     def header(self):
-        self.mPage += '''
+        self.__mPage += '''
           <html><head>
           <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">
           <meta http-equiv=\"content-language\" content=\"cs\">
@@ -80,63 +81,63 @@ class HtmlDocument(VfkDocument):
         self.titleIsSet = False
     
     def footer(self):
-        self.mPage += "</body></html>"
+        self.__mPage += "</body></html>"
         
     def heading1(self, text):
-        self.mPage += "<h1>{}</h1>".format(text)
+        self.__mPage += "<h1>{}</h1>".format(text)
 
         if self.titleIsSet is False:
           self.title( text )
           
     def heading2(self, text):
-        self.mPage += "<h2>{}</h2>".format(text)
+        self.__mPage += "<h2>{}</h2>".format(text)
         
     def heading3(self, text):
-        self.mPage += "<h3>{}</h3>".format(text)
+        self.__mPage += "<h3>{}</h3>".format(text)
         
     def beginItemize(self):
-        self.mPage += "<ul>"
+        self.__mPage += "<ul>"
         
     def endItemize(self):
-        self.mPage += "</ul>"
+        self.__mPage += "</ul>"
         
     def beginItem(self):
-        self.mPage += "<li>"
+        self.__mPage += "<li>"
         
     def endItem(self):
-        self.mPage += "</li>"
+        self.__mPage += "</li>"
 
     def item(self, text):
-        self.mPage += "<li>{}</li>".format(text)
+        self.__mPage += "<li>{}</li>".format(text)
         
     def beginTable(self):
-        self.mPage += "<table>"    
+        self.__mPage += "<table>"
         
     def endTable(self):
-        self.mPage += "</table>"
+        self.__mPage += "</table>"
         
     def tableHeader(self, columns):
-        self.mPage += "<tr>"
+        self.__mPage += "<tr>"
         
         for column in columns:
-          self.mPage += "<th>{}</th>".format(column)
+          self.__mPage += "<th>{}</th>".format(column)
         
-        self.mPage += "</tr>"
-        self.mLastColumnNumber = len(columns)
+        self.__mPage += "</tr>"
+        self.__mLastColumnNumber = len(columns)
         
     def tableRow(self, columns):
-        self.mPage += "<tr>"
+        self.__mPage += "<tr>"
         
         for column in columns:
-          self.mPage += "<td>{}</td>".format(column)
+          self.__mPage += "<td>{}</td>".format(column)
         
-        self.mPage += "</tr>"        
-        self.mLastColumnNumber = len(columns)
+        self.__mPage += "</tr>"
+        self.__mLastColumnNumber = len(columns)
         
     def tableRowOneColumnSpan(self, text):
-        self.mPage += "<tr>"
-        self.mPage += "<td colspan=\"{}\">{}</td>".format(mLastColumnNumber, text)
-        self.mPage += "</tr>"
+        self.__mPage += "<tr>"
+        self.__mPage += "<td colspan=\"{}\">{}</td>".format(self.__mLastColumnNumber, text)
+        self.__mPage += "</tr>"
         
     def link(self, href, text):
         return "<a href=\"{}\">{}</a>".format(href, text)
@@ -148,43 +149,45 @@ class HtmlDocument(VfkDocument):
         return "<br/>"
     
     def keyValueTable(self, content):
-        self.mPage += "<table>"
+        self.__mPage += "<table>"
         
         for i in content:        
-          self.mPage += "<tr>"
-          self.mPage += "<td>{}</td>".format(i[0])
-          self.mPage += "<td>{}</td>".format(i[1])
-          self.mPage += "</tr>"
+          self.__mPage += "<tr>"
+          self.__mPage += "<td>{}</td>".format(i.first)
+          self.__mPage += "<td>{}</td>".format(i.second)
+          self.__mPage += "</tr>"
         
-        self.mPage += "</table>"
+        self.__mPage += "</table>"
     
     def paragraph(self, text):
-        self.mPage += "<p>{}</p>".format(text)
+        self.__mPage += "<p>{}</p>".format(text)
         
     def table(self, content, header):        
         self.beginTable()
-        
-        for i, cont in enumerate(content):
-            if i == 0 and header and content != "":
-                self.tableHeader(content[0])            
-            
-            self.tableRow(content[i])        
+        i = 0
+
+        if header and content:
+            self.tableHeader(content[0])
+            i += 1
+
+        for j in xrange(i, len(content)):
+            self.tableRow(content[j])
         
         self.endTable()
         
     def text(self, text):
-        self.mPage += text
+        self.__mPage += text
         
     def discardLastBeginTable(self):
-        index = self.mPage.rfind("<table")
-        self.mPage = self.mPage[:(len(self.mPage) - index)]
+        index = self.__mPage.rfind("<table")
+        self.__mPage = self.__mPage[:index]
 
     def isLastTableEmpty(self):
-        if self.mPage.find(QRegExp("<table[^>]*>$")) != -1:
+        if self.__mPage.find(QRegExp("<table[^>]*>$")) != -1:
             return True
         else:
             return False
     
     def title(self, text):
-        self.mPage.replace(QRegExp("<title>.*</title>"), "<title>{}</title>".format(text))
+        self.__mPage.replace(QRegExp("<title>.*</title>"), "<title>{}</title>".format(text))
         self.titleIsSet = True

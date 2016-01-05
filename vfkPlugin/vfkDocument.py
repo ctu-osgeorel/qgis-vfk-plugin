@@ -28,7 +28,7 @@ class TPair:
         self.second = second
 
 
-class VfkDocument():
+class VfkDocument(object):
     def __init__(self):
         pass
 

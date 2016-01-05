@@ -21,8 +21,154 @@
  *                                                                         *
  ***************************************************************************/
 """
+from PyQt4.QtCore import QRegExp
+from vfkDocument import *
 
+class RichTextDocument(VfkDocument):
+    # static variables
+    defaultTableAttributes = "border=\"0\" cellspacing=\"1px\" cellpadding=\"0\""
+    defaultCssStyle = """
+        body{
+          background-color: white;
+          color: black;
+        }
+        table th{
+          background-color: #ffbb22;
+          padding: 3px;
+        }
+        table td{
+          padding: 3px;
+        }
+        table tr td.oddRow{
+          background-color: #ffff55;
+        }
+        table tr td.evenRow{
+          background-color: #ffff99;
+        }"""
 
-class RichTextDocument:
     def __init__(self):
-        pass
+        super(RichTextDocument, self).__init__()
+
+        self.__mPage = ""
+        self.__mLastColumnNumber = 0
+        self.__mCurrentTableRowNumber = 0
+
+    def __currentTableRowCssClass(self):
+        return "evenRow" if self.__mCurrentTableRowNumber % 2 == 0 else "oddRow"
+
+    def toString(self):
+        return self.__mPage
+
+    def header(self):
+        self.__mPage += "<html><head>"
+        self.__mPage += "<style>" + self.defaultCssStyle + "</style>"
+        self.__mPage += "</head><body>"
+
+    def footer(self):
+        self.__mPage += "</body></html>"
+
+    def heading1(self, text):
+        self.__mPage += "<h1>{}</h1>".format(text)
+
+    def heading2(self, text):
+        self.__mPage += "<h2>{}</h2>".format(text)
+
+    def heading3(self, text):
+        self.__mPage += "<h3>{}</h3>".format(text)
+
+    def beginItemize(self):
+        self.__mPage += "<ul>"
+
+    def endItemize(self):
+        self.__mPage += "</ul>"
+
+    def beginItem(self):
+        self.__mPage += "<li>"
+
+    def endItem(self):
+        self.__mPage += "</li>"
+
+    def item(self, text):
+        self.__mPage += "<li>{}</li>".format(text)
+
+    def beginTable(self):
+        self.__mPage += "<table " + self.defaultTableAttributes + ">"
+        self.__mCurrentTableRowNumber = 1
+
+    def endTable(self):
+        self.__mPage += "</table>"
+
+    def tableHeader(self, columns):
+        self.__mPage += "<tr>"
+
+        for column in columns:
+            self.__mPage += "<th>{}</th>".format(column)
+
+        self.__mPage += "</tr>"
+        self.__mLastColumnNumber = len(columns)
+
+    def tableRow(self, columns):
+        self.__mPage += "<tr>"
+
+        for column in columns:
+            self.__mPage += "<td class=\"{}\">{}</td>".format(self.__currentTableRowCssClass(), column)
+
+        self.__mPage += "</tr>"
+        self.__mLastColumnNumber = len(columns)
+        self.__mCurrentTableRowNumber += 1
+
+    def tableRowOneColumnSpan(self, text):
+        self.__mPage += "<tr>"
+        self.__mPage += "<td colspan=\"{}\" class=\"{}\">{}</td>".format(self.__mLastColumnNumber,
+                                                                         self.__currentTableRowCssClass(), text)
+        self.__mPage += "</tr>"
+        self.__mCurrentTableRowNumber += 1
+
+    def link(self, href, text):
+        return "<a href=\"{}\">{}</a>".format(href, text)
+
+    def superScript(self, text):
+        return "<sup>{}</sup>".format(text)
+
+    def newLine(self):
+        return "<br/>"
+
+    def keyValueTable(self, content):
+        self.beginTable()
+
+        for it in content:
+            self.tableRow([content.first, content.second])
+
+        self.endTable()
+
+    def paragraph(self, text):
+        self.__mPage += "<p>{}</p>".format(text)
+
+    def table(self, content, header):
+        """
+        :param content: list
+        :param header: bool
+        """
+        self.beginTable()
+        i = 0
+        if header and content:
+            self.tableHeader(content[0])
+            i += 1
+
+        for j in xrange(i, len(content)):
+            self.tableRow(content[j])
+
+        self.endTable()
+
+    def text(self, text):
+        self.__mPage += text
+
+    def discardLastBeginTable(self):
+        index = self.__mPage.rfind("<table")
+        self.__mPage = self.__mPage[:index]
+
+    def isLastTableEmpty(self):
+        if self.__mPage.find(QRegExp("<table[^>]*>$")) != -1:
+            return True
+        else:
+            return False

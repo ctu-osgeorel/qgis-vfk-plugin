@@ -193,9 +193,10 @@ class VfkTextBrowser(QTextBrowser):
 # }
 
     def showHelpPage(self):
+        qWarning("..VfkTextBrowser.showHelpPage()")
         url = "showText?page=help"
         self.processAction(QUrl(url))
-        qWarning("..Zobrazuji napovedu")
+
 
     def showInfoAboutSelection(self, parIds, budIds):
         """
@@ -273,21 +274,27 @@ class VfkTextBrowser(QTextBrowser):
         """
         self.__mCurrentUrl = task
 
-        # taskMap = {} ############### predelat mapu
-        #
-        # if taskMap["action"] == "showText":
-        #     QApplication.setOverrideCursor(QCursor(QtCore.Qt.WaitCursor))
-        #     html = self.documentContent(taskMap, self.ExportFormat.RichText)
-        #     QApplication.restoreOverrideCursor()
-        #     self.setHtml(html)
-        #
-        #     record = HistoryRecord()
-        #     record.html = html
-        #     record.parIds = DocumentBuilder.currentParIds()
-        #     record.budIds = DocumentBuilder.currentBudIds()
-        #     record.definitionPoint = DocumentBuilder.currentDefinitionPoint()
-        #
-        #     self.updateHistory.emit(record)
+        qWarning("..VfkTextBrowser.processAction()")
+
+        taskMap = self.__parseTask(task)
+
+        if taskMap["action"] == "showText":
+            QApplication.setOverrideCursor(QCursor(QtCore.Qt.WaitCursor))
+            t = QtCore.QTime()
+            t.start()
+            html = self.__documentContent(taskMap, self.ExportFormat.RichText)
+            qWarning("Total time elapsed: {} ms".format(t.elapsed()))
+            QApplication.restoreOverrideCursor()
+            self.setHtml(html)
+
+            record = HistoryRecord()
+            record.html = html
+            record.parIds = self.__mDocumentBuilder.currentParIds()
+            record.budIds = self.__mDocumentBuilder.currentBudIds()
+            record.definitionPoint = self.__mDocumentBuilder.currentDefinitionPoint()
+
+            self.updateHistory.emit(record)
+
         # elif taskMap["action"] == "selectInMap":
         #     self.showParcely.emit(taskMap['ids'].split(','))
         # elif taskMap["action"] == "switchPanel":
