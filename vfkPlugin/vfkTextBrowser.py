@@ -142,7 +142,7 @@ class VfkTextBrowser(QTextBrowser):
         taskMap = {'action': task.path()}
 
         for key, value in task.encodedQueryItems():
-            taskMap[key] = QUrl.fromPercentEncoding(value)
+            taskMap[str(key)] = QUrl.fromPercentEncoding(value)
 
         return taskMap
 
@@ -279,6 +279,7 @@ class VfkTextBrowser(QTextBrowser):
         taskMap = self.__parseTask(task)
 
         if taskMap["action"] == "showText":
+            qWarning("...............showText ano")
             QApplication.setOverrideCursor(QCursor(QtCore.Qt.WaitCursor))
             t = QtCore.QTime()
             t.start()
@@ -293,18 +294,18 @@ class VfkTextBrowser(QTextBrowser):
             record.budIds = self.__mDocumentBuilder.currentBudIds()
             record.definitionPoint = self.__mDocumentBuilder.currentDefinitionPoint()
 
-            self.updateHistory.emit(record)
+            #self.updateHistory.emit(record)
 
-        # elif taskMap["action"] == "selectInMap":
-        #     self.showParcely.emit(taskMap['ids'].split(','))
-        # elif taskMap["action"] == "switchPanel":
-        #     if taskMap["panel"] == "import":
-        #         self.switchToPanelImport.emit()
-        #     elif taskMap["panel"] == "search":
-        #         self.switchToPanelSearch.emit(int(taskMap['type']))
-        #     self.setHtml(self.__mCurrentRecord.html)
-        # else:
-        #     qWarning("..Jina akce")
+        elif taskMap["action"] == "selectInMap":
+            self.showParcely.emit(taskMap['ids'].split(','))
+        elif taskMap["action"] == "switchPanel":
+            if taskMap["panel"] == "import":
+                self.switchToPanelImport.emit()
+            elif taskMap["panel"] == "search":
+                self.switchToPanelSearch.emit(int(taskMap['type']))
+            self.setHtml(self.__mCurrentRecord.html)
+        else:
+            qWarning("..Jina akce")
 
     def __documentContent(self, taskMap, format):
         """

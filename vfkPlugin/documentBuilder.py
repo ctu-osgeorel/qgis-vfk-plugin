@@ -56,7 +56,7 @@ class DocumentBuilder:
         self.__mCurrentPageParIds = []
         self.__mCurrentPageBudIds = []
         self.__mCurrentDefinitionPoint.first = ""
-        self.__mCurrentDefinitionPoint.first = ""
+        self.__mCurrentDefinitionPoint.second = ""
 
         self.__mDocument = document
         self.__mDocument.header()
