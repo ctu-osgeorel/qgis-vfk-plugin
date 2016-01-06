@@ -11,7 +11,7 @@ from htmlDocument import *
 from domains import *
 
 
-class Coordinates:
+class Coordinates(object):
     def __init__(self):
         self.first = ""
         self.second = ""
@@ -26,7 +26,7 @@ class DocumentBuilder:
         self.__mCurrentPageParIds = []
         self.__mCurrentPageBudIds = []
         self.__mCurrentDefinitionPoint = Coordinates()
-        self.__mDocument = VfkDocument()
+        self.__mDocument = None
 
         # constructor depended decision
         if connectionName != "":
@@ -61,11 +61,8 @@ class DocumentBuilder:
         self.__mDocument = document
         self.__mDocument.header()
 
-        qWarning("snazim se vytvorit html document -- fce buildHtml()..")
-        print(taskMap)
-
         if taskMap["page"] == "help":
-            qWarning("vytvarim helpPage")
+            qWarning("..vytvarim helpPage")
             self.pageHelp()
 
         if self.__mHasConnection:
@@ -749,31 +746,31 @@ class DocumentBuilder:
         self.__mCurrentPageParIds.append(id)
         self.saveDefinitionPoint(id, VfkTableModel.Nemovitost.NParcela)
 
-        content = [TPair("Parcelní číslo:", self.makeParcelniCislo(model, 0))]
+        content = [TPair(u"Parcelní číslo:", self.makeParcelniCislo(model, 0))]
 
         telesoModel = VfkTableModel(self.__mConnectionName)
         telesoModel.nemovitostTeleso(id, VfkTableModel.Nemovitost.NParcela)
-        content.append(TPair("List vlastnictví:", self.makeLVCislo(telesoModel, 0)))
-        content.append(TPair("Výměra [m{}]:".format(self.__mDocument.superScript("2")),
-                             model.value(0, "par_vymera_parcely")))
-        content.append(TPair("Určení výměry:", model.value(0, "zpurvy_nazev")))
+        content.append(TPair(u"List vlastnictví:", self.makeLVCislo(telesoModel, 0)))
+        content.append(TPair(u"Výměra [m{}]:".format(self.__mDocument.superScript("2")),
+                             model.value(0, u"par_vymera_parcely")))
+        content.append(TPair(u"Určení výměry:", model.value(0, u"zpurvy_nazev")))
 
-        if model.value(0, "par_cena_nemovitosti"):
-            content.append(TPair("Cena nemovitosti:", model.value(0, "par_cena_nemovitosti")))
+        if model.value(0, u"par_cena_nemovitosti"):
+            content.append(TPair(u"Cena nemovitosti:", model.value(0, u"par_cena_nemovitosti")))
 
-        content.append(TPair("Typ parcely:", model.value(0, "par_par_type")))
-        content.append(TPair("Mapový list:", model.value(0, "maplis_oznaceni_mapoveho_listu")))
-        content.append(TPair("Katastrální území:", self.makeKatastrUzemi(model, 0)))
-        content.append(TPair("Druh pozemku:", model.value(0, "drupoz_nazev")))
+        content.append(TPair(u"Typ parcely:", model.value(0, u"par_par_type")))
+        content.append(TPair(u"Mapový list:", model.value(0, u"maplis_oznaceni_mapoveho_listu")))
+        content.append(TPair(u"Katastrální území:", self.makeKatastrUzemi(model, 0)))
+        content.append(TPair(u"Druh pozemku:", model.value(0, u"drupoz_nazev")))
 
-        if model.value(0, "zpvypo_nazev"):
-            content.append(TPair("Způsob využití pozemku:", model.value(0, "zpvypo_nazev")))
+        if model.value(0, u"zpvypo_nazev"):
+            content.append(TPair(u"Způsob využití pozemku:", model.value(0, u"zpvypo_nazev")))
 
-        if Domains.anoNe(model.value(0, "drupoz_stavebni_parcela")):
-            content.append(TPair("Stavba na parcele:", self.makeDomovniCislo(model, 0)))
-            self.__mCurrentPageBudIds.append(model.value(0, "bud_id"))
+        if Domains.anoNe(model.value(0, u"drupoz_stavebni_parcela")):
+            content.append(TPair(u"Stavba na parcele:", self.makeDomovniCislo(model, 0)))
+            self.__mCurrentPageBudIds.append(model.value(0, u"bud_id"))
 
-        self.__mDocument.heading1("Informace o parcele")
+        self.__mDocument.heading1(u"Informace o parcele")
         self.__mDocument.keyValueTable(content)
 
         sousedniModel = VfkTableModel(self.__mConnectionName)
@@ -786,8 +783,8 @@ class DocumentBuilder:
         ids = list(set(ids))
         ids.remove(id)
 
-        link = self.__mDocument.link("showText?page=seznam&type=id&parcely={}".format(",".join(ids)),
-                                     "Sousední parcely")
+        link = self.__mDocument.link(u"showText?page=seznam&type=id&parcely={}".format(",".join(ids)),
+                                     u"Sousední parcely")
 
         self.__mDocument.paragraph(link)
         opsubIds = []
@@ -1216,34 +1213,35 @@ class DocumentBuilder:
         self.pageSeznamJednotek(ids)
 
     def pageHelp(self):
-        self.__mDocument.heading1("VFK plugin")
-        self.__mDocument.paragraph("VFK plugin slouží pro usnadnění práce s českými katastrálními daty ve formátu VFK.")
-        self.__mDocument.heading2("Kde začít?")
+        qWarning("Vytvarim pageHelp --> fce v documentBuilder.py")
+        self.__mDocument.heading1(u"VFK plugin")
+        self.__mDocument.paragraph(u"VFK plugin slouží pro usnadnění práce s českými katastrálními daty ve formátu VFK.")
+        self.__mDocument.heading2(u"Kde začít?")
 
-        link = self.__mDocument.link("switchPanel?panel=import", "Importujte")
-        text = "{} data ve formátu VFK. Během importu se vytváří databáze, tato operace může chvíli trvat. ".format(link)
-        text += "Následně lze vyhledávat:"
+        link = self.__mDocument.link(u"switchPanel?panel=import", u"Importujte")
+        text = u"{} data ve formátu VFK. Během importu se vytváří databáze, tato operace může chvíli trvat. ".format(link)
+        text += u"Následně lze vyhledávat:"
 
         self.__mDocument.beginItemize()
-        link = self.__mDocument.link("switchPanel?panel=search&type=0", "oprávněné osoby")
+        link = self.__mDocument.link(u"switchPanel?panel=search&type=0", u"oprávněné osoby")
         self.__mDocument.item(link)
-        link = self.__mDocument.link("switchPanel?panel=search&type=1", "parcely")
+        link = self.__mDocument.link(u"switchPanel?panel=search&type=1", u"parcely")
         self.__mDocument.item(link)
-        link = self.__mDocument.link("switchPanel?panel=search&type=2", "budovy")
+        link = self.__mDocument.link(u"switchPanel?panel=search&type=2", u"budovy")
         self.__mDocument.item(link)
-        link = self.__mDocument.link("switchPanel?panel=search&type=3", "jednotky")
+        link = self.__mDocument.link(u"switchPanel?panel=search&type=3", u"jednotky")
         self.__mDocument.item(link)
         self.__mDocument.endItemize()
 
-        text = "Vyhledávat lze na základě různých kritérií. " \
-                "Není-li kritérium zadáno, vyhledány jsou všechny nemovitosti či osoby obsažené v databázi. " \
-                "Výsledky hledání jsou pak vždy zobrazeny v tomto okně."
+        text = u"Vyhledávat lze na základě různých kritérií. " \
+                u"Není-li kritérium zadáno, vyhledány jsou všechny nemovitosti či osoby obsažené v databázi. " \
+                u"Výsledky hledání jsou pak vždy zobrazeny v tomto okně."
         self.__mDocument.paragraph(text)
 
-        text = "Výsledky hledání obsahují odkazy na další informace, " \
-                "kliknutím na odkaz si tyto informace zobrazíte, " \
-                "stejně jako je tomu u webového prohlížeče. " \
-                "Pro procházení historie použijte tlačítka Zpět a Vpřed v panelu nástrojů nad tímto oknem."
+        text = u"Výsledky hledání obsahují odkazy na další informace, " \
+                u"kliknutím na odkaz si tyto informace zobrazíte, " \
+                u"stejně jako je tomu u webového prohlížeče. " \
+                u"Pro procházení historie použijte tlačítka Zpět a Vpřed v panelu nástrojů nad tímto oknem."
         self.__mDocument.paragraph(text)
 
     def makeShortDescription(self, id, nemovitost):

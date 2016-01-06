@@ -23,8 +23,6 @@
 
 
 from PyQt4.QtCore import QRegExp
-from PyQt4.Qt import QTableWidget
-
 from vfkDocument import VfkDocument
 
 

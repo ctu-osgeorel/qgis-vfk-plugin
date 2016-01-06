@@ -237,16 +237,20 @@ class VfkTextBrowser(QTextBrowser):
         :param format: VfkTextBrowser.ExportFormat
         :rtype: VfkDocument
         """
-        doc = VfkDocument()
+        doc = VfkDocument
+        qWarning("dewdweewf " + str(doc))
 
         if format == VfkTextBrowser.ExportFormat.Latex:
             doc = LatexDocument()
+            qWarning("jsem v Latex")
             return doc
         elif format == VfkTextBrowser.ExportFormat.Html:
             doc = HtmlDocument()
+            qWarning("jsem v Html")
             return doc
         elif format == VfkTextBrowser.ExportFormat.RichText:
             doc = RichTextDocument()
+            qWarning("jsem v RichText")
             return doc
         else:
             qWarning("Nejsou podporovany jine formaty pro export")
@@ -288,6 +292,8 @@ class VfkTextBrowser(QTextBrowser):
             QApplication.restoreOverrideCursor()
             self.setHtml(html)
 
+            print(html)
+
             record = HistoryRecord()
             record.html = html
             record.parIds = self.__mDocumentBuilder.currentParIds()
@@ -315,10 +321,10 @@ class VfkTextBrowser(QTextBrowser):
         :return:
         """
         doc = self.documentFactory(format)
+        qWarning("Vytvarim dokument ve formatu: " + str(format))
         if not doc:
             return ""
 
         self.__mDocumentBuilder.buildHtml(doc, taskMap)
-        text = str(doc)
-
+        text = doc.toString()
         return text

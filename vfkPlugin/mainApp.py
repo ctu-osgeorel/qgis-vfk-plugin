@@ -31,8 +31,8 @@ from qgis.gui import *
 import ogr
 
 from ui_MainApp import Ui_MainApp
-import htmlDocument
-import domains
+from htmlDocument import *
+from domains import *
 from vfkTextBrowser import *
 from searchFormController import *
 from budovySearchForm import *
@@ -142,9 +142,9 @@ class MainApp (QtGui.QMainWindow):
             qWarning(".... setSelectionChangedConnected...........")
 
             if connected is True:
-                self.connect(vectorLayer, SIGNAL("selectionChanged()"), self, SLOT("showInfoAboutSelection()"))
+                self.connect(vectorLayer, SIGNAL("selectionChanged()"), self, SLOT("showInfoAboutSelection"))
             else:
-                self.disconnect(vectorLayer, SIGNAL("selectionChanged()"), self, SLOT("showInfoAboutSelection()"))
+                self.disconnect(vectorLayer, SIGNAL("selectionChanged()"), self, SLOT("showInfoAboutSelection"))
 
     def showInMap(self, ids, layerName):
         if self.__mLoadedLayers.has_key(layerName):

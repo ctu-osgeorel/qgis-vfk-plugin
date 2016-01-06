@@ -26,8 +26,8 @@ from vfkDocument import *
 
 class RichTextDocument(VfkDocument):
     # static variables
-    defaultTableAttributes = "border=\"0\" cellspacing=\"1px\" cellpadding=\"0\""
-    defaultCssStyle = """
+    defaultTableAttributes = u"border=\"0\" cellspacing=\"1px\" cellpadding=\"0\""
+    defaultCssStyle = u"""
         body{
           background-color: white;
           color: black;
@@ -48,90 +48,89 @@ class RichTextDocument(VfkDocument):
 
     def __init__(self):
         super(RichTextDocument, self).__init__()
-
-        self.__mPage = ""
+        self.__mPage = u""
         self.__mLastColumnNumber = 0
         self.__mCurrentTableRowNumber = 0
 
     def __currentTableRowCssClass(self):
-        return "evenRow" if self.__mCurrentTableRowNumber % 2 == 0 else "oddRow"
+        return u"evenRow" if self.__mCurrentTableRowNumber % 2 == 0 else u"oddRow"
 
     def toString(self):
         return self.__mPage
 
     def header(self):
-        self.__mPage += "<html><head>"
-        self.__mPage += "<style>" + self.defaultCssStyle + "</style>"
-        self.__mPage += "</head><body>"
+        self.__mPage += u"<html><head>"
+        self.__mPage += u"<style>" + self.defaultCssStyle + u"</style>"
+        self.__mPage += u"</head><body>"
 
     def footer(self):
-        self.__mPage += "</body></html>"
+        self.__mPage += u"</body></html>"
 
     def heading1(self, text):
-        self.__mPage += "<h1>{}</h1>".format(text)
+        self.__mPage += u"<h1>{}</h1>".format(text)
 
     def heading2(self, text):
-        self.__mPage += "<h2>{}</h2>".format(text)
+        self.__mPage += u"<h2>{}</h2>".format(text)
 
     def heading3(self, text):
-        self.__mPage += "<h3>{}</h3>".format(text)
+        self.__mPage += u"<h3>{}</h3>".format(text)
 
     def beginItemize(self):
-        self.__mPage += "<ul>"
+        self.__mPage += u"<ul>"
 
     def endItemize(self):
-        self.__mPage += "</ul>"
+        self.__mPage += u"</ul>"
 
     def beginItem(self):
-        self.__mPage += "<li>"
+        self.__mPage += u"<li>"
 
     def endItem(self):
-        self.__mPage += "</li>"
+        self.__mPage += u"</li>"
 
     def item(self, text):
-        self.__mPage += "<li>{}</li>".format(text)
+        self.__mPage += u"<li>{}</li>".format(text)
 
     def beginTable(self):
-        self.__mPage += "<table " + self.defaultTableAttributes + ">"
+        self.__mPage += u"<table " + self.defaultTableAttributes + u">"
         self.__mCurrentTableRowNumber = 1
 
     def endTable(self):
-        self.__mPage += "</table>"
+        self.__mPage += u"</table>"
 
     def tableHeader(self, columns):
-        self.__mPage += "<tr>"
+        self.__mPage += u"<tr>"
 
         for column in columns:
-            self.__mPage += "<th>{}</th>".format(column)
+            self.__mPage += u"<th>{}</th>".format(column)
 
-        self.__mPage += "</tr>"
+        self.__mPage += u"</tr>"
         self.__mLastColumnNumber = len(columns)
 
     def tableRow(self, columns):
-        self.__mPage += "<tr>"
+        self.__mPage += u"<tr>"
 
         for column in columns:
-            self.__mPage += "<td class=\"{}\">{}</td>".format(self.__currentTableRowCssClass(), column)
+            self.__mPage += u"<td class=\"{}\">{}</td>".format(self.__currentTableRowCssClass(), column)
 
-        self.__mPage += "</tr>"
+        self.__mPage += u"</tr>"
         self.__mLastColumnNumber = len(columns)
         self.__mCurrentTableRowNumber += 1
 
     def tableRowOneColumnSpan(self, text):
-        self.__mPage += "<tr>"
-        self.__mPage += "<td colspan=\"{}\" class=\"{}\">{}</td>".format(self.__mLastColumnNumber,
+        self.__mPage += u"<tr>"
+        self.__mPage += u"<td colspan=\"{}\" class=\"{}\">{}</td>".format(self.__mLastColumnNumber,
                                                                          self.__currentTableRowCssClass(), text)
-        self.__mPage += "</tr>"
+        self.__mPage += u"</tr>"
         self.__mCurrentTableRowNumber += 1
 
     def link(self, href, text):
-        return "<a href=\"{}\">{}</a>".format(href, text)
+        return u"<a href=\"{}\">{}</a>".format(href, text)
 
     def superScript(self, text):
-        return "<sup>{}</sup>".format(text)
+        return u"<sup>{}</sup>".format(text)
 
     def newLine(self):
-        return "<br/>"
+        return u"<br/>"
 
     def keyValueTable(self, content):
         self.beginTable()
@@ -142,7 +141,7 @@ class RichTextDocument(VfkDocument):
         self.endTable()
 
     def paragraph(self, text):
-        self.__mPage += "<p>{}</p>".format(text)
+        self.__mPage += u"<p>{}</p>".format(text)
 
     def table(self, content, header):
         """
