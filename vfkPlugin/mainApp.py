@@ -69,11 +69,11 @@ class MainApp (QtGui.QMainWindow):
         self.__mainToolBar = QToolBar()
 
         # settings of custom widgets
-        self.ui.vfkBrowser = VfkTextBrowser()
-        self.ui.parcelySearchForm = ParcelySearchForm()
-        self.ui.vlastniciSearchForm = VlastniciSearchForm()
-        self.ui.budovySearchForm = BudovySearchForm()
-        self.ui.jednotkySearchForm = JednotkySearchForm()
+        # self.ui.vfkBrowser = VfkTextBrowser()
+        # self.ui.parcelySearchForm = ParcelySearchForm
+        # self.ui.vlastniciSearchForm = VlastniciSearchForm
+        # self.ui.budovySearchForm = BudovySearchForm
+        # self.ui.jednotkySearchForm = JednotkySearchForm
 
         # Connect ui with functions
         self.__createToolbarsAndConnect()
@@ -87,7 +87,7 @@ class MainApp (QtGui.QMainWindow):
         self.searchFormMainControls.searchForms = self.ui.searchForms
         self.searchFormMainControls.searchButton = self.ui.searchButton
 
-        self.searchForms = SearchFormController.SearchForms
+        self.searchForms = SearchFormController.SearchForms()
         self.searchForms.vlastnici = self.ui.vlastniciSearchForm
         self.searchForms.parcely = self.ui.parcelySearchForm
         self.searchForms.budovy = self.ui.budovySearchForm
