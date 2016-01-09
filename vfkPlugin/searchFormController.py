@@ -45,13 +45,13 @@ from vfkTableModel import *
 
 
 class SearchFormController(QObject):
-    class SearchForms:
+    class SearchForms(object):
         vlastnici = VlastniciSearchForm()
         parcely = ParcelySearchForm()
         budovy = BudovySearchForm()
         jednotky = JednotkySearchForm()
 
-    class MainControls:
+    class MainControls(object):
         formCombobox = QComboBox()
         searchForms = QStackedWidget()
         searchButton = QPushButton()
@@ -69,8 +69,8 @@ class SearchFormController(QObject):
 
         super(SearchFormController, self).__init__()
 
-        self.__controls = self.MainControls()
-        self.__forms = self.SearchForms()
+        self.__controls = mainControls
+        self.__forms = searchForms
         self.__mConnectionName = ""
 
         self.__mDruhParcely = VfkTableModel()
@@ -169,6 +169,7 @@ class SearchFormController(QObject):
         url = QUrl("showText?page=search&type=vlastnici&jmeno={}&rcIco={}&sjm={}&opo={}&ofo={}&lv={}"
                    .format(jmeno, rcIco, 1 if sjm is not None else 0, 1 if opo is not None else 0,
                            1 if ofo is not None else 0, lv))
+        qWarning(str(url))
         self.actionTriggered.emit(url)
 
     def searchParcely(self):
@@ -182,6 +183,7 @@ class SearchFormController(QObject):
 
         url = QUrl("showText?page=search&type=parcely&parcelniCislo={}&typ={}&druh={}&lv={}"
                    .format(parcelniCislo, typ, druh, lv))
+        qWarning(str(url))
         self.actionTriggered.emit(url)
 
     def searchBudovy(self):
@@ -195,6 +197,7 @@ class SearchFormController(QObject):
 
         url = QUrl("showText?page=search&type=budovy&domovniCislo={}&naParcele={}&zpusobVyuziti={}&lv={}"
                    .format(domovniCislo, naParcele, zpusobVyuziti, lv))
+        qWarning(str(url))
         self.actionTriggered.emit(url)
 
     def searchJednotky(self):
@@ -209,6 +212,7 @@ class SearchFormController(QObject):
 
         url = QUrl("showText?page=search&type=jednotky&cisloJednotky={}&domovniCislo={}&naParcele={}&zpusobVyuziti={}&lv={}"
                    .format(cisloJednotky, domovniCislo, naParcele, zpusobVyuziti, lv))
+        qWarning(str(url))
         self.actionTriggered.emit(url)
 
     def addFirstRowToModel(self, oldModel, newRow):

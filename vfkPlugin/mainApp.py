@@ -65,8 +65,6 @@ class MainApp (QtGui.QMainWindow):
         self.__mDataSourceName = ""
         self.__fileName = ""
         self.__mLoadedLayers = {}
-        self.__mBrowserToolbar = QToolBar()
-        self.__mainToolBar = QToolBar()
 
         # settings of custom widgets
         # self.ui.vfkBrowser = VfkTextBrowser()
@@ -128,12 +126,12 @@ class MainApp (QtGui.QMainWindow):
     def latexExport(self):
         fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", "", "LaTeX (*.tex)")
         if fileName is not None:
-            VfkTextBrowser.exportDocument(VfkTextBrowser.currentUrl(), fileName, VfkTextBrowser.Latex)
+            self.ui.vfkBrowser.exportDocument(self.ui.vfkBrowser.currentUrl(), fileName, self.ui.vfkBrowser.ExportFormat.Latex)
 
     def htmlExport(self):
         fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", "", "HTML (*.html)")
         if fileName is not None:
-            VfkTextBrowser.exportDocument(VfkTextBrowser.currentUrl(), fileName, VfkTextBrowser.Html)
+            self.ui.vfkBrowser.exportDocument(self.ui.vfkBrowser.currentUrl(), fileName, self.ui.vfkBrowser.ExportFormat.Html)
 
     def setSelectionChangedConnected(self, connected):
         for i, id in enumerate(self.__mLoadedLayers):
