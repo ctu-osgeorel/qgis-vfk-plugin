@@ -40,7 +40,7 @@ from jednotkySearchForm import *
 from parcelySearchForm import *
 
 
-class MainApp (QtGui.QMainWindow):
+class MainApp(QDockWidget, Ui_MainApp):
     # signals
     goBack = pyqtSignal()
     searchOpsubByName = pyqtSignal(str)
@@ -51,13 +51,11 @@ class MainApp (QtGui.QMainWindow):
         Par = 0
         Bud = 1
 
-    def __init__(self, iface, parent=None):
-        QtGui.QMainWindow.__init__(self)
-        self.iface = iface
+    def __init__(self, iface):
 
-        # Set up the user interface from Designer.
-        self.ui = Ui_MainApp()
-        self.ui.setupUi(self)
+        QDockWidget.__init__(self, iface.mainWindow())
+        self.setupUi(self)
+        self.iface = iface
 
         # variables
         self.__mLastVfkFile = ""
@@ -65,41 +63,34 @@ class MainApp (QtGui.QMainWindow):
         self.__mDataSourceName = ""
         self.__fileName = ""
         self.__mLoadedLayers = {}
-
-        # settings of custom widgets
-        # self.ui.vfkBrowser = VfkTextBrowser()
-        # self.ui.parcelySearchForm = ParcelySearchForm
-        # self.ui.vlastniciSearchForm = VlastniciSearchForm
-        # self.ui.budovySearchForm = BudovySearchForm
-        # self.ui.jednotkySearchForm = JednotkySearchForm
+        self.__mDefaultPalette = self.vfkFileLineEdit.palette()
 
         # Connect ui with functions
         self.__createToolbarsAndConnect()
 
         # settings
-        self.ui.loadVfkButton.setDisabled(True)
-        self.__mDefaultPalette = self.ui.vfkFileLineEdit.palette()
+        self.loadVfkButton.setDisabled(True)
 
         self.searchFormMainControls = SearchFormController.MainControls
-        self.searchFormMainControls.formCombobox = self.ui.searchCombo
-        self.searchFormMainControls.searchForms = self.ui.searchForms
-        self.searchFormMainControls.searchButton = self.ui.searchButton
+        self.searchFormMainControls.formCombobox = self.searchCombo
+        self.searchFormMainControls.searchForms = self.searchForms
+        self.searchFormMainControls.searchButton = self.searchButton
 
         self.searchForms = SearchFormController.SearchForms()
-        self.searchForms.vlastnici = self.ui.vlastniciSearchForm
-        self.searchForms.parcely = self.ui.parcelySearchForm
-        self.searchForms.budovy = self.ui.budovySearchForm
-        self.searchForms.jednotky = self.ui.jednotkySearchForm
+        self.searchForms.vlastnici = self.vlastniciSearchForm
+        self.searchForms.parcely = self.parcelySearchForm
+        self.searchForms.budovy = self.budovySearchForm
+        self.searchForms.jednotky = self.jednotkySearchForm
 
         # search form controller
         self.__mSearchController = SearchFormController(self.searchFormMainControls, self.searchForms, self)
 
-        self.connect(self.__mSearchController, SIGNAL("actionTriggered(QUrl)"), self.ui.vfkBrowser, SLOT("processAction(QUrl)"))
-        self.connect(self, SIGNAL("enableSearch(bool)"), self.ui.searchButton, SLOT("setEnabled(bool)"))
-        self.ui.vfkBrowser.connect(self, SIGNAL("showParcely(list)"), self, SLOT("showParInMap(list)"))
-        self.ui.vfkBrowser.connect(self, SIGNAL("showBudovy(list)"), self, SLOT("showBudInMap(list)"))
+        self.connect(self.__mSearchController, SIGNAL("actionTriggered(QUrl)"), self.vfkBrowser, SLOT("processAction(QUrl)"))
+        self.connect(self, SIGNAL("enableSearch(bool)"), self.searchButton, SLOT("setEnabled(bool)"))
+        self.vfkBrowser.connect(self, SIGNAL("showParcely(list)"), self, SLOT("showParInMap(list)"))
+        self.vfkBrowser.connect(self, SIGNAL("showBudovy(list)"), self, SLOT("showBudInMap(list)"))
 
-        self.ui.vfkBrowser.showHelpPage()
+        self.vfkBrowser.showHelpPage()
 
     def browseButton_clicked(self):
         title = u'Načti soubor VFK'
@@ -108,30 +99,30 @@ class MainApp (QtGui.QMainWindow):
         if self.__fileName == "":
             return
         else:
-            self.ui.vfkFileLineEdit.setText(self.__fileName)
-            self.ui.loadVfkButton.setEnabled(True)
+            self.vfkFileLineEdit.setText(self.__fileName)
+            self.loadVfkButton.setEnabled(True)
 
     def browserGoBack(self):
-        self.ui.vfkBrowser.goBack()
+        self.vfkBrowser.goBack()
 
     def browserGoForward(self):
-        self.ui.vfkBrowser.goForth()
+        self.vfkBrowser.goForth()
 
     def selectParInMap(self):
-        self.showInMap(self.ui.vfkBrowser.currentParIds(), "PAR")
+        self.showInMap(self.vfkBrowser.currentParIds(), "PAR")
 
     def selectBudInMap(self):
-        self.showInMap(self.ui.vfkBrowser.currentBudIds(), "BUD")
+        self.showInMap(self.vfkBrowser.currentBudIds(), "BUD")
 
     def latexExport(self):
         fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", "", "LaTeX (*.tex)")
         if fileName is not None:
-            self.ui.vfkBrowser.exportDocument(self.ui.vfkBrowser.currentUrl(), fileName, self.ui.vfkBrowser.ExportFormat.Latex)
+            self.vfkBrowser.exportDocument(self.vfkBrowser.currentUrl(), fileName, self.vfkBrowser.ExportFormat.Latex)
 
     def htmlExport(self):
         fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", "", "HTML (*.html)")
         if fileName is not None:
-            self.ui.vfkBrowser.exportDocument(self.ui.vfkBrowser.currentUrl(), fileName, self.ui.vfkBrowser.ExportFormat.Html)
+            self.vfkBrowser.exportDocument(self.vfkBrowser.currentUrl(), fileName, self.vfkBrowser.ExportFormat.Html)
 
     def setSelectionChangedConnected(self, connected):
         for i, id in enumerate(self.__mLoadedLayers):
@@ -189,7 +180,7 @@ class MainApp (QtGui.QMainWindow):
         return fIds
 
     def loadVfkButton_clicked(self):
-        fileName = self.ui.vfkFileLineEdit.text()
+        fileName = self.vfkFileLineEdit.text()
 
         if self.__mLastVfkFile != fileName:
             errorMsg = ""
@@ -210,19 +201,19 @@ class MainApp (QtGui.QMainWindow):
                 self.enableSearch.emit(False)
                 return
 
-            self.ui.vfkBrowser.setConnectionName(str(self.property("connectionName")))
+            self.vfkBrowser.setConnectionName(str(self.property("connectionName")))
             self.__mSearchController.setConnectionName(str(self.property("connectionName")))
 
             self.enableSearch.emit(True)
             self.__mLastVfkFile = fileName
             self.__mLoadedLayers.clear()
 
-        if self.ui.parCheckBox.isChecked():
+        if self.parCheckBox.isChecked():
             self.__loadVfkLayer('PAR')
         else:
             self.__unLoadVfkLayer('PAR')
 
-        if self.ui.budCheckBox.isChecked():
+        if self.budCheckBox.isChecked():
             self.__loadVfkLayer('BUD')
         else:
             self.__unLoadVfkLayer('BUD')
@@ -231,13 +222,13 @@ class MainApp (QtGui.QMainWindow):
         info = QFileInfo(arg1)
 
         if info.isFile():
-            self.ui.loadVfkButton.setEnabled(True)
-            self.ui.vfkFileLineEdit.setPalette(self.__mDefaultPalette)
+            self.loadVfkButton.setEnabled(True)
+            self.vfkFileLineEdit.setPalette(self.__mDefaultPalette)
         else:
-            self.ui.loadVfkButton.setEnabled(False)
-            pal = QPalette(self.ui.vfkFileLineEdit.palette())
+            self.loadVfkButton.setEnabled(False)
+            pal = QPalette(self.vfkFileLineEdit.palette())
             pal.setColor(QPalette.text(), Qt.red)
-            self.ui.vfkFileLineEdit.setPalette(pal)
+            self.vfkFileLineEdit.setPalette(pal)
 
     def __loadVfkLayer(self, vfkLayerName):
         qWarning("Loading vfk layer {}".format(vfkLayerName))
@@ -361,10 +352,10 @@ class MainApp (QtGui.QMainWindow):
                 vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
                 layerIds[layer] = self.__selectedIds(vectorLayer)
 
-        self.ui.vfkBrowser.showInfoAboutSelection(layerIds["PAR"], layerIds["BUD"])
+        self.vfkBrowser.showInfoAboutSelection(layerIds["PAR"], layerIds["BUD"])
 
     def showParInMap(self, ids):
-        if self.ui.actionShowInfoaboutSelection.isChecked():
+        if self.actionShowInfoaboutSelection.isChecked():
             self.setSelectionChangedConnected(False)
             self.showInMap(ids, "PAR")
             self.setSelectionChangedConnected(True)
@@ -372,7 +363,7 @@ class MainApp (QtGui.QMainWindow):
             self.showInMap(ids, "PAR")
 
     def showBudInMap(self, ids):
-        if self.ui.actionShowInfoaboutSelection.isChecked():
+        if self.actionShowInfoaboutSelection.isChecked():
             self.setSelectionChangedConnected(False)
             self.showInMap(ids, "BUD")
             self.setSelectionChangedConnected(True)
@@ -380,105 +371,108 @@ class MainApp (QtGui.QMainWindow):
             self.showInMap(ids, "BUD")
 
     def showOnCuzk(self):
-        x = self.ui.vfkBrowser.currentDefinitionPoint().first.split(".")[0]
-        y= self.ui.vfkBrowser.currentDefinitionPoint().second.split(".")[0]
+        x = self.vfkBrowser.currentDefinitionPoint().first.split(".")[0]
+        y= self.vfkBrowser.currentDefinitionPoint().second.split(".")[0]
 
         url = "http://nahlizenidokn.cuzk.cz/MapaIdentifikace.aspx?&x=-{}&y=-{}".format(y, x)
         QDesktopServices.openUrl(QUrl(url, QUrl.TolerantMode))
 
     @pyqtSlot()
     def switchToImport(self):
-        self.ui.actionImport.trigger()
+        self.actionImport.trigger()
 
     @pyqtSlot(int)
     def switchToSearch(self, searchType):
         """
         :param searchType: int
         """
-        self.ui.actionVyhledavani.trigger()
-        self.ui.searchCombo.setCurrentIndex(searchType)
-        self.ui.searchForms.setCurrentIndex(searchType)
+        self.actionVyhledavani.trigger()
+        self.searchCombo.setCurrentIndex(searchType)
+        self.searchForms.setCurrentIndex(searchType)
 
     def __createToolbarsAndConnect(self):
 
         # Main toolbar
         # ------------
-        self.__mainToolBar = QToolBar(self)
-        self.__mainToolBar.addAction(self.ui.actionImport)
-        self.__mainToolBar.addAction(self.ui.actionVyhledavani)
-        self.__mainToolBar.setOrientation(Qt.Vertical)
-        self.addToolBar(Qt.LeftToolBarArea, self.__mainToolBar)
+        # self.__mainToolBar = QToolBar(self)
+        # self.__mainToolBar.addAction(self.ui.actionImport)
+        # self.__mainToolBar.addAction(self.ui.actionVyhledavani)
+        # self.__mainToolBar.setOrientation(Qt.Vertical)
+        # self.addToolBar(Qt.LeftToolBarArea, self.__mainToolBar)
 
         actionGroup = QActionGroup(self)
-        actionGroup.addAction(self.ui.actionImport)
-        actionGroup.addAction(self.ui.actionVyhledavani)
+        actionGroup.addAction(self.actionImport)
+        actionGroup.addAction(self.actionVyhledavani)
 
         # QSignalMapper
         # -------------
-        self.ui.signalMapper = QSignalMapper(self)
+        self.signalMapper = QSignalMapper(self)
 
         # connect to 'clicked' on all buttons
-        self.connect(self.ui.actionImport, SIGNAL("triggered()"), self.ui.signalMapper, SLOT("map()"))
-        self.connect(self.ui.actionVyhledavani, SIGNAL("triggered()"), self.ui.signalMapper, SLOT("map()"))
+        self.connect(self.actionImport, SIGNAL("triggered()"), self.signalMapper, SLOT("map()"))
+        self.connect(self.actionVyhledavani, SIGNAL("triggered()"), self.signalMapper, SLOT("map()"))
 
         # setMapping on each button to the QStackedWidget index we'd like to switch to
-        self.ui.signalMapper.setMapping(self.ui.actionImport, 0)
-        self.ui.signalMapper.setMapping(self.ui.actionVyhledavani, 1)
+        self.signalMapper.setMapping(self.actionImport, 0)
+        self.signalMapper.setMapping(self.actionVyhledavani, 1)
 
         # connect mapper to stackedWidget
-        self.connect(self.ui.signalMapper, SIGNAL("mapped(int)"), self.ui.stackedWidget, SLOT("setCurrentIndex(int)"))
-        self.ui.actionImport.trigger()
+        self.connect(self.signalMapper, SIGNAL("mapped(int)"), self.stackedWidget, SLOT("setCurrentIndex(int)"))
+        self.actionImport.trigger()
 
-        self.connect(self.ui.vfkBrowser, SIGNAL("switchToPanelImport()"), self.switchToImport)
-        self.connect(self.ui.vfkBrowser, SIGNAL("switchToPanelSearch(int)"), self, SLOT("switchToSearch(int)"))
+        self.connect(self.vfkBrowser, SIGNAL("switchToPanelImport()"), self.switchToImport)
+        self.connect(self.vfkBrowser, SIGNAL("switchToPanelSearch(int)"), self, SLOT("switchToSearch(int)"))
 
         # Browser toolbar
         # ---------------
         self.__mBrowserToolbar = QToolBar(self)
-        self.connect(self.ui.actionBack, SIGNAL("triggered()"), self.ui.vfkBrowser.goBack)
-        self.connect(self.ui.actionForward, SIGNAL("triggered()"), self.ui.vfkBrowser.goForth)
-        self.ui.actionSelectBudInMap.triggered.connect(self.selectBudInMap)
-        self.ui.actionSelectParInMap.triggered.connect(self.selectParInMap)
-        self.ui.actionCuzkPage.triggered.connect(self.showOnCuzk)
-        self.ui.actionExportLatex.triggered.connect(self.latexExport)
-        self.ui.actionExportHtml.triggered.connect(self.htmlExport)
-        self.connect(self.ui.actionShowInfoaboutSelection, SIGNAL("toggled(bool)"), self,
+        self.connect(self.actionBack, SIGNAL("triggered()"), self.vfkBrowser.goBack)
+        self.connect(self.actionForward, SIGNAL("triggered()"), self.vfkBrowser.goForth)
+        self.actionSelectBudInMap.triggered.connect(self.selectBudInMap)
+        self.actionSelectParInMap.triggered.connect(self.selectParInMap)
+        self.actionCuzkPage.triggered.connect(self.showOnCuzk)
+        self.actionExportLatex.triggered.connect(self.latexExport)
+        self.actionExportHtml.triggered.connect(self.htmlExport)
+        self.connect(self.actionShowInfoaboutSelection, SIGNAL("toggled(bool)"), self,
                      SLOT("setSelectionChangedConnected(bool)"))
-        self.connect(self.ui.actionShowHelpPage, SIGNAL("triggered()"), self.ui.vfkBrowser.showHelpPage)
+        self.connect(self.actionShowHelpPage, SIGNAL("triggered()"), self.vfkBrowser.showHelpPage)
 
-        self.ui.browseButton.clicked.connect(self.browseButton_clicked)
-        self.ui.loadVfkButton.clicked.connect(self.loadVfkButton_clicked)
+        self.browseButton.clicked.connect(self.browseButton_clicked)
+        self.loadVfkButton.clicked.connect(self.loadVfkButton_clicked)
 
         bt = QToolButton(self.__mBrowserToolbar)
         bt.setPopupMode(QToolButton.InstantPopup)
         bt.setText("Export ")
 
         menu = QMenu(bt)
-        menu.addAction(self.ui.actionExportLatex)
-        menu.addAction(self.ui.actionExportHtml)
+        menu.addAction(self.actionExportLatex)
+        menu.addAction(self.actionExportHtml)
         bt.setMenu(menu)
 
         # add actions to toolbar icons
-        self.__mBrowserToolbar.addAction(self.ui.actionBack)
-        self.__mBrowserToolbar.addAction(self.ui.actionForward)
-        self.__mBrowserToolbar.addAction(self.ui.actionSelectParInMap)
-        self.__mBrowserToolbar.addAction(self.ui.actionSelectBudInMap)
-        self.__mBrowserToolbar.addAction(self.ui.actionCuzkPage)
+        self.__mBrowserToolbar.addAction(self.actionImport)
+        self.__mBrowserToolbar.addAction(self.actionVyhledavani)
         self.__mBrowserToolbar.addSeparator()
-        self.__mBrowserToolbar.addAction(self.ui.actionShowInfoaboutSelection)
+        self.__mBrowserToolbar.addAction(self.actionBack)
+        self.__mBrowserToolbar.addAction(self.actionForward)
+        self.__mBrowserToolbar.addAction(self.actionSelectParInMap)
+        self.__mBrowserToolbar.addAction(self.actionSelectBudInMap)
+        self.__mBrowserToolbar.addAction(self.actionCuzkPage)
+        self.__mBrowserToolbar.addSeparator()
+        self.__mBrowserToolbar.addAction(self.actionShowInfoaboutSelection)
         self.__mBrowserToolbar.addSeparator()
         self.__mBrowserToolbar.addWidget(bt)
         self.__mBrowserToolbar.addSeparator()
-        self.__mBrowserToolbar.addAction(self.ui.actionShowHelpPage)
+        self.__mBrowserToolbar.addAction(self.actionShowHelpPage)
 
-        self.ui.rightWidgetLayout.insertWidget(0, self.__mBrowserToolbar)
+        self.rightWidgetLayout.insertWidget(0, self.__mBrowserToolbar)
 
         # connect signals from vfkbrowser when changing history
-        self.connect(self.ui.vfkBrowser, SIGNAL("currentParIdsChanged(bool)"),
-                     self.ui.actionSelectParInMap, SLOT("setEnabled(bool)"))
-        self.connect(self.ui.vfkBrowser, SIGNAL("currentBudIdsChanged(bool)"),
-                     self.ui.actionSelectBudInMap, SLOT("setEnabled(bool)"))
-        self.connect(self.ui.vfkBrowser, SIGNAL("historyBefore(bool)"), self.ui.actionBack, SLOT("setEnabled(bool)"))
-        self.connect(self.ui.vfkBrowser, SIGNAL("historyAfter(bool)"), self.ui.actionForward, SLOT("setEnabled(bool)"))
-        self.connect(self.ui.vfkBrowser, SIGNAL("definitionPointAvailable(bool)"),
-                     self.ui.actionCuzkPage, SLOT("setEnabled(bool)"))
+        self.connect(self.vfkBrowser, SIGNAL("currentParIdsChanged(bool)"),
+                     self.actionSelectParInMap, SLOT("setEnabled(bool)"))
+        self.connect(self.vfkBrowser, SIGNAL("currentBudIdsChanged(bool)"),
+                     self.actionSelectBudInMap, SLOT("setEnabled(bool)"))
+        self.connect(self.vfkBrowser, SIGNAL("historyBefore(bool)"), self.actionBack, SLOT("setEnabled(bool)"))
+        self.connect(self.vfkBrowser, SIGNAL("historyAfter(bool)"), self.actionForward, SLOT("setEnabled(bool)"))
+        self.connect(self.vfkBrowser, SIGNAL("definitionPointAvailable(bool)"),
+                     self.actionCuzkPage, SLOT("setEnabled(bool)"))

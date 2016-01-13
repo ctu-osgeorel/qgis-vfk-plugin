@@ -60,7 +60,8 @@ class vfkPlugin:
                 QCoreApplication.installTranslator(self.translator)
 
         # Create the dialog (after translation) and keep reference
-        self.app = MainApp(self.iface)
+        #self.app = MainApp(self.iface)
+
 
         # Declare instance attributes
         self.actions = []
@@ -168,6 +169,7 @@ class vfkPlugin:
             callback=self.run,
             parent=self.iface.mainWindow())
 
+        self.myDockWidget = MainApp(self.iface)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -179,8 +181,15 @@ class vfkPlugin:
         # remove the toolbar
         del self.toolbar
 
+        if self.myDockWidget:
+            self.myDockWidget.close()
+        self.myDockWidget = None
 
     def run(self):
         """Run method that performs all the real work"""
         # show the dialog
-        self.app.show()
+        if self.myDockWidget.isVisible():
+            self.myDockWidget.hide()
+        else:
+            self.iface.addDockWidget(Qt.TopDockWidgetArea, self.myDockWidget)
+            self.myDockWidget.show()
