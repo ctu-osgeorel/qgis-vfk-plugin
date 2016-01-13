@@ -22,6 +22,7 @@
 """
 
 from PyQt4.QtSql import QSqlQueryModel, QSqlRecord, QSqlField, QSqlDatabase
+from PyQt4.QtCore import qWarning
 
 
 class VfkTableModel(QSqlQueryModel):
@@ -41,8 +42,8 @@ class VfkTableModel(QSqlQueryModel):
         Opravneni = 0
         Povinnost = 1
 
-    def __init__(self, connectionName=None):
-        super(VfkTableModel, self).__init__()
+    def __init__(self, connectionName=None, parent=None):
+        super(VfkTableModel, self).__init__(parent)
 
         self.__mConnectionName = connectionName
 
@@ -88,6 +89,7 @@ class VfkTableModel(QSqlQueryModel):
                 "LEFT JOIN drupoz ON par.drupoz_kod = drupoz.kod " \
                 "LEFT JOIN zpvypo ON par.zpvypa_kod = zpvypo.kod " \
                 "WHERE tel.id = {};".format(columns, cisloTel)
+
         return self.__evaluate(query)
 
     def vlastnikParcely(self, opsubId, extended):

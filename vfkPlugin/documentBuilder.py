@@ -144,11 +144,11 @@ class DocumentBuilder:
             return
 
         self.__mDocument.heading1(u"List vlastnictví")
-        content = [TPair("List vlastnictví:", self.makeLVCislo(hlavickaModel, 0)),
-                   TPair("Kat. území:", self.makeKatastrUzemi(hlavickaModel, 0)),
-                   TPair("Obec:", self.makeObec(hlavickaModel, 0)),
-                   TPair("Okres:", "{} {}".format(hlavickaModel.value(0, "okresy_nazev"),
-                                                  hlavickaModel.value(0, "okresy_nuts4")))]
+        content = [TPair(u"List vlastnictví:", self.makeLVCislo(hlavickaModel, 0)),
+                   TPair(u"Kat. území:", self.makeKatastrUzemi(hlavickaModel, 0)),
+                   TPair(u"Obec:", self.makeObec(hlavickaModel, 0)),
+                   TPair(u"Okres:", u"{} {}".format(hlavickaModel.value(0, u"okresy_nazev"),
+                                                  hlavickaModel.value(0, u"okresy_nuts4")))]
 
         self.__mDocument.keyValueTable(content)
 
