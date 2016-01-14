@@ -59,7 +59,7 @@ class SearchFormController(QObject):
 
         self.__controls = mainControls
         self.__forms = searchForms
-        self.__mConnectionName = ""
+        self.__mConnectionName = ''
 
         self.__mDruhParcely = None
         self.__mDruhPozemkoveParcely = None
@@ -92,8 +92,6 @@ class SearchFormController(QObject):
         """
 
         """
-        qWarning("...SearchComboIndex = {}".format(self.__controls.formCombobox.itemData(self.__controls.formCombobox.currentIndex())))
-
         QApplication.setOverrideCursor(Qt.WaitCursor)
         QApplication.processEvents()
 
