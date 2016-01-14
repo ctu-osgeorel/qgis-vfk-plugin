@@ -52,7 +52,6 @@ class MainApp(QDockWidget, Ui_MainApp):
         Bud = 1
 
     def __init__(self, iface):
-
         QDockWidget.__init__(self, iface.mainWindow())
         self.setupUi(self)
         self.iface = iface

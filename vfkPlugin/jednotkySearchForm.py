@@ -39,16 +39,16 @@ class JednotkySearchForm(QWidget):
         self.__mZpusobVyuzitiModel = QAbstractItemModel
 
     def cisloJednotky(self):
-        return str(self.ui.mCisloJednotkyLineEdit.text()).strip()
+        return unicode(self.ui.mCisloJednotkyLineEdit.text()).strip()
 
     def domovniCislo(self):
-        return str(self.ui.mCisloDomovniLineEdit.text()).strip()
+        return unicode(self.ui.mCisloDomovniLineEdit.text()).strip()
 
     def naParcele(self):
-        return str(self.ui.mNaParceleLineEdit.text()).strip()
+        return unicode(self.ui.mNaParceleLineEdit.text()).strip()
 
     def lv(self):
-        return str(self.ui.mLvJednotkyLineEdit.text()).strip()
+        return unicode(self.ui.mLvJednotkyLineEdit.text()).strip()
 
     def setZpusobVyuzitiModel(self, model):
         self.__mZpusobVyuzitiModel = model
@@ -58,4 +58,4 @@ class JednotkySearchForm(QWidget):
     def zpusobVyuzitiKod(self):
         row = self.ui.mZpVyuzitiCombo.currentIndex()
         index = QModelIndex(self.ui.mZpVyuzitiCombo.model().index(row, 0))
-        return str(self.ui.mZpVyuzitiCombo.model().data(index))
+        return unicode(self.ui.mZpVyuzitiCombo.model().data(index))

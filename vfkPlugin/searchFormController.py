@@ -22,7 +22,7 @@
 """
 
 from PyQt4.QtCore import QObject, QUrl, QRegExp, SIGNAL, SLOT, Qt, pyqtSignal, qWarning, QVariant, QDataStream
-from PyQt4.QtGui import QStandardItemModel, QComboBox, QPushButton, QStackedWidget
+from PyQt4.QtGui import QStandardItemModel, QComboBox, QPushButton, QStackedWidget, QStandardItem
 
 from vlastniciSearchForm import *
 from parcelySearchForm import *
@@ -32,18 +32,19 @@ from vfkTableModel import *
 
 
 class SearchFormController(QObject):
-    class SearchForms(object):
-        vlastnici = VlastniciSearchForm()
-        parcely = ParcelySearchForm()
-        budovy = BudovySearchForm()
-        jednotky = JednotkySearchForm()
 
-    class MainControls(object):
+    class SearchForms:
+        vlastnici = None
+        parcely = None
+        budovy = None
+        jednotky = None
+
+    class MainControls:
         formCombobox = QComboBox()
         searchForms = QStackedWidget()
         searchButton = QPushButton()
 
-    class Form(object):
+    class Form:
         Vlastnici = 0
         Parcely = 1
         Budovy = 2
@@ -192,7 +193,7 @@ class SearchFormController(QObject):
         self.__mZpusobVyuzitiJednotek = VfkTableModel(self.__mConnectionName)
         self.__mZpusobVyuzitiJednotek.zpusobVyuzitiJednotek()
 
-        falseKodForDefaultDruh = ""
+        falseKodForDefaultDruh = u''
         text = u'libovolný'
         fakeRow = [falseKodForDefaultDruh, text]
 
@@ -222,11 +223,8 @@ class SearchFormController(QObject):
 
             for j in xrange(oldModel.columnCount()):
                 index = QModelIndex(oldModel.index(i, j))
-                #data = oldModel.data(index)
-                data = QDataStream()
-                data.writeQVariant(oldModel.data(index))
-
-                item = QStandardItem(data.readQVariant())
+                data = oldModel.data(index)
+                item = QStandardItem(data)
                 items.append(item)
 
             model.appendRow(items)

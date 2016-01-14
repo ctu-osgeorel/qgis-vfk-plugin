@@ -47,10 +47,10 @@ class VlastniciSearchForm(QWidget):
         self.connect(self.ui.sjmCheckBox, SIGNAL("clicked()"), self.__vlastniciSearchEnabled)
 
     def jmeno(self):
-        return str(self.ui.jmenoLineEdit.text()).strip()
+        return unicode(self.ui.jmenoLineEdit.text()).strip()
 
     def rcIco(self):
-        return str(self.ui.rcIcoLineEdit.text()).strip()
+        return unicode(self.ui.rcIcoLineEdit.text()).strip()
 
     def isSjm(self):
         return self.ui.sjmCheckBox.isChecked()
@@ -62,7 +62,7 @@ class VlastniciSearchForm(QWidget):
         return self.ui.ofoCheckBox.isChecked()
 
     def lv(self):
-        return str(self.ui.lvVlastniciLineEdit.text()).strip()
+        return unicode(self.ui.lvVlastniciLineEdit.text()).strip()
 
     def __vlastniciSearchEnabled(self):
         if self.ui.ofoCheckBox.isChecked() or self.ui.opoCheckBox.isChecked() or self.ui.sjmCheckBox.isChecked():

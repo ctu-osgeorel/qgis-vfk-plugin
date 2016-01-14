@@ -39,13 +39,13 @@ class BudovySearchForm(QWidget):
         self.__mZpusobVyuzitiModel = QAbstractItemModel
 
     def domovniCislo(self):
-        return str(self.ui.cisloDomovniLineEdit.text()).strip()
+        return unicode(self.ui.cisloDomovniLineEdit.text()).strip()
 
     def naParcele(self):
-        return str(self.ui.naParceleLineEdit.text()).strip()
+        return unicode(self.ui.naParceleLineEdit.text()).strip()
 
     def lv(self):
-        return str(self.ui.lvBudovyLineEdit.text()).strip()
+        return unicode(self.ui.lvBudovyLineEdit.text()).strip()
 
     def setZpusobVyuzitiModel(self, model):
         """
@@ -59,4 +59,4 @@ class BudovySearchForm(QWidget):
     def zpusobVyuzitiKod(self):
         row = self.ui.mZpVyuzitiCombo.currentIndex()
         index = QModelIndex(self.ui.mZpVyuzitiCombo.model().index(row, 0))
-        return str(self.ui.mZpVyuzitiCombo.model().data(index))
+        return unicode(self.ui.mZpVyuzitiCombo.model().data(index))

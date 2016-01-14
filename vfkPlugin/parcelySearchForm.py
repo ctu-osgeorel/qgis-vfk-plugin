@@ -45,10 +45,10 @@ class ParcelySearchForm(QWidget):
         self.ui.parCisloLineEdit.setValidator(self.validator)
 
     def parcelniCislo(self):
-        return str(self.ui.parCisloLineEdit.text()).strip()
+        return unicode(self.ui.parCisloLineEdit.text()).strip()
 
     def lv(self):
-        return str(self.ui.lvParcelyLineEdit.text()).strip()
+        return unicode(self.ui.lvParcelyLineEdit.text()).strip()
 
     def setDruhPozemkuModel(self, model):
         """
@@ -87,4 +87,4 @@ class ParcelySearchForm(QWidget):
     def druhPozemkuKod(self):
         row = int(self.ui.druhPozemkuCombo.currentIndex())
         index = QModelIndex(self.ui.druhPozemkuCombo.model().index(row, 0))
-        return str(self.ui.druhPozemkuCombo.model().data(index))
+        return unicode(self.ui.druhPozemkuCombo.model().data(index))

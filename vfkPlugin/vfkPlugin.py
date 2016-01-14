@@ -30,7 +30,7 @@ from mainApp import MainApp
 import os.path
 
 
-class vfkPlugin:
+class vfkPlugin(object):
     """QGIS Plugin Implementation."""
 
     def __init__(self, iface):

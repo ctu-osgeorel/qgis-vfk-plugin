@@ -877,7 +877,7 @@ class VfkTableModel(QSqlQueryModel):
         :param stavebni: bool
         :return: bool
         """
-        where = ""
+        where = ''
 
         if pozemkova is True and stavebni is True:
             pass
