@@ -225,11 +225,11 @@ class VfkTextBrowser(QTextBrowser):
             self.processAction(QUrl(url))
 
     def postInit(self):
-        self.currentParIdsChanged.emit(False)
-        self.currentBudIdsChanged.emit(False)
-        self.historyBefore.emit(False)
-        self.historyAfter.emit(False)
-        self.definitionPointAvailable.emit(False)
+        self.emit(SIGNAL("currentParIdsChanged"), False)
+        self.emit(SIGNAL("currentBudIdsChanged"), False)
+        self.emit(SIGNAL("historyBefore"), False)
+        self.emit(SIGNAL("historyAfter"), False)
+        self.emit(SIGNAL("definitionPointAvailable"), False)
 
     def documentFactory(self, format):
         """
@@ -238,7 +238,6 @@ class VfkTextBrowser(QTextBrowser):
         :rtype: VfkDocument
         """
         doc = VfkDocument
-        qWarning("dewdweewf " + str(doc))
 
         if format == VfkTextBrowser.ExportFormat.Latex:
             doc = LatexDocument()
@@ -256,11 +255,13 @@ class VfkTextBrowser(QTextBrowser):
             qWarning("Nejsou podporovany jine formaty pro export")
 
     def updateButtonEnabledState(self):
-        self.currentParIdsChanged.emit(True if self.__mCurrentRecord.parIds else False)
-        self.currentBudIdsChanged.emit(True if self.__mCurrentRecord.budIds else False)
+        self.emit(SIGNAL("currentParIdsChanged"), True if self.__mCurrentRecord.parIds else False)
+        self.emit(SIGNAL("currentBudIdsChanged"), True if self.__mCurrentRecord.budIds else False)
+
         self.historyBefore.emit() ##### dodelat
         self.historyAfter.emit() ##### dodelat
-        self.definitionPointAvailable.emit(True if (self.__mCurrentRecord.definitionPoint.first
+
+        self.emit(SIGNAL("definitionPointAvailable"), True if (self.__mCurrentRecord.definitionPoint.first
                                                     and self.__mCurrentRecord.definitionPoint.second) else False)
 
     def onLinkClicked(self, task):
@@ -297,15 +298,15 @@ class VfkTextBrowser(QTextBrowser):
             record.budIds = self.__mDocumentBuilder.currentBudIds()
             record.definitionPoint = self.__mDocumentBuilder.currentDefinitionPoint()
 
-            #self.updateHistory.emit(record)
+            self.emit(SIGNAL("updateHistory"), record)
 
         elif taskMap["action"] == "selectInMap":
-            self.showParcely.emit(taskMap['ids'].split(','))
+            self.emit(SIGNAL("showParcely"), taskMap['ids'].split(','))
         elif taskMap["action"] == "switchPanel":
             if taskMap["panel"] == "import":
-                self.switchToPanelImport.emit()
+                self.emit(SIGNAL("switchToPanelImport"))
             elif taskMap["panel"] == "search":
-                self.switchToPanelSearch.emit(int(taskMap['type']))
+                self.emit(SIGNAL("switchToPanelSearch"), int(taskMap['type']))
             self.setHtml(self.__mCurrentRecord.html)
         else:
             qWarning("..Jina akce")

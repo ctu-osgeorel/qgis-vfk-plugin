@@ -133,9 +133,9 @@ class MainApp(QDockWidget, Ui_MainApp):
             qWarning(".... ddddddddddddddddddddd...........")
             qWarning(str(vectorLayer))
             if connected is True:
-                self.connect(vectorLayer, SIGNAL("selectionChanged()"), self, SLOT("showInfoAboutSelection()"))
+                self.connect(vectorLayer, SIGNAL("selectionChanged()"), self, SLOT("showInfoAboutSelection"))
             else:
-                self.disconnect(vectorLayer, SIGNAL("selectionChanged()"), self, SLOT("showInfoAboutSelection()"))
+                self.disconnect(vectorLayer, SIGNAL("selectionChanged()"), self, SLOT("showInfoAboutSelection"))
 
     def showInMap(self, ids, layerName):
         qWarning("--jsem v showInMap--")
@@ -436,11 +436,14 @@ class MainApp(QDockWidget, Ui_MainApp):
         self.__mBrowserToolbar = QToolBar(self)
         self.connect(self.actionBack, SIGNAL("triggered()"), self.vfkBrowser.goBack)
         self.connect(self.actionForward, SIGNAL("triggered()"), self.vfkBrowser.goForth)
-        self.actionSelectBudInMap.triggered.connect(self.selectBudInMap)
-        self.actionSelectParInMap.triggered.connect(self.selectParInMap)
-        self.actionCuzkPage.triggered.connect(self.showOnCuzk)
-        self.actionExportLatex.triggered.connect(self.latexExport)
-        self.actionExportHtml.triggered.connect(self.htmlExport)
+
+        self.connect(self.actionSelectBudInMap, SIGNAL("triggered()"), self.selectBudInMap)
+        self.connect(self.actionSelectParInMap, SIGNAL("triggered()"), self.selectParInMap)
+        self.connect(self.actionCuzkPage, SIGNAL("triggered()"), self.showOnCuzk)
+
+        self.connect(self.actionExportLatex, SIGNAL("triggered()"), self.latexExport)
+        self.connect(self.actionExportHtml, SIGNAL("triggered()"), self.htmlExport)
+
         self.connect(self.actionShowInfoaboutSelection, SIGNAL("toggled(bool)"), self.setSelectionChangedConnected)
         self.connect(self.actionShowHelpPage, SIGNAL("triggered()"), self.vfkBrowser.showHelpPage)
 
