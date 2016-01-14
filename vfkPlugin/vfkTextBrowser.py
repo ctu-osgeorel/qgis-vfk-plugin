@@ -146,7 +146,7 @@ class VfkTextBrowser(QTextBrowser):
 
         return taskMap
 
-    @pyqtSlot()
+
     def goBack(self):
         qWarning("...goBack function")
         # if self.__mHistoryIt != self.__mUrlHistory[0]:
@@ -155,7 +155,7 @@ class VfkTextBrowser(QTextBrowser):
         #     self.setHtml(self.__mCurrentRecord.html)
         #     self.updateButtonEnabledState()
 
-    @pyqtSlot()
+
     def goForth(self):
         qWarning("...goForth function")
         # if self.__mHistoryIt != self.__mUrlHistory[-2]:
@@ -278,12 +278,9 @@ class VfkTextBrowser(QTextBrowser):
         """
         self.__mCurrentUrl = task
 
-        qWarning("..VfkTextBrowser.processAction()")
-
         taskMap = self.__parseTask(task)
 
         if taskMap["action"] == "showText":
-            qWarning("...............showText ano")
             QApplication.setOverrideCursor(QCursor(QtCore.Qt.WaitCursor))
             t = QtCore.QTime()
             t.start()

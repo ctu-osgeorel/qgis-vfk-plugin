@@ -13,12 +13,12 @@ from domains import *
 
 class Coordinates(object):
     def __init__(self):
-        self.first = ""
-        self.second = ""
+        self.first = ''
+        self.second = ''
 
 
 class DocumentBuilder:
-    def __init__(self, connectionName=""):
+    def __init__(self, connectionName=''):
         """
         :type connectionName: str
         """
@@ -970,9 +970,9 @@ class DocumentBuilder:
         if ok is False:
             return
 
-        content = [TPair("Číslo jednotky:", self.makeJednotka(model, 0)),
-                   TPair("V budově:", self.makeDomovniCislo(model, 0)),
-                   TPair("Na parcele:", self.makeParcelniCislo(model, 0))]
+        content = [TPair(u"Číslo jednotky:", self.makeJednotka(model, 0)),
+                   TPair(u"V budově:", self.makeDomovniCislo(model, 0)),
+                   TPair(u"Na parcele:", self.makeParcelniCislo(model, 0))]
 
         self.__mCurrentPageParIds.append(model.value(0, "par_id"))
         self.__mCurrentPageBudIds.append(model.value(0, "bud_id"))
@@ -1418,9 +1418,9 @@ class DocumentBuilder:
         :param row: int
         :return: str
         """
-        return self.__mDocument.link("showText?page=bud&id={}".format(model.value(row, "bud_id")),
-                                     "{} {}".format(model.value(row, "typbud_zkratka"),
-                                                    model.value(row, "bud_cislo_domovni")))
+        return self.__mDocument.link(u"showText?page=bud&id={}".format(model.value(row, u"bud_id")),
+                                     u"{} {}".format(model.value(row, u"typbud_zkratka"),
+                                                    model.value(row, u"bud_cislo_domovni")))
 
     def makeJednotka(self, model, row):
         """

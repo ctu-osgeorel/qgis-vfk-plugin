@@ -22,6 +22,7 @@
 """
 
 # Import the PyQt, QGIS libraries and classes
+from PIL.PsdImagePlugin import _layerinfo
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup
 from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, pyqtSlot, qWarning
@@ -57,10 +58,10 @@ class MainApp(QDockWidget, Ui_MainApp):
         self.iface = iface
 
         # variables
-        self.__mLastVfkFile = ""
+        self.__mLastVfkFile = ''
         self.__mOgrDataSource = None
-        self.__mDataSourceName = ""
-        self.__fileName = ""
+        self.__mDataSourceName = ''
+        self.__fileName = ''
         self.__mLoadedLayers = {}
         self.__mDefaultPalette = self.vfkFileLineEdit.palette()
 
@@ -84,10 +85,11 @@ class MainApp(QDockWidget, Ui_MainApp):
         # search form controller
         self.__mSearchController = SearchFormController(self.searchFormMainControls, self.searchForms, self)
 
-        self.connect(self.__mSearchController, SIGNAL("actionTriggered(QUrl)"), self.vfkBrowser, SLOT("processAction(QUrl)"))
-        self.connect(self, SIGNAL("enableSearch(bool)"), self.searchButton, SLOT("setEnabled(bool)"))
-        self.vfkBrowser.connect(self, SIGNAL("showParcely(list)"), self, SLOT("showParInMap(list)"))
-        self.vfkBrowser.connect(self, SIGNAL("showBudovy(list)"), self, SLOT("showBudInMap(list)"))
+        self.connect(self.__mSearchController, SIGNAL("actionTriggered(QUrl)"), self.vfkBrowser.processAction)
+        self.connect(self, SIGNAL("enableSearch"), self.searchButton.setEnabled)
+
+        self.connect(self.vfkBrowser, SIGNAL("showParcely"), self.showParInMap)
+        self.connect(self.vfkBrowser, SIGNAL("showBudovy"), self.showBudInMap)
 
         self.vfkBrowser.showHelpPage()
 
@@ -124,22 +126,26 @@ class MainApp(QDockWidget, Ui_MainApp):
             self.vfkBrowser.exportDocument(self.vfkBrowser.currentUrl(), fileName, self.vfkBrowser.ExportFormat.Html)
 
     def setSelectionChangedConnected(self, connected):
+        qWarning(".... setSelectionChangedConnected...........")
         for i, id in enumerate(self.__mLoadedLayers):
             vectorLayer = QgsVectorLayer(QgsMapLayerRegistry.instance().mapLayer(id))
 
-            qWarning(".... setSelectionChangedConnected...........")
-
+            qWarning(".... ddddddddddddddddddddd...........")
+            qWarning(str(vectorLayer))
             if connected is True:
-                self.connect(vectorLayer, SIGNAL("selectionChanged()"), self, SLOT("showInfoAboutSelection"))
+                self.connect(vectorLayer, SIGNAL("selectionChanged()"), self, SLOT("showInfoAboutSelection()"))
             else:
-                self.disconnect(vectorLayer, SIGNAL("selectionChanged()"), self, SLOT("showInfoAboutSelection"))
+                self.disconnect(vectorLayer, SIGNAL("selectionChanged()"), self, SLOT("showInfoAboutSelection()"))
 
     def showInMap(self, ids, layerName):
+        qWarning("--jsem v showInMap--")
+        qWarning(str(ids))
+        qWarning("layerName: " + str(layerName))
         if self.__mLoadedLayers.has_key(layerName):
             id = self.__mLoadedLayers[layerName]
             vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
-            searchString = "ID IN ('{}')".format("','".join(ids))
-
+            searchString = "ID IN ({})".format("','".join(ids))
+            qWarning(searchString)
             error = ""
             fIds = self.__search(vectorLayer, searchString, error)
             if error != "":
@@ -189,7 +195,7 @@ class MainApp(QDockWidget, Ui_MainApp):
             if self.loadVfkFile(fileName, errorMsg) is False:
                 msg2 = u'Nepodařilo se získat OGR provider'
                 QMessageBox.critical(self, u'Nepodařilo se získat data provider', msg2)
-                self.enableSearch.emit(False)
+                self.emit(SIGNAL("enableSearch"), False)
                 return
 
             if self.__openDatabase(self.__mDataSourceName) is False:
@@ -197,13 +203,13 @@ class MainApp(QDockWidget, Ui_MainApp):
                 if QSqlDatabase.isDriverAvailable('QSQLITE') is False:
                     msg1 += u'\nDatabázový ovladač QSQLITE není dostupný.'
                 QMessageBox.critical(self, u'Chyba', msg1)
-                self.enableSearch.emit(False)
+                self.emit(SIGNAL("enableSearch"), False)
                 return
 
             self.vfkBrowser.setConnectionName(str(self.property("connectionName")))
             self.__mSearchController.setConnectionName(str(self.property("connectionName")))
 
-            self.enableSearch.emit(True)
+            self.emit(SIGNAL("enableSearch"), True)
             self.__mLastVfkFile = fileName
             self.__mLoadedLayers.clear()
 
@@ -270,7 +276,7 @@ class MainApp(QDockWidget, Ui_MainApp):
             QMessageBox.information(self, 'Load Style', errorMsg)
 
         layer.triggerRepaint()
-        self.refreshLegend.emit(layer)
+        self.emit(SIGNAL("refreshLegend"), layer)
 
         return True
 
@@ -343,7 +349,7 @@ class MainApp(QDockWidget, Ui_MainApp):
     def showInfoAboutSelection(self):
         layers = ["PAR", "BUD"]
         layerIds = {}
-
+        qWarning("--showInfoAboutSelection")
         for layer in layers:
             if layer in self.__mLoadedLayers:
                 qWarning("Vrstva {} obsazena..".format(layer))
@@ -354,6 +360,7 @@ class MainApp(QDockWidget, Ui_MainApp):
         self.vfkBrowser.showInfoAboutSelection(layerIds["PAR"], layerIds["BUD"])
 
     def showParInMap(self, ids):
+        qWarning("showParInMap")
         if self.actionShowInfoaboutSelection.isChecked():
             self.setSelectionChangedConnected(False)
             self.showInMap(ids, "PAR")
@@ -362,6 +369,7 @@ class MainApp(QDockWidget, Ui_MainApp):
             self.showInMap(ids, "PAR")
 
     def showBudInMap(self, ids):
+        qWarning("showBudInMap")
         if self.actionShowInfoaboutSelection.isChecked():
             self.setSelectionChangedConnected(False)
             self.showInMap(ids, "BUD")
@@ -376,11 +384,11 @@ class MainApp(QDockWidget, Ui_MainApp):
         url = "http://nahlizenidokn.cuzk.cz/MapaIdentifikace.aspx?&x=-{}&y=-{}".format(y, x)
         QDesktopServices.openUrl(QUrl(url, QUrl.TolerantMode))
 
-    @pyqtSlot()
+
     def switchToImport(self):
         self.actionImport.trigger()
 
-    @pyqtSlot(int)
+
     def switchToSearch(self, searchType):
         """
         :param searchType: int
@@ -388,6 +396,7 @@ class MainApp(QDockWidget, Ui_MainApp):
         self.actionVyhledavani.trigger()
         self.searchCombo.setCurrentIndex(searchType)
         self.searchForms.setCurrentIndex(searchType)
+        qWarning("switched to search window..")
 
     def __createToolbarsAndConnect(self):
 
@@ -419,8 +428,8 @@ class MainApp(QDockWidget, Ui_MainApp):
         self.connect(self.signalMapper, SIGNAL("mapped(int)"), self.stackedWidget, SLOT("setCurrentIndex(int)"))
         self.actionImport.trigger()
 
-        self.connect(self.vfkBrowser, SIGNAL("switchToPanelImport()"), self.switchToImport)
-        self.connect(self.vfkBrowser, SIGNAL("switchToPanelSearch(int)"), self, SLOT("switchToSearch(int)"))
+        self.connect(self.vfkBrowser, SIGNAL("switchToPanelImport"), self.switchToImport)
+        self.connect(self.vfkBrowser, SIGNAL("switchToPanelSearch"), self.switchToSearch)
 
         # Browser toolbar
         # ---------------
@@ -432,8 +441,7 @@ class MainApp(QDockWidget, Ui_MainApp):
         self.actionCuzkPage.triggered.connect(self.showOnCuzk)
         self.actionExportLatex.triggered.connect(self.latexExport)
         self.actionExportHtml.triggered.connect(self.htmlExport)
-        self.connect(self.actionShowInfoaboutSelection, SIGNAL("toggled(bool)"), self,
-                     SLOT("setSelectionChangedConnected(bool)"))
+        self.connect(self.actionShowInfoaboutSelection, SIGNAL("toggled(bool)"), self.setSelectionChangedConnected)
         self.connect(self.actionShowHelpPage, SIGNAL("triggered()"), self.vfkBrowser.showHelpPage)
 
         self.browseButton.clicked.connect(self.browseButton_clicked)
@@ -467,11 +475,8 @@ class MainApp(QDockWidget, Ui_MainApp):
         self.rightWidgetLayout.insertWidget(0, self.__mBrowserToolbar)
 
         # connect signals from vfkbrowser when changing history
-        self.connect(self.vfkBrowser, SIGNAL("currentParIdsChanged(bool)"),
-                     self.actionSelectParInMap, SLOT("setEnabled(bool)"))
-        self.connect(self.vfkBrowser, SIGNAL("currentBudIdsChanged(bool)"),
-                     self.actionSelectBudInMap, SLOT("setEnabled(bool)"))
-        self.connect(self.vfkBrowser, SIGNAL("historyBefore(bool)"), self.actionBack, SLOT("setEnabled(bool)"))
-        self.connect(self.vfkBrowser, SIGNAL("historyAfter(bool)"), self.actionForward, SLOT("setEnabled(bool)"))
-        self.connect(self.vfkBrowser, SIGNAL("definitionPointAvailable(bool)"),
-                     self.actionCuzkPage, SLOT("setEnabled(bool)"))
+        self.connect(self.vfkBrowser, SIGNAL("currentParIdsChanged(bool)"), self.actionSelectParInMap.setEnabled)
+        self.connect(self.vfkBrowser, SIGNAL("currentBudIdsChanged(bool)"), self.actionSelectBudInMap.setEnabled)
+        self.connect(self.vfkBrowser, SIGNAL("historyBefore(bool)"), self.actionBack.setEnabled)
+        self.connect(self.vfkBrowser, SIGNAL("historyAfter(bool)"), self.actionForward.setEnabled)
+        self.connect(self.vfkBrowser, SIGNAL("definitionPointAvailable(bool)"), self.actionCuzkPage.setEnabled)

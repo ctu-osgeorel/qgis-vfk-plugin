@@ -932,4 +932,4 @@ class VfkTableModel(QSqlQueryModel):
         :param column:
         :return: str
         """
-        return str(self.record(row).field(column).value())
+        return unicode(self.record(row).field(column).value())
