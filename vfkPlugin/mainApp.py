@@ -395,7 +395,7 @@ class MainApp(QDockWidget, Ui_MainApp):
         """
         self.actionVyhledavani.trigger()
         self.searchCombo.setCurrentIndex(searchType)
-        self.searchForms.setCurrentIndex(searchType)
+        #self.searchForms.setCurrentIndex(searchType)
         qWarning("switched to search window..")
 
     def __createToolbarsAndConnect(self):

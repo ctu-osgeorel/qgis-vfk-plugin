@@ -26,8 +26,8 @@ from vfkDocument import *
 
 class RichTextDocument(VfkDocument):
     # static variables
-    defaultTableAttributes = u"border=\"0\" cellspacing=\"1px\" cellpadding=\"0\""
-    defaultCssStyle = u"""
+    defaultTableAttributes = "border=\"0\" cellspacing=\"1px\" cellpadding=\"0\""
+    defaultCssStyle = """
         body{
           background-color: white;
           color: black;
@@ -136,7 +136,7 @@ class RichTextDocument(VfkDocument):
         self.beginTable()
 
         for it in content:
-            self.tableRow([content.first, content.second])
+            self.tableRow([it.first, it.second])
 
         self.endTable()
 

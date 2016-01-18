@@ -26,7 +26,6 @@ from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import *
 from PyQt4.QtCore import QFile, QIODevice, QUrl, QObject, SIGNAL, SLOT, pyqtSlot, pyqtSignal, QTextStream, qWarning
 from PyQt4.QtSql import QSqlDatabase
-from collections import namedtuple
 
 from documentBuilder import *
 from htmlDocument import *
@@ -35,14 +34,14 @@ from richTextDocument import *
 
 
 class TPair:
-    def __init__(self, first="", second=""):
+    def __init__(self, first=u'', second=u''):
         self.first = first
         self.second = second
 
 
 class HistoryRecord:
     def __init__(self):
-        self.html = ""
+        self.html = u''
         self.parIds = []
         self.budIds = []
         self.definitionPoint = Coordinates()
@@ -79,13 +78,13 @@ class VfkTextBrowser(QTextBrowser):
         self.__mUrlHistory = []     # list of history records
         self.__mHistoryIt = 0      # saving current index in history list
 
-        self.connect(self, SIGNAL("anchorClicked(QUrl)"), self, SLOT("oLinkClicked(QUrl)"))
-        #self.connect(self, SIGNAL("updateHistory(HistoryRecord)"), self.saveHistory(HistoryRecord))
+        self.connect(self, SIGNAL("anchorClicked(QUrl)"), self.onLinkClicked) #, SLOT("oLinkClicked"))
+        self.connect(self, SIGNAL("updateHistory"), self, SLOT("saveHistory"))
 
-        self.currentParIdsChanged.emit(False)
-        self.currentBudIdsChanged.emit(False)
-        self.historyBefore.emit(False)
-        self.historyAfter.emit(False)
+        self.emit(SIGNAL("currentParIdsChanged"), False)
+        self.emit(SIGNAL("currentBudIdsChanged"), False)
+        self.emit(SIGNAL("historyBefore"), False)
+        self.emit(SIGNAL("historyAfter"), False)
 
     def currentUrl(self):
         return self.__mCurrentUrl
@@ -139,7 +138,7 @@ class VfkTextBrowser(QTextBrowser):
         :param task: QUrl
         :return: dict
         """
-        taskMap = {'action': task.path()}
+        taskMap = {u'action': task.path()}
 
         for key, value in task.encodedQueryItems():
             taskMap[str(key)] = QUrl.fromPercentEncoding(value)
@@ -193,7 +192,6 @@ class VfkTextBrowser(QTextBrowser):
 # }
 
     def showHelpPage(self):
-        qWarning("..VfkTextBrowser.showHelpPage()")
         url = "showText?page=help"
         self.processAction(QUrl(url))
 
@@ -205,23 +203,23 @@ class VfkTextBrowser(QTextBrowser):
         :param budIds: list
         :return:
         """
-        url = ""
+        url = u''
         if len(parIds) + len(budIds) == 1:
             if len(parIds) == 1:
-                url = "showText?page=par&id={}".format(parIds[0])
+                url = u"showText?page=par&id={}".format(parIds[0])
             else:
-                url = "showText?page=bud&id={}".format(budIds[0])
+                url = u"showText?page=bud&id={}".format(budIds[0])
 
             self.processAction(QUrl(url))
             return
 
-        urlPart = ""
+        urlPart = u''
         if len(parIds) > 0:
-            urlPart = "&parcely={}".format(", ".join(parIds))
+            urlPart = u"&parcely={}".format(u", ".join(parIds))
         if len(budIds) > 0:
-            urlPart = "&budovy={}".format(", ".join(budIds))
+            urlPart = u"&budovy={}".format(u", ".join(budIds))
         if urlPart:
-            url = "showText?page=seznam&type=id{}".format(urlPart)
+            url = u"showText?page=seznam&type=id{}".format(urlPart)
             self.processAction(QUrl(url))
 
     def postInit(self):
@@ -269,7 +267,6 @@ class VfkTextBrowser(QTextBrowser):
 
         :param task: QUrl
         """
-        qWarning("..onLinkClicked")
         self.processAction(task)
 
     def processAction(self, task):
@@ -281,7 +278,7 @@ class VfkTextBrowser(QTextBrowser):
 
         taskMap = self.__parseTask(task)
 
-        if taskMap["action"] == "showText":
+        if taskMap[u"action"] == u"showText":
             QApplication.setOverrideCursor(QCursor(QtCore.Qt.WaitCursor))
             t = QtCore.QTime()
             t.start()
@@ -300,13 +297,13 @@ class VfkTextBrowser(QTextBrowser):
 
             self.emit(SIGNAL("updateHistory"), record)
 
-        elif taskMap["action"] == "selectInMap":
-            self.emit(SIGNAL("showParcely"), taskMap['ids'].split(','))
-        elif taskMap["action"] == "switchPanel":
-            if taskMap["panel"] == "import":
+        elif taskMap[u"action"] == u"selectInMap":
+            self.emit(SIGNAL("showParcely"), taskMap[u'ids'].split(u','))
+        elif taskMap[u"action"] == u"switchPanel":
+            if taskMap[u"panel"] == u"import":
                 self.emit(SIGNAL("switchToPanelImport"))
-            elif taskMap["panel"] == "search":
-                self.emit(SIGNAL("switchToPanelSearch"), int(taskMap['type']))
+            elif taskMap[u"panel"] == u"search":
+                self.emit(SIGNAL("switchToPanelSearch"), int(taskMap[u'type']))
             self.setHtml(self.__mCurrentRecord.html)
         else:
             qWarning("..Jina akce")
@@ -321,8 +318,8 @@ class VfkTextBrowser(QTextBrowser):
         doc = self.documentFactory(format)
         qWarning("Vytvarim dokument ve formatu: " + str(format))
         if not doc:
-            return ""
+            return ''
 
         self.__mDocumentBuilder.buildHtml(doc, taskMap)
         text = doc.toString()
-        return text
+        return u'{}'.format(text)

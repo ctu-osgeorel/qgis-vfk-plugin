@@ -41,7 +41,7 @@ class ParcelySearchForm(QWidget):
 
         self.connect(self.ui.typParcelyCombo, SIGNAL("currentIndexChanged(int)"), self.__setDruhModel)
         self.rx = QRegExp("[0-9]*/?[0-9]*")
-        self.validator = QRegExpValidator(self.rx, self)
+        self.validator = QRegExpValidator(self.rx)
         self.ui.parCisloLineEdit.setValidator(self.validator)
 
     def parcelniCislo(self):
@@ -55,7 +55,9 @@ class ParcelySearchForm(QWidget):
 
         :param model: QAbstractItemModel
         """
-        self.__defaultModel = self.__pozemkovaModel = self.__stavebniModel = model
+        self.__defaultModel = model
+        self.__pozemkovaModel = model
+        self.__stavebniModel = model
         self.ui.druhPozemkuCombo.setModel(model)
         self.ui.druhPozemkuCombo.setModelColumn(1)
 
@@ -85,6 +87,6 @@ class ParcelySearchForm(QWidget):
         return self.ui.typParcelyCombo.currentIndex()
 
     def druhPozemkuKod(self):
-        row = int(self.ui.druhPozemkuCombo.currentIndex())
-        index = QModelIndex(self.ui.druhPozemkuCombo.model().index(row, 0))
-        return unicode(self.ui.druhPozemkuCombo.model().data(index))
+        row = self.ui.druhPozemkuCombo.currentIndex()
+        index = self.ui.druhPozemkuCombo.model().index(row, 0)
+        return self.ui.druhPozemkuCombo.model().data(index)

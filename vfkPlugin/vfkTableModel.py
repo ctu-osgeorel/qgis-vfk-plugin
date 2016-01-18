@@ -27,18 +27,18 @@ from PyQt4.QtCore import qWarning
 
 class VfkTableModel(QSqlQueryModel):
 
-    class Nemovitost(object):
+    class Nemovitost:
         NParcela = 0
         NBudova = 1
         NJednotka = 2
 
-    class OpravnenyPovinny(object):
+    class OpravnenyPovinny:
         OPParcela = 0
         OPBudova = 1
         OPJednotka = 2
         OPOsoba = 3
 
-    class Pravo(object):
+    class Pravo:
         Opravneni = 0
         Povinnost = 1
 
@@ -275,8 +275,8 @@ class VfkTableModel(QSqlQueryModel):
         query = "SELECT DISTINCT hp.par_id_1 hp_par_id_1, " \
                 "hp.par_id_2 hp_par_id_2 " \
                 "FROM hp " \
-                "WHERE hp.par_id_1 = %1 " \
-                "OR hp.par_id_2 = {};".format(id)
+                "WHERE hp.par_id_1 = {} " \
+                "OR hp.par_id_2 = {};".format(id, id)
         return self.__evaluate(query)
 
     def opravnenySubjekt(self, id, extended):
@@ -436,7 +436,7 @@ class VfkTableModel(QSqlQueryModel):
                 "ORDER BY rl.listin_id;".format(columns, ", ".join(parIds), ", ".join(budIds), ", ".join(jedIds))
         return self.__evaluate(query)
 
-    def vlastnik(self, id, extended):
+    def vlastnik(self, id, extended=False):
         """
 
         :param id: str
@@ -488,48 +488,48 @@ class VfkTableModel(QSqlQueryModel):
         :param lv: str
         :return:
         """
-        whereJmeno = ""
-        join = ""
+        whereJmeno = u''
+        join = u''
 
-        if jmeno != "":
+        if jmeno != u'':
             if ofo is True:
-                whereJmeno += 'opsub.jmeno LIKE "%{}%" OR opsub.prijmeni LIKE "%{}%" OR '.format(jmeno, jmeno)
+                whereJmeno += u'opsub.jmeno LIKE "%{}%" OR opsub.prijmeni LIKE "%{}%" OR '.format(jmeno, jmeno)
             if sjm is True or opo is True:
-                whereJmeno += 'opsub.nazev LIKE "%{}%" OR '.format(jmeno)
-            whereJmeno += "0 "
+                whereJmeno += u'opsub.nazev LIKE "%{}%" OR '.format(jmeno)
+            whereJmeno += u"0 "
 
-        whereIdent = ""
-        if identifikator != "":
+        whereIdent = u""
+        if identifikator != u"":
             if ofo is True:
-                whereIdent += "opsub.rodne_cislo = {} OR ".format(identifikator)
+                whereIdent += u"opsub.rodne_cislo = {} OR ".format(identifikator)
             if opo is True:
-                whereIdent += "opsub.ico = {} OR ".format(identifikator)
-            whereIdent += "0 "
+                whereIdent += u"opsub.ico = {} OR ".format(identifikator)
+            whereIdent += u"0 "
 
         opsubType = []
         if ofo is True:
-            opsubType.append('"OFO"')
+            opsubType.append(u'"OFO"')
         if opo is True:
-            opsubType.append('"OPO"')
+            opsubType.append(u'"OPO"')
         if sjm is True:
-            opsubType.append('"BSM"')
+            opsubType.append(u'"BSM"')
 
-        where = "WHERE "
-        if whereJmeno != "":
-            where += "({}) AND ".format(whereJmeno)
-        if whereIdent != "":
-            where += "({}) AND ".format(whereIdent)
+        where = u"WHERE "
+        if whereJmeno != u"":
+            where += u"({}) AND ".format(whereJmeno)
+        if whereIdent != u"":
+            where += u"({}) AND ".format(whereIdent)
 
-        if lv != "":
-            where += "tel.cislo_tel = {} AND ".format(lv)
-            join += "JOIN vla ON vla.opsub_id = opsub.id " \
-                    "JOIN tel ON vla.tel_id = tel.id "
+        if lv != u"":
+            where += u"tel.cislo_tel = {} AND ".format(lv)
+            join += u"JOIN vla ON vla.opsub_id = opsub.id " \
+                    u"JOIN tel ON vla.tel_id = tel.id "
 
-        where += "opsub.opsub_type IN ({}) ".format(", ".join(opsubType))
-        query = "SELECT DISTINCT opsub.id opsub_id " \
-                "FROM opsub " \
-                "{} {} " \
-                "ORDER BY opsub.prijmeni, opsub.nazev;".format(join, where)
+        where += u"opsub.opsub_type IN ({}) ".format(u", ".join(opsubType))
+        query = u"SELECT DISTINCT opsub.id opsub_id " \
+                u"FROM opsub " \
+                u"{} {} " \
+                u"ORDER BY opsub.prijmeni, opsub.nazev;".format(join, where)
         return self.__evaluate(query)
 
     def searchPar(self, parcelniCislo, typIndex, druhKod, lv):
@@ -541,37 +541,37 @@ class VfkTableModel(QSqlQueryModel):
         :param lv: str
         :return:
         """
-        where = "WHERE "
-        join = ""
+        where = u"WHERE "
+        join = u""
 
-        if parcelniCislo != "":
-            kmenAPoddeleni = [str(parcelniCislo).split("/")]
-            where += "par.kmenove_cislo_par = {} AND ".format(kmenAPoddeleni[0])
+        if parcelniCislo != u"":
+            kmenAPoddeleni = [str(parcelniCislo).split(u"/")]
+            where += u"par.kmenove_cislo_par = {} AND ".format(kmenAPoddeleni[0])
 
-            if len(kmenAPoddeleni) == 2 and kmenAPoddeleni[1] != "":
-                where += "par.poddeleni_cisla_par = {} AND ".format(kmenAPoddeleni[1])
+            if len(kmenAPoddeleni) == 2 and kmenAPoddeleni[1] != u"":
+                where += u"par.poddeleni_cisla_par = {} AND ".format(kmenAPoddeleni[1])
 
-        if druhKod != "":
-            where += "drupoz.kod = {} AND ".format(druhKod)
+        if druhKod != u"":
+            where += u"drupoz.kod = {} AND ".format(druhKod)
 
-        if typIndex == "1":
-            where += 'drupoz.stavebni_parcela = "n" AND '
-        elif typIndex == "2":
-            where += 'drupoz.stavebni_parcela = "a" AND '
+        if typIndex == u"1":
+            where += u'drupoz.stavebni_parcela = "n" AND '
+        elif typIndex == u"2":
+            where += u'drupoz.stavebni_parcela = "a" AND '
 
-        if druhKod != "":
-            where += "par.drupoz_kod = {} AND ".format(druhKod)
+        if druhKod != u"":
+            where += u"par.drupoz_kod = {} AND ".format(druhKod)
 
-        if lv != "":
-            where += "tel.cislo_tel = {} AND ".format(lv)
-            join += "JOIN tel ON tel.id = par.tel_id "
+        if lv != u"":
+            where += u"tel.cislo_tel = {} AND ".format(lv)
+            join += u"JOIN tel ON tel.id = par.tel_id "
 
-        where += "1 "
+        where += u"1 "
 
-        query = "SELECT DISTINCT par.id par_id " \
-                "FROM par " \
-                "JOIN drupoz ON par.drupoz_kod = drupoz.kod " \
-                "{} {};".format(join, where)
+        query = u"SELECT DISTINCT par.id par_id " \
+                u"FROM par " \
+                u"JOIN drupoz ON par.drupoz_kod = drupoz.kod " \
+                u"{} {};".format(join, where)
         return self.__evaluate(query)
 
     def searchBud(self, domovniCislo, naParcele, zpusobVyuzitiKod, lv):
@@ -583,34 +583,34 @@ class VfkTableModel(QSqlQueryModel):
         :param lv: str
         :return:
         """
-        where = "WHERE "
-        join = ""
+        where = u"WHERE "
+        join = u""
 
-        if domovniCislo != "":
-            where += "bud.cislo_domovni = {} AND ".format(domovniCislo)
+        if domovniCislo != u"":
+            where += u"bud.cislo_domovni = {} AND ".format(domovniCislo)
 
-        if naParcele != "":
-            kmenAPoddeleni = str(naParcele).split("/")
-            where += "par.kmenove_cislo_par = {} AND ".format(kmenAPoddeleni[0])
+        if naParcele != u"":
+            kmenAPoddeleni = str(naParcele).split(u"/")
+            where += u"par.kmenove_cislo_par = {} AND ".format(kmenAPoddeleni[0])
 
-            if len(kmenAPoddeleni) == 2 and kmenAPoddeleni[1] != "":
-                where += "par.poddeleni_cisla_par = {} AND ".format(kmenAPoddeleni[1])
+            if len(kmenAPoddeleni) == 2 and kmenAPoddeleni[1] != u"":
+                where += u"par.poddeleni_cisla_par = {} AND ".format(kmenAPoddeleni[1])
 
-            join += "JOIN par ON bud.id = par.bud_id "
+            join += u"JOIN par ON bud.id = par.bud_id "
 
-        if lv != "":
-            where += "tel.cislo_tel = {} AND ".format(lv)
-            join += "JOIN tel ON tel.id = bud.tel_id "
+        if lv != u"":
+            where += u"tel.cislo_tel = {} AND ".format(lv)
+            join += u"JOIN tel ON tel.id = bud.tel_id "
 
-        if zpusobVyuzitiKod != "":
-            where += "zpvybu.kod = {} AND ".format(zpusobVyuzitiKod)
-            join += "JOIN zpvybu ON zpvybu.kod = bud.zpvybu_kod "
+        if zpusobVyuzitiKod != u"":
+            where += u"zpvybu.kod = {} AND ".format(zpusobVyuzitiKod)
+            join += u"JOIN zpvybu ON zpvybu.kod = bud.zpvybu_kod "
 
-        where += "1 "
+        where += u"1 "
 
-        query = "SELECT DISTINCT bud.id bud_id " \
-                "FROM bud " \
-                "{} {};".format(join, where)
+        query = u"SELECT DISTINCT bud.id bud_id " \
+                u"FROM bud " \
+                u"{} {};".format(join, where)
         return self.__evaluate(query)
 
     def searchJed(self, cisloJednotky, domovniCislo, naParcele, zpusobVyuzitiKod, lv):
@@ -623,38 +623,38 @@ class VfkTableModel(QSqlQueryModel):
         :param lv: str
         :return:
         """
-        where = "WHERE "
-        join = ""
+        where = u"WHERE "
+        join = u""
 
-        if cisloJednotky != "":
-            where += "jed.cislo_jednotky = {} AND ".format(cisloJednotky)
+        if cisloJednotky != u"":
+            where += u"jed.cislo_jednotky = {} AND ".format(cisloJednotky)
 
-        if domovniCislo != "":
-            where += "bud.cislo_domovni = {} AND ".format(domovniCislo)
+        if domovniCislo != u"":
+            where += u"bud.cislo_domovni = {} AND ".format(domovniCislo)
 
-        if naParcele != "":
-            kmenAPoddeleni = str(naParcele).split("/")
-            where += "par.kmenove_cislo_par = {} AND ".format(kmenAPoddeleni[0])
+        if naParcele != u"":
+            kmenAPoddeleni = str(naParcele).split(u"/")
+            where += u"par.kmenove_cislo_par = {} AND ".format(kmenAPoddeleni[0])
 
-            if len(kmenAPoddeleni) == 2 and kmenAPoddeleni[1] != "":
-                where += "par.poddeleni_cisla_par = {} AND ".format(kmenAPoddeleni[1])
+            if len(kmenAPoddeleni) == 2 and kmenAPoddeleni[1] != u"":
+                where += u"par.poddeleni_cisla_par = {} AND ".format(kmenAPoddeleni[1])
 
-            join += "JOIN par ON bud.id = par.bud_id "
+            join += u"JOIN par ON bud.id = par.bud_id "
 
-        if lv != "":
-            where += "tel.cislo_tel = {} AND ".format(lv)
-            join += "JOIN tel ON tel.id = jed.tel_id "
+        if lv != u"":
+            where += u"tel.cislo_tel = {} AND ".format(lv)
+            join += u"JOIN tel ON tel.id = jed.tel_id "
 
-        if zpusobVyuzitiKod != "":
-            where += "zpvyje.kod = {} AND ".format(zpusobVyuzitiKod)
-            join += "JOIN zpvyje ON zpvyje.kod = jed.zpvyje_kod "
+        if zpusobVyuzitiKod != u"":
+            where += u"zpvyje.kod = {} AND ".format(zpusobVyuzitiKod)
+            join += u"JOIN zpvyje ON zpvyje.kod = jed.zpvyje_kod "
 
-        where += "1 "
+        where += u"1 "
 
-        query = "SELECT DISTINCT jed.id jed_id " \
-                "FROM jed " \
-                "JOIN bud ON bud.id = jed.bud_id " \
-                "{} {};".format(join, where)
+        query = u"SELECT DISTINCT jed.id jed_id " \
+                u"FROM jed " \
+                u"JOIN bud ON bud.id = jed.bud_id " \
+                u"{} {};".format(join, where)
         return self.__evaluate(query)
 
     @staticmethod

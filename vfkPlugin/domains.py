@@ -26,7 +26,7 @@ class Domains:
 
     @staticmethod
     def anoNe(an):
-        if an == "a":
+        if an == u"a":
             return True
         else:
             return False
@@ -34,36 +34,36 @@ class Domains:
     @staticmethod
     def cpCe(kod):
         if kod == 1:
-            return "Číslo popisné"
+            return u"Číslo popisné"
         elif kod == 2:
-            return "Číslo evidenční"
+            return u"Číslo evidenční"
         else:
-            return ""
+            return u""
 
     @staticmethod
     def druhUcastnika(kod):
         if kod == 1:
-            return "právnická osoba"
+            return u"právnická osoba"
         elif kod == 2:
-            return "fyzická osoba"
+            return u"fyzická osoba"
         elif kod == 3:
-            return "ostatní"
+            return u"ostatní"
         elif kod == 4:
-            return "právnická osoba státní správy"
+            return u"právnická osoba státní správy"
         else:
-            return ""
+            return u""
 
     @staticmethod
     def rodinnyStav(kod):
         if kod == 1:
-            return "svobodný/svobodná"
+            return u"svobodný/svobodná"
         elif kod == 2:
-            return "ženatý/vdaná"
+            return u"ženatý/vdaná"
         elif kod == 3:
-            return "rozvedený/rozvedená"
+            return u"rozvedený/rozvedená"
         elif kod == 4:
-            return "ovdovělý/ovdovělá"
+            return u"ovdovělý/ovdovělá"
         elif kod == 5:
-            return "druh/družka"
+            return u"druh/družka"
         else:
-            return ""
+            return u""

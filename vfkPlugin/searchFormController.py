@@ -33,11 +33,11 @@ from vfkTableModel import *
 
 class SearchFormController(QObject):
 
-    class SearchForms:
-        vlastnici = None
-        parcely = None
-        budovy = None
-        jednotky = None
+    class SearchForms(QObject):
+        vlastnici = VlastniciSearchForm()
+        parcely = ParcelySearchForm()
+        budovy = BudovySearchForm()
+        jednotky = JednotkySearchForm()
 
     class MainControls:
         formCombobox = QComboBox()
