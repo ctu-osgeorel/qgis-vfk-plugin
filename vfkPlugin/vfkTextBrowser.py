@@ -239,15 +239,12 @@ class VfkTextBrowser(QTextBrowser):
 
         if format == VfkTextBrowser.ExportFormat.Latex:
             doc = LatexDocument()
-            qWarning("jsem v Latex")
             return doc
         elif format == VfkTextBrowser.ExportFormat.Html:
             doc = HtmlDocument()
-            qWarning("jsem v Html")
             return doc
         elif format == VfkTextBrowser.ExportFormat.RichText:
             doc = RichTextDocument()
-            qWarning("jsem v RichText")
             return doc
         else:
             qWarning("Nejsou podporovany jine formaty pro export")
