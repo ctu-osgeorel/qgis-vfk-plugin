@@ -116,14 +116,18 @@ class MainApp(QDockWidget, Ui_MainApp):
         self.showInMap(self.vfkBrowser.currentBudIds(), "BUD")
 
     def latexExport(self):
-        fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", "", "LaTeX (*.tex)")
-        if fileName is not None:
+        fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", ".tex", "LaTeX (*.tex)")
+        if fileName:
             self.vfkBrowser.exportDocument(self.vfkBrowser.currentUrl(), fileName, self.vfkBrowser.ExportFormat.Latex)
 
+        self.succesfullExport("LaTeX")
+
     def htmlExport(self):
-        fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", "", "HTML (*.html)")
-        if fileName is not None:
+        fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", ".html", "HTML (*.html)")
+        if fileName:
             self.vfkBrowser.exportDocument(self.vfkBrowser.currentUrl(), fileName, self.vfkBrowser.ExportFormat.Html)
+
+        self.succesfullExport("HTML")
 
     def setSelectionChangedConnected(self, connected):
         qWarning(".... setSelectionChangedConnected...........")
@@ -397,6 +401,9 @@ class MainApp(QDockWidget, Ui_MainApp):
         self.searchCombo.setCurrentIndex(searchType)
         #self.searchForms.setCurrentIndex(searchType)
         qWarning("switched to search window..")
+
+    def succesfullExport(self, export_format):
+        QMessageBox.about(self, "Info", u"Export do formátu {} proběhl úspěšně.".format(export_format))
 
     def __createToolbarsAndConnect(self):
 
