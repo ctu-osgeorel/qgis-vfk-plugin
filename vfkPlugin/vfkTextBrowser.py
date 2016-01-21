@@ -76,10 +76,10 @@ class VfkTextBrowser(QTextBrowser):
         self.__mCurrentRecord = HistoryRecord()
         self.__mDocumentBuilder = DocumentBuilder()
         self.__mUrlHistory = []     # list of history records
-        self.__mHistoryIt = 0      # saving current index in history list
+        self.__mHistoryOrder = -1      # saving current index in history list
 
         self.connect(self, SIGNAL("anchorClicked(QUrl)"), self.onLinkClicked) #, SLOT("oLinkClicked"))
-        self.connect(self, SIGNAL("updateHistory"), self, SLOT("saveHistory"))
+        self.connect(self, SIGNAL("updateHistory"), self.saveHistory)
 
         self.emit(SIGNAL("currentParIdsChanged"), False)
         self.emit(SIGNAL("currentBudIdsChanged"), False)
@@ -147,54 +147,33 @@ class VfkTextBrowser(QTextBrowser):
 
 
     def goBack(self):
-        qWarning("...goBack function")
-        # if self.__mHistoryIt != self.__mUrlHistory[0]:
-        #     qWarning("..podminka v goBack splnena")
-        #     #self.__mCurrentRecord = self.__mUrlHistory[self.__mHistoryIt]
-        #     self.setHtml(self.__mCurrentRecord.html)
-        #     self.updateButtonEnabledState()
-
+        if len(self.__mUrlHistory) > 1 and len(self.__mUrlHistory) - self.__mHistoryOrder > 0 and self.__mHistoryOrder > 0:
+            self.__mCurrentRecord = self.__mUrlHistory[self.__mHistoryOrder - 1]
+            self.__mHistoryOrder -= 1 if self.__mHistoryOrder > 0 else self.__mHistoryOrder == 0
+            self.setHtml(self.__mCurrentRecord.html)
+            self.updateButtonEnabledState()
 
     def goForth(self):
-        qWarning("...goForth function")
-        # if self.__mHistoryIt != self.__mUrlHistory[-2]:
-        #     qWarning("..podminka v goForth splnena")
-        #     #self.__mCurrentRecord = self.__mUrlHistory[self.__mHistoryIt]
-        #     self.setHtml(self.__mCurrentRecord.html)
-        #     self.updateButtonEnabledState()
-
+        if len(self.__mUrlHistory) > 1 and len(self.__mUrlHistory) - self.__mHistoryOrder > 1 and self.__mHistoryOrder >= 0:
+            self.__mCurrentRecord = self.__mUrlHistory[self.__mHistoryOrder + 1]
+            self.__mHistoryOrder += 1
+            self.setHtml(self.__mCurrentRecord.html)
+            self.updateButtonEnabledState()
 
     def saveHistory(self, record):
-        pass
+        if len(self.__mUrlHistory) == 0:
+            self.__mUrlHistory.append(record)
+            self.__mHistoryOrder = 0
+        else:
+            self.__mUrlHistory.append(record)
+            self.__mHistoryOrder += 1
 
-
-
-# void VfkTextBrowser::saveHistory( HistoryRecord record )
-# {
-#   if ( mUrlHistory.isEmpty() )
-#   {
-#     mUrlHistory.append( record );
-#     mHistoryIt = mUrlHistory.begin();
-#   }
-#   else if ( mHistoryIt == --mUrlHistory.end() )
-#   {
-#     mUrlHistory.append( record );
-#     mHistoryIt = --(mUrlHistory.end());
-#   }
-#   else
-#   {
-#     mUrlHistory.erase( ++mHistoryIt, mUrlHistory.end() );
-#     mUrlHistory.append( record );
-#     mHistoryIt = --(mUrlHistory.end());
-#   }
-#   mCurrentRecord = *mHistoryIt;
-#   updateButtonEnabledState();
-# }
+        self.__mCurrentRecord = self.__mUrlHistory[self.__mHistoryOrder]
+        self.updateButtonEnabledState()
 
     def showHelpPage(self):
         url = "showText?page=help"
         self.processAction(QUrl(url))
-
 
     def showInfoAboutSelection(self, parIds, budIds):
         """
@@ -250,14 +229,18 @@ class VfkTextBrowser(QTextBrowser):
             qDebug("Nejsou podporovany jine formaty pro export")
 
     def updateButtonEnabledState(self):
-        self.emit(SIGNAL("currentParIdsChanged"), True if self.__mCurrentRecord.parIds else False)
-        self.emit(SIGNAL("currentBudIdsChanged"), True if self.__mCurrentRecord.budIds else False)
+        self.emit(SIGNAL("currentParIdsChanged"), False if self.__mCurrentRecord.parIds else True)
+        self.emit(SIGNAL("currentBudIdsChanged"), False if self.__mCurrentRecord.budIds else True)
 
-        self.historyBefore.emit() ##### dodelat
-        self.historyAfter.emit() ##### dodelat
+        # self.emit(SIGNAL("historyBefore"), self.__mHistoryIt != self.__mUrlHistory[0])
+        self.emit(SIGNAL("historyBefore"), self.__mHistoryOrder > 0)
 
-        self.emit(SIGNAL("definitionPointAvailable"), True if (self.__mCurrentRecord.definitionPoint.first
-                                                    and self.__mCurrentRecord.definitionPoint.second) else False)
+
+        # self.emit(SIGNAL("historyAfter"), self.__mHistoryIt != self.__mUrlHistory[-1])
+        self.emit(SIGNAL("historyAfter"), len(self.__mUrlHistory) - self.__mHistoryOrder > 0)
+
+        self.emit(SIGNAL("definitionPointAvailable"), False if (self.__mCurrentRecord.definitionPoint.first
+                                                    and self.__mCurrentRecord.definitionPoint.second) else True)
 
     def onLinkClicked(self, task):
         """

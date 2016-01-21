@@ -134,25 +134,24 @@ class MainApp(QDockWidget, Ui_MainApp):
         for i, id in enumerate(self.__mLoadedLayers):
             vectorLayer = QgsVectorLayer(QgsMapLayerRegistry.instance().mapLayer(id))
 
-            qWarning(".... ddddddddddddddddddddd...........")
-            qWarning(str(vectorLayer))
-            if connected is True:
-                self.connect(vectorLayer, SIGNAL("selectionChanged()"), self, SLOT("showInfoAboutSelection"))
+            if connected:
+                self.connect(vectorLayer, SIGNAL("selectionChanged()"), self.showInfoAboutSelection)
             else:
-                self.disconnect(vectorLayer, SIGNAL("selectionChanged()"), self, SLOT("showInfoAboutSelection"))
+                self.disconnect(vectorLayer, SIGNAL("selectionChanged()"), self.showInfoAboutSelection)
 
     def showInMap(self, ids, layerName):
         qWarning("--jsem v showInMap--")
         qWarning(str(ids))
         qWarning("layerName: " + str(layerName))
-        if self.__mLoadedLayers.has_key(layerName):
+        if layerName in self.__mLoadedLayers:
+        #if self.__mLoadedLayers.has_key(layerName):
             id = self.__mLoadedLayers[layerName]
             vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
-            searchString = "ID IN ({})".format("','".join(ids))
+            searchString = "ID IN ('{}')".format("','".join(ids))
             qDebug(searchString)
-            error = ""
+            error = ''
             fIds = self.__search(vectorLayer, searchString, error)
-            if error != "":
+            if error:
                 qDebug(error)
                 return
             else:
@@ -354,6 +353,7 @@ class MainApp(QDockWidget, Ui_MainApp):
         layers = ["PAR", "BUD"]
         layerIds = {}
         qWarning("--showInfoAboutSelection")
+        qWarning("-------------------------------------------------")
         for layer in layers:
             if layer in self.__mLoadedLayers:
                 qWarning("Vrstva {} obsazena..".format(layer))

@@ -1193,11 +1193,11 @@ class DocumentBuilder:
     def pageSearchJednotky(self, cisloJednotky, domovniCislo, naParcele, zpusobVyuziti, lv):
         """
 
-        :param cisloJednotky: str
-        :param domovniCislo: str
-        :param naParcele: str
-        :param zpusobVyuziti: str
-        :param lv: str
+        :param cisloJednotky: cislo jednotky
+        :param domovniCislo: domovni cislo
+        :param naParcele: cislo parcely
+        :param zpusobVyuziti: zpusob vyuziti
+        :param lv: list vlastnictvi
         :return:
         """
         model = VfkTableModel(self.__mConnectionName)
@@ -1490,3 +1490,4 @@ class DocumentBuilder:
             return
         self.__mCurrentDefinitionPoint.first = model.value(0, u"obdebo_souradnice_x")
         self.__mCurrentDefinitionPoint.second = model.value(0, u"obdebo_souradnice_y")
+        qDebug("Definicni bod je: {}, {}".format(self.__mCurrentDefinitionPoint.first, self.__mCurrentDefinitionPoint.second))
