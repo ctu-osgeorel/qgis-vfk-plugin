@@ -22,7 +22,7 @@
 """
 
 from PyQt4.QtSql import QSqlQueryModel, QSqlRecord, QSqlField, QSqlDatabase
-from PyQt4.QtCore import qWarning
+from PyQt4.QtCore import qWarning, qDebug, QTime
 
 
 class VfkTableModel(QSqlQueryModel):
@@ -433,7 +433,7 @@ class VfkTableModel(QSqlQueryModel):
                 "WHERE par.id in ({}) " \
                 "OR bud.id in ({}) " \
                 "OR jed.id in ({}) " \
-                "ORDER BY rl.listin_id;".format(columns, ", ".join(parIds), ", ".join(budIds), ", ".join(jedIds))
+                "ORDER BY rl.listin_id;".format(columns, ",".join(parIds), ",".join(budIds), ",".join(jedIds))
         return self.__evaluate(query)
 
     def vlastnik(self, id, extended=False):
@@ -455,7 +455,7 @@ class VfkTableModel(QSqlQueryModel):
 
         :return: bool
         """
-        query = "SELECT 1 from FROM where druh_cislovani_par = 1"
+        query = "SELECT 1 FROM doci WHERE druh_cislovani_par = 1"
         self.setQuery(query, QSqlDatabase.database(self.__mConnectionName))
 
         if self.rowCount() > 0:
@@ -657,8 +657,7 @@ class VfkTableModel(QSqlQueryModel):
                 u"{} {};".format(join, where)
         return self.__evaluate(query)
 
-    @staticmethod
-    def parColumns(extended):
+    def parColumns(self, extended):
         """
 
         :param extended: bool
@@ -684,8 +683,7 @@ class VfkTableModel(QSqlQueryModel):
 
         return columns
 
-    @staticmethod
-    def budColumns(extended):
+    def budColumns(self, extended):
         """
 
         :param extended: bool
@@ -705,8 +703,7 @@ class VfkTableModel(QSqlQueryModel):
 
         return columns
 
-    @staticmethod
-    def jedColumns(extended):
+    def jedColumns(self, extended):
         """
 
         :param extended: bool
@@ -732,8 +729,7 @@ class VfkTableModel(QSqlQueryModel):
 
         return columns
 
-    @staticmethod
-    def opsubColumns(extended):
+    def opsubColumns(self, extended):
         """
 
         :param extended: bool
@@ -757,8 +753,7 @@ class VfkTableModel(QSqlQueryModel):
             columns.append("opsub.mestska_cast opsub_mestska_cast")
         return columns
 
-    @staticmethod
-    def jpvColumns(extended):
+    def jpvColumns(self, extended):
         """
 
         :param extended: bool
@@ -773,8 +768,7 @@ class VfkTableModel(QSqlQueryModel):
             pass
         return columns
 
-    @staticmethod
-    def listinyColumns():
+    def listinyColumns(self):
         """
 
         :return: []
@@ -784,8 +778,7 @@ class VfkTableModel(QSqlQueryModel):
 
         return columns
 
-    @staticmethod
-    def bpejColumns():
+    def bpejColumns(self):
         """
 
         :return: []
@@ -879,7 +872,7 @@ class VfkTableModel(QSqlQueryModel):
         """
         where = ''
 
-        if pozemkova is True and stavebni is True:
+        if pozemkova and stavebni:
             pass
         elif pozemkova is True:
             where += "WHERE drupoz.stavebni_parcela = 'n'"
@@ -915,12 +908,20 @@ class VfkTableModel(QSqlQueryModel):
         :param query: str
         :return: bool
         """
+        t = QTime()
+        t.start()
         self.setQuery(query, QSqlDatabase.database(self.__mConnectionName))
 
         while self.canFetchMore():
             self.fetchMore()
 
+        if t.elapsed() > 500:
+            qDebug(query)
+            qDebug("\nTime elapsed: {} ms\n".format(t.elapsed()))
+
         if self.lastError().isValid():
+            qDebug(str(self.lastError()))
+            qDebug(query)
             return False
 
         return True

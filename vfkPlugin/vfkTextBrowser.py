@@ -24,7 +24,7 @@
 
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import *
-from PyQt4.QtCore import QFile, QIODevice, QUrl, QObject, SIGNAL, SLOT, pyqtSlot, pyqtSignal, QTextStream, qWarning
+from PyQt4.QtCore import QFile, QIODevice, QUrl, QObject, SIGNAL, SLOT, pyqtSlot, pyqtSignal, QTextStream, qWarning, qDebug
 from PyQt4.QtSql import QSqlDatabase
 
 from documentBuilder import *
@@ -247,7 +247,7 @@ class VfkTextBrowser(QTextBrowser):
             doc = RichTextDocument()
             return doc
         else:
-            qWarning("Nejsou podporovany jine formaty pro export")
+            qDebug("Nejsou podporovany jine formaty pro export")
 
     def updateButtonEnabledState(self):
         self.emit(SIGNAL("currentParIdsChanged"), True if self.__mCurrentRecord.parIds else False)
@@ -280,7 +280,7 @@ class VfkTextBrowser(QTextBrowser):
             t = QtCore.QTime()
             t.start()
             html = self.__documentContent(taskMap, self.ExportFormat.RichText)
-            qWarning("Total time elapsed: {} ms".format(t.elapsed()))
+            qDebug("Total time elapsed: {} ms".format(t.elapsed()))
             QApplication.restoreOverrideCursor()
             self.setHtml(html)
 
@@ -303,7 +303,7 @@ class VfkTextBrowser(QTextBrowser):
                 self.emit(SIGNAL("switchToPanelSearch"), int(taskMap[u'type']))
             self.setHtml(self.__mCurrentRecord.html)
         else:
-            qWarning("..Jina akce")
+            qDebug("..Jina akce")
 
     def __documentContent(self, taskMap, format):
         """

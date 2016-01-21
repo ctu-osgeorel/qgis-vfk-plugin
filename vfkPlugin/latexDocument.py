@@ -22,7 +22,7 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtCore import qWarning
+from PyQt4.QtCore import qWarning, qDebug
 from vfkDocument import VfkDocument
 
 
@@ -140,7 +140,7 @@ class LatexDocument(VfkDocument):
 
     def tableRow(self, columns):
         if self.__mLastColumnNumber != len(columns):
-            qWarning("inconsistent number of columns: {} {}".format(self.__mLastColumnNumber, len(columns)))
+            qDebug("inconsistent number of columns: {} {}".format(self.__mLastColumnNumber, len(columns)))
             return
         if self.__mLastColumnNumber > 0:
             tableRow = u'{} '.format(columns[0])

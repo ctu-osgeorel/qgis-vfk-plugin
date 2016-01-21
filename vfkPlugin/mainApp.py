@@ -25,7 +25,7 @@
 from PIL.PsdImagePlugin import _layerinfo
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup
-from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, pyqtSlot, qWarning
+from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, pyqtSlot, qWarning, qDebug
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import *
 from qgis.gui import *
@@ -145,11 +145,11 @@ class MainApp(QDockWidget, Ui_MainApp):
             id = self.__mLoadedLayers[layerName]
             vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
             searchString = "ID IN ({})".format("','".join(ids))
-            qWarning(searchString)
+            qDebug(searchString)
             error = ""
             fIds = self.__search(vectorLayer, searchString, error)
             if error != "":
-                qWarning(error)
+                qDebug(error)
                 return
             else:
                 vectorLayer.setSelectedFeatures(fIds)
@@ -236,15 +236,15 @@ class MainApp(QDockWidget, Ui_MainApp):
             self.vfkFileLineEdit.setPalette(pal)
 
     def __loadVfkLayer(self, vfkLayerName):
-        qWarning("Loading vfk layer {}".format(vfkLayerName))
+        qDebug("Loading vfk layer {}".format(vfkLayerName))
         if vfkLayerName in self.__mLoadedLayers:
-            qWarning("Vfk layer {} is already loaded".format(vfkLayerName))
+            qDebug("Vfk layer {} is already loaded".format(vfkLayerName))
             return
 
         composedURI = self.__mLastVfkFile + "|layername=" + vfkLayerName
         layer = QgsVectorLayer(composedURI, vfkLayerName, "ogr")
         if not layer.isValid():
-            qWarning("Layer failed to load!")
+            qDebug("Layer failed to load!")
 
         self.__mLoadedLayers[vfkLayerName] = layer.id()
         self.__setSymbology(layer)
@@ -252,10 +252,10 @@ class MainApp(QDockWidget, Ui_MainApp):
         QgsMapLayerRegistry.instance().addMapLayer(layer)
 
     def __unLoadVfkLayer(self, vfkLayerName):
-        qWarning("Unloading vfk layer {}".format(vfkLayerName))
+        qDebug("Unloading vfk layer {}".format(vfkLayerName))
 
         if vfkLayerName not in self.__mLoadedLayers:
-            qWarning("Vfk layer {} is already unloaded".format(vfkLayerName))
+            qDebug("Vfk layer {} is already unloaded".format(vfkLayerName))
             return
 
         QgsMapLayerRegistry.instance().removeMapLayer(self.__mLoadedLayers[vfkLayerName])
@@ -283,7 +283,7 @@ class MainApp(QDockWidget, Ui_MainApp):
     def __openDatabase(self, dbPath):
         connectionName = QUuid.createUuid().toString()
         db = QSqlDatabase.addDatabase("QSQLITE", connectionName)
-        qWarning(dbPath)
+        qDebug(dbPath)
         db.setDatabaseName(dbPath)
         if db.open() is False:
             return False
@@ -309,7 +309,7 @@ class MainApp(QDockWidget, Ui_MainApp):
         QgsApplication.processEvents()
         progress.setValue(1)
 
-        qWarning("Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
+        qDebug("Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
         self.__mOgrDataSource = ogr.Open(self.__fileName, 0)
         if self.__mOgrDataSource is None:
             errorMsg = u'Unable to set open OGR data source'
@@ -379,7 +379,7 @@ class MainApp(QDockWidget, Ui_MainApp):
 
     def showOnCuzk(self):
         x = self.vfkBrowser.currentDefinitionPoint().first.split(".")[0]
-        y= self.vfkBrowser.currentDefinitionPoint().second.split(".")[0]
+        y = self.vfkBrowser.currentDefinitionPoint().second.split(".")[0]
 
         url = "http://nahlizenidokn.cuzk.cz/MapaIdentifikace.aspx?&x=-{}&y=-{}".format(y, x)
         QDesktopServices.openUrl(QUrl(url, QUrl.TolerantMode))

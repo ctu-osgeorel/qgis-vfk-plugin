@@ -21,7 +21,7 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtCore import QObject, QUrl, QRegExp, SIGNAL, SLOT, Qt, pyqtSignal, qWarning, QVariant, QDataStream
+from PyQt4.QtCore import QObject, QUrl, QRegExp, SIGNAL, SLOT, Qt, pyqtSignal, qWarning, qDebug, QVariant, QDataStream
 from PyQt4.QtGui import QStandardItemModel, QComboBox, QPushButton, QStackedWidget, QStandardItem
 
 from vlastniciSearchForm import *
@@ -108,7 +108,7 @@ class SearchFormController(QObject):
             qWarning("vlastnici")
             self.__searchVlastnici()
         else:
-            qWarning("Neplatna hodnota v SearchComboBoxu!!!")
+            qDebug("Neplatna hodnota v SearchComboBoxu!!!")
 
         QApplication.restoreOverrideCursor()
 

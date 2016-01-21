@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from PyQt4.QtCore import qWarning
+from PyQt4.QtCore import qWarning, qDebug
 
 from collections import defaultdict
 
@@ -78,12 +78,12 @@ class DocumentBuilder:
             elif taskMap[u"page"] == u"seznam":
                 if taskMap[u"type"] == u"id":
                     if u"parcely" in taskMap:
-                        self.pageSeznamParcel([str(taskMap[u"parcely"]).split(u",")])
+                        self.pageSeznamParcel(taskMap[u"parcely"].split(","))
                     if u"budovy" in taskMap:
-                        self.pageSeznamBudov([str(taskMap[u"budovy"]).split(u",")])
+                        self.pageSeznamBudov(taskMap[u"budovy"].split(","))
                 elif taskMap[u"type"] == u"string":
                     if u"opsub" in taskMap:
-                        pass
+                        self.pageSeznamOsob(taskMap[u'opsub'].split(","))
             elif taskMap[u"page"] == u"search":
                 if taskMap[u"type"] == u"vlastnici":
                     self.pageSearchVlastnici(taskMap[u"jmeno"], taskMap[u"rcIco"],
@@ -103,7 +103,7 @@ class DocumentBuilder:
     def initKatUzemi(self):
         model = VfkTableModel(self.__mConnectionName)
 
-        if model.dveRadyCislovani() is True:
+        if model.dveRadyCislovani():
             self.__mDveRadyCislovani = True
 
     def pageTelesa(self):
@@ -151,7 +151,7 @@ class DocumentBuilder:
 
         self.__mDocument.keyValueTable(content)
 
-        if hlavickaModel.dveRadyCislovani() is True:
+        if hlavickaModel.dveRadyCislovani():
             self.__mDocument.paragraph(u"V kat. území jsou pozemky vedeny ve dvou číselných řadách.")
         else:
             self.__mDocument.paragraph(u"V kat. území jsou pozemky vedeny v jedné číselné řadě.")
@@ -1146,7 +1146,7 @@ class DocumentBuilder:
 
         ids = []
         for i in xrange(model.rowCount()):
-            ids.append(model.value(i, u"opsub_id"))
+            ids.append(model.value(i, u'opsub_id'))
 
         self.pageSeznamOsob(ids)
 
@@ -1219,6 +1219,7 @@ class DocumentBuilder:
         link = self.__mDocument.link(u"switchPanel?panel=import", u"Importujte")
         text = u"{} data ve formátu VFK. Během importu se vytváří databáze, tato operace může chvíli trvat. ".format(link)
         text += u"Následně lze vyhledávat:"
+        self.__mDocument.paragraph(text)
 
         self.__mDocument.beginItemize()
         link = self.__mDocument.link(u"switchPanel?panel=search&type=0", u"oprávněné osoby")
@@ -1394,15 +1395,15 @@ class DocumentBuilder:
         :param row: int
         :return: str
         """
-        cislo = u""
+        cislo = u''
         cislo += model.value(row, u"par_kmenove_cislo_par")
         poddeleni = model.value(row, u"par_poddeleni_cisla_par")
-        if poddeleni:
+        if poddeleni != u"NULL":
             cislo += u"/" + poddeleni
 
-        st = u""
+        st = u''
         if not model.value(row, u"drupoz_stavebni_parcela"):
-            qWarning("neni drupoz_stavebni_parcela")
+            qDebug("neni drupoz_stavebni_parcela")
         if self.__mDveRadyCislovani and Domains.anoNe(model.value(row, u"drupoz_stavebni_parcela")):
             st = u"st."
 
