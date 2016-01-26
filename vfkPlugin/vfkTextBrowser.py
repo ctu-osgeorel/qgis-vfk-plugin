@@ -141,7 +141,7 @@ class VfkTextBrowser(QTextBrowser):
         taskMap = {u'action': task.path()}
 
         for key, value in task.encodedQueryItems():
-            taskMap[str(key)] = QUrl.fromPercentEncoding(value)
+            taskMap[unicode(key)] = QUrl.fromPercentEncoding(unicode(value))
 
         return taskMap
 
@@ -232,11 +232,7 @@ class VfkTextBrowser(QTextBrowser):
         self.emit(SIGNAL("currentParIdsChanged"), False if self.__mCurrentRecord.parIds else True)
         self.emit(SIGNAL("currentBudIdsChanged"), False if self.__mCurrentRecord.budIds else True)
 
-        # self.emit(SIGNAL("historyBefore"), self.__mHistoryIt != self.__mUrlHistory[0])
         self.emit(SIGNAL("historyBefore"), self.__mHistoryOrder > 0)
-
-
-        # self.emit(SIGNAL("historyAfter"), self.__mHistoryIt != self.__mUrlHistory[-1])
         self.emit(SIGNAL("historyAfter"), len(self.__mUrlHistory) - self.__mHistoryOrder > 0)
 
         self.emit(SIGNAL("definitionPointAvailable"), False if (self.__mCurrentRecord.definitionPoint.first
@@ -267,7 +263,7 @@ class VfkTextBrowser(QTextBrowser):
             QApplication.restoreOverrideCursor()
             self.setHtml(html)
 
-            print(html)
+            #print(html)
 
             record = HistoryRecord()
             record.html = html
@@ -296,7 +292,6 @@ class VfkTextBrowser(QTextBrowser):
         :return:
         """
         doc = self.documentFactory(format)
-        qWarning("Vytvarim dokument ve formatu: " + str(format))
         if not doc:
             return ''
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
+from scipy.weave.build_tools import configure_temp_dir
 
-
-from PyQt4.QtCore import qWarning, qDebug
+from PyQt4.QtCore import qWarning, qDebug, QObject
 
 from collections import defaultdict
 
@@ -9,7 +9,6 @@ from vfkDocument import *
 from vfkTableModel import *
 from htmlDocument import *
 from domains import *
-
 
 class Coordinates(object):
     def __init__(self):
@@ -55,48 +54,48 @@ class DocumentBuilder:
         """
         self.__mCurrentPageParIds = []
         self.__mCurrentPageBudIds = []
-        self.__mCurrentDefinitionPoint.first = u''
-        self.__mCurrentDefinitionPoint.second = u''
+        self.__mCurrentDefinitionPoint.first = ''
+        self.__mCurrentDefinitionPoint.second = ''
 
         self.__mDocument = document
         self.__mDocument.header()
 
-        if taskMap[u"page"] == u"help":
+        if taskMap["page"] == "help":
             self.pageHelp()
 
         if self.__mHasConnection:
-            if taskMap[u"page"] == u"tel":
-                self.pageTeleso(taskMap[u"id"])
-            elif taskMap[u"page"] == u"par":
-                self.pageParcela(taskMap[u"id"])
-            elif taskMap[u"page"] == u"bud":
-                self.pageBudova(taskMap[u"id"])
-            elif taskMap[u"page"] == u"jed":
-                self.pageJednotka(taskMap[u"id"])
-            elif taskMap[u"page"] == u"opsub":
-                self.pageOpravnenySubjekt(taskMap[u"id"])
-            elif taskMap[u"page"] == u"seznam":
-                if taskMap[u"type"] == u"id":
-                    if u"parcely" in taskMap:
-                        self.pageSeznamParcel(taskMap[u"parcely"].split(","))
-                    if u"budovy" in taskMap:
-                        self.pageSeznamBudov(taskMap[u"budovy"].split(","))
-                elif taskMap[u"type"] == u"string":
-                    if u"opsub" in taskMap:
-                        self.pageSeznamOsob(taskMap[u'opsub'].split(","))
-            elif taskMap[u"page"] == u"search":
-                if taskMap[u"type"] == u"vlastnici":
-                    self.pageSearchVlastnici(taskMap[u"jmeno"], taskMap[u"rcIco"],
-                                             int(taskMap[u"sjm"]), int(taskMap[u"opo"]),
-                                             int(taskMap[u"ofo"]), taskMap[u"lv"])
-                elif taskMap[u"type"] == u"parcely":
-                    self.pageSearchParcely(taskMap[u"parcelniCislo"], taskMap[u"typ"], taskMap[u"druh"], taskMap[u"lv"])
-                elif taskMap[u"type"] == u"budovy":
-                    self.pageSearchBudovy(taskMap[u"domovniCislo"], taskMap[u"naParcele"],taskMap[u"zpusobVyuziti"],
-                                          taskMap[u"lv"])
-                elif taskMap[u"type"] == u"jednotky":
-                    self.pageSearchJednotky(taskMap[u"cisloJednotky"], taskMap[u"domovniCislo"], taskMap[u"naParcele"],
-                                            taskMap[u"zpusobVyuziti"], taskMap[u"lv"])
+            if taskMap["page"] == "tel":
+                self.pageTeleso(taskMap["id"])
+            elif taskMap["page"] == "par":
+                self.pageParcela(taskMap["id"])
+            elif taskMap["page"] == "bud":
+                self.pageBudova(taskMap["id"])
+            elif taskMap["page"] == "jed":
+                self.pageJednotka(taskMap["id"])
+            elif taskMap["page"] == "opsub":
+                self.pageOpravnenySubjekt(taskMap["id"])
+            elif taskMap["page"] == "seznam":
+                if taskMap["type"] == "id":
+                    if "parcely" in taskMap:
+                        self.pageSeznamParcel(taskMap["parcely"].split(","))
+                    if "budovy" in taskMap:
+                        self.pageSeznamBudov(taskMap["budovy"].split(","))
+                elif taskMap["type"] == "string":
+                    if "opsub" in taskMap:
+                        self.pageSeznamOsob(taskMap['opsub'].split(","))
+            elif taskMap["page"] == "search":
+                if taskMap["type"] == "vlastnici":
+                    self.pageSearchVlastnici(taskMap["jmeno"], taskMap["rcIco"],
+                                             int(taskMap["sjm"]), int(taskMap["opo"]),
+                                             int(taskMap["ofo"]), taskMap["lv"])
+                elif taskMap["type"] == "parcely":
+                    self.pageSearchParcely(taskMap["parcelniCislo"], taskMap["typ"], taskMap["druh"], taskMap["lv"])
+                elif taskMap["type"] == "budovy":
+                    self.pageSearchBudovy(taskMap["domovniCislo"], taskMap["naParcele"],taskMap["zpusobVyuziti"],
+                                          taskMap["lv"])
+                elif taskMap["type"] == "jednotky":
+                    self.pageSearchJednotky(taskMap["cisloJednotky"], taskMap["domovniCislo"], taskMap["naParcele"],
+                                            taskMap["zpusobVyuziti"], taskMap["lv"])
         self.__mDocument.footer()
         return
 
@@ -188,7 +187,7 @@ class DocumentBuilder:
             return
 
         parIds = []
-        self.tableParcely(model, parIds, False)
+        self.tableParcely(model, parIds, True)
         self.__mCurrentPageParIds = parIds
 
     def tableParcely(self, model, parIds, LVColumn):
@@ -196,7 +195,7 @@ class DocumentBuilder:
         self.__mDocument.beginTable()
         header = [u"Parcela", u"Výměra [m{}]".format(self.__mDocument.superScript(u"2")), u"Druh pozemku", u"Způsob využití",
                   u"Způsob ochrany"]
-        if LVColumn is True:
+        if LVColumn:
             header.append(u"LV")
 
         self.__mDocument.tableHeader(header)
@@ -218,7 +217,7 @@ class DocumentBuilder:
 
             row.append(u", ".join(ochranaNazev))
 
-            if LVColumn is True:
+            if LVColumn:
                 row.append(self.makeLVCislo(model, i))
 
             self.__mDocument.tableRow(row)
@@ -250,7 +249,7 @@ class DocumentBuilder:
         self.__mDocument.beginTable()
         header = [u"Typ stavby", u"Část obce", u"Č. budovy", u"Způsob využití", u"Způsob ochrany", u"Na parcele"]
 
-        if LVColumn is True:
+        if LVColumn:
             header.append(u"LV")
 
         self.__mDocument.tableHeader(header)
@@ -285,7 +284,7 @@ class DocumentBuilder:
             row.append(u", ".join(ochranaNazev))
             row.append(self.makeParcelniCislo(model, i))
 
-            if LVColumn is True:
+            if LVColumn:
                 row.append(self.makeLVCislo(model, i))
 
             self.__mDocument.tableRow(row)
@@ -317,7 +316,7 @@ class DocumentBuilder:
         header = [u"Č.p./Č.jednotky ", u"Způsob využití", u"Způsob ochrany",
                   u"Podíl na společných{}částech domu a pozemku".format(self.__mDocument.newLine())]
 
-        if LVColumn is True:
+        if LVColumn:
             header.append(u"LV")
 
         self.__mDocument.tableHeader(header)
@@ -340,9 +339,9 @@ class DocumentBuilder:
 
             row.append(u", ".join(ochranaNazev))
 
-            podilCit = str(model.value(i, u"jed_podil_citatel"))
-            podilJmen = str(model.value(i, u"jed_podil_jmenovatel"))
-            podil = u""
+            podilCit = model.value(i, u"jed_podil_citatel")
+            podilJmen = model.value(i, u"jed_podil_jmenovatel")
+            podil = u''
 
             if podilCit and podilJmen and podilJmen != u"1":
                 podil += u"{}/{}".format(podilCit, podilJmen)
@@ -364,8 +363,8 @@ class DocumentBuilder:
         :param budId: str
         :return:
         """
-        budInfo = u""
-        parInfo = u""
+        budInfo = u''
+        parInfo = u''
 
         budModel = VfkTableModel(self.__mConnectionName)
         ok = budModel.budova(budId, False)
@@ -374,9 +373,9 @@ class DocumentBuilder:
 
         budInfo += u"Budova" + u" "
         casobc = budModel.value(0, u"casobc_nazev")
-        budInfo += u"" if casobc else casobc + u", "
+        budInfo += casobc + u", " if casobc else u''
 
-        budova = u""
+        budova = u''
         budova += budModel.value(0, u"typbud_zkratka")
         if Domains.anoNe(budModel.value(0, u"typbud_zadani_cd")):
             budova += u" " + budModel.value(0, u"bud_cislo_domovni")
@@ -388,7 +387,7 @@ class DocumentBuilder:
             budInfo += self.__mDocument.link(u"showText?page=tel&id={}".format(lvId), u"LV {}".format(lv))
 
         zpvybu = budModel.value(0, u"zpvybu_nazev")
-        budInfo += u"" if not zpvybu else u", {}".format(zpvybu)
+        budInfo += u", {}".format(zpvybu) if zpvybu else u''
 
         budInfo + u", na parcele {}".format(self.makeParcelniCislo(budModel, 0))
 
@@ -407,7 +406,7 @@ class DocumentBuilder:
             parInfo += self.__mDocument.link(u"showText?page=tel&id={}".format(lvId), u"LV {}".format(lv))
 
         zpvypo = parModel.value(0, u"zpvypo_nazev")
-        parInfo += u"" if not zpvypo else u", {}".format(zpvypo)
+        parInfo += u'' if not zpvypo else u", {}".format(zpvypo)
         parInfo += u", {} m{}".format(parModel.value(0, u"par_vymera_parcely"), self.__mDocument.superScript(u"2"))
 
         self.__mDocument.tableRowOneColumnSpan(parInfo)
@@ -429,9 +428,9 @@ class DocumentBuilder:
             self.__mDocument.beginTable()
             self.__mDocument.tableHeader(header)
 
-            if self.partTelesoJinaPrava( parIds, VfkTableModel.OpravnenyPovinny.OPParcela ) or \
+            if self.partTelesoJinaPrava(parIds, VfkTableModel.OpravnenyPovinny.OPParcela) or \
                     self.partTelesoJinaPrava(budIds, VfkTableModel.OpravnenyPovinny.OPBudova) or \
-                    self.partTelesoJinaPrava(jedIds, VfkTableModel.OpravnenyPovinny.OPJednotka ) or \
+                    self.partTelesoJinaPrava(jedIds, VfkTableModel.OpravnenyPovinny.OPJednotka) or \
                     self.partTelesoJinaPrava(opsubIds, VfkTableModel.OpravnenyPovinny.OPOsoba):
                 self.__mDocument.endTable()
             else:
@@ -514,7 +513,7 @@ class DocumentBuilder:
                 self.__mDocument.discardLastBeginTable()
                 self.__mDocument.text(self.__mStringBezZapisu)
         else:
-            self.__mDocument.heading2(u"D – Jiné zápisy")
+            self.__mDocument.heading2(u"Jiné zápisy")
             self.__mDocument.beginTable()
             self.__mDocument.tableHeader(header)
 
@@ -544,7 +543,7 @@ class DocumentBuilder:
         if model.rowCount() == 0:
             self.__mDocument.text(self.__mStringBezZapisu)
         else:
-            lastListinaId = u""
+            lastListinaId = u''
             self.__mDocument.beginItemize()
             for i in xrange(model.rowCount()):
                 currentListinaId = model.value(i, u"rl_listin_id")
@@ -676,12 +675,12 @@ class DocumentBuilder:
         :return: bool
         """
         isRecord = False
-        povinni = ["jpv_par_id_k", "jpv_bud_id_k", "jpv_jed_id_k", "jpv_opsub_id_k"]
-        opravneni = ["jpv_par_id_pro", "jpv_bud_id_pro", "jpv_jed_id_pro", "jpv_opsub_id_pro"]
+        povinni = [u"jpv_par_id_k", u"jpv_bud_id_k", u"jpv_jed_id_k", u"jpv_opsub_id_k"]
+        opravneni = [u"jpv_par_id_pro", u"jpv_bud_id_pro", u"jpv_jed_id_pro", u"jpv_opsub_id_pro"]
 
         for id in ids:
             model = VfkTableModel(self.__mConnectionName)
-            where = u"typrav.sekce {}= \"D\"".format(u"" if sekceD else u"!")
+            where = u"typrav.sekce {}= 'D'".format(u'' if sekceD else u'!')
             ok = model.nemovitostJpv(id, pravniSubjekt, pravo, where)
             if ok is False or model.rowCount() == 0:
                 continue
@@ -772,6 +771,7 @@ class DocumentBuilder:
         self.__mDocument.heading1(u"Informace o parcele")
         self.__mDocument.keyValueTable(content)
 
+        # neighbours
         sousedniModel = VfkTableModel(self.__mConnectionName)
         sousedniModel.sousedniParcely(id)
         ids = []
@@ -820,7 +820,8 @@ class DocumentBuilder:
 
         orderedPrava = list(set(orderedPrava))
 
-        tables = defaultdict(list)
+        # tables =  {[[]]}
+        tables = {}
         header = [u"Jméno", u"Adresa", u"Identifikátor", u"Podíl"]
 
         for i, item in enumerate(orderedPrava):
@@ -832,9 +833,9 @@ class DocumentBuilder:
             opsubId = vlastniciModel.value(i, u"vla_opsub_id")
             vlaPodilCitatel = vlastniciModel.value(i, u"vla_podil_citatel")
             vlaPodilJmenovatel = vlastniciModel.value(i, u"vla_podil_jmenovatel")
-            podil = u""
+            podil = u''
 
-            if vlaPodilCitatel and vlaPodilJmenovatel and vlaPodilJmenovatel != 1:
+            if vlaPodilCitatel and vlaPodilJmenovatel and vlaPodilJmenovatel != u'1':
                 podil += u"{}/{}".format(vlaPodilCitatel, vlaPodilJmenovatel)
 
             vlastnikModel = VfkTableModel(self.__mConnectionName)
@@ -853,9 +854,10 @@ class DocumentBuilder:
                 content.append(adresa)
                 content.append(identifikator)
                 content.append(podil)
+                tables[typravNazev].append(content)
             else:
                 nazev += u" ({})".format(vlastnikModel.value(0, u"charos_zkratka"))
-                rowContent = [nazev, u"", u"", podil]
+                rowContent = [nazev, u'', u'', podil]
                 tables[typravNazev].append(rowContent)
 
                 manzeleId = [vlastnikModel.value(0, u"opsub_id_je_1_partner_bsm"),
@@ -868,7 +870,7 @@ class DocumentBuilder:
                         break
 
                     identifikatorSJM = sjmModel.value(0, u"opsub_rodne_cislo")
-                    rowContent = [self.makeJmeno(sjmModel, 0), self.makeAdresa(sjmModel, 0), identifikatorSJM, u""]
+                    rowContent = [self.makeJmeno(sjmModel, 0), self.makeAdresa(sjmModel, 0), identifikatorSJM, u'']
                     tables[typravNazev].append(rowContent)
 
             opsubIds.append(opsubId)
@@ -1030,7 +1032,7 @@ class DocumentBuilder:
             for i in xrange(1, 3):
                 manzelId = opsubModel.value(0, u"opsub_id_je_{}_partner_bsm".format(i))
                 desc = self.makeShortDescription(manzelId, VfkTableModel.OpravnenyPovinny.OPOsoba)
-                content.append(TPair(u"", desc))
+                content.append(TPair(u'', desc))
 
         content.append(TPair(u"Typ:", opsubModel.value(0, u"charos_nazev")))
 
@@ -1250,7 +1252,7 @@ class DocumentBuilder:
         :param nemovitost: VfkTableModel.OpravnenyPovinny
         :return: str
         """
-        text = u""
+        text = u''
         if not id:
             return text
 
@@ -1380,7 +1382,7 @@ class DocumentBuilder:
         :return: str
         """
         type = model.value(row, u"opsub_opsub_type")
-        identifikator = u""
+        identifikator = u''
         if type == u"OPO":
             identifikator = model.value(row, u"opsub_ico")
         elif type == u"OFO":
@@ -1398,7 +1400,7 @@ class DocumentBuilder:
         cislo = u''
         cislo += model.value(row, u"par_kmenove_cislo_par")
         poddeleni = model.value(row, u"par_poddeleni_cisla_par")
-        if poddeleni != u"NULL":
+        if poddeleni:
             cislo += u"/" + poddeleni
 
         st = u''

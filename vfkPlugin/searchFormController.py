@@ -33,16 +33,16 @@ from vfkTableModel import *
 
 class SearchFormController(QObject):
 
-    class SearchForms(QObject):
-        vlastnici = VlastniciSearchForm()
-        parcely = ParcelySearchForm()
-        budovy = BudovySearchForm()
-        jednotky = JednotkySearchForm()
+    class SearchForms:
+        vlastnici = None
+        parcely = None
+        budovy = None
+        jednotky = None
 
     class MainControls:
-        formCombobox = QComboBox()
-        searchForms = QStackedWidget()
-        searchButton = QPushButton()
+        formCombobox = None
+        searchForms = None
+        searchButton = None
 
     class Form:
         Vlastnici = 0
@@ -96,16 +96,12 @@ class SearchFormController(QObject):
         QApplication.processEvents()
 
         if int(self.__controls.formCombobox.itemData(self.__controls.formCombobox.currentIndex())) == self.Form.Parcely:
-            qWarning("parcely")
             self.__searchParcely()
         elif int(self.__controls.formCombobox.itemData(self.__controls.formCombobox.currentIndex())) == self.Form.Budovy:
-            qWarning("budovy")
             self.__searchBudovy()
         elif int(self.__controls.formCombobox.itemData(self.__controls.formCombobox.currentIndex())) == self.Form.Jednotky:
-            qWarning("jednotky")
             self.__searchJednotky()
         elif int(self.__controls.formCombobox.itemData(self.__controls.formCombobox.currentIndex())) == self.Form.Vlastnici:
-            qWarning("vlastnici")
             self.__searchVlastnici()
         else:
             qDebug("Neplatna hodnota v SearchComboBoxu!!!")
@@ -124,8 +120,7 @@ class SearchFormController(QObject):
         ofo = self.__forms.vlastnici.isOfo()
 
         url = QUrl(u"showText?page=search&type=vlastnici&jmeno={}&rcIco={}&sjm={}&opo={}&ofo={}&lv={}"
-                   .format(jmeno, rcIco, 1 if sjm is not None else 0, 1 if opo is not None else 0,
-                           1 if ofo is not None else 0, lv))
+                   .format(jmeno, rcIco, 1 if sjm else 0, 1 if None else 0, 1 if ofo else 0, lv))
         qWarning(str(url))
         self.actionTriggered.emit(url)
 

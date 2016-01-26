@@ -71,7 +71,7 @@ class MainApp(QDockWidget, Ui_MainApp):
         # settings
         self.loadVfkButton.setDisabled(True)
 
-        self.searchFormMainControls = SearchFormController.MainControls
+        self.searchFormMainControls = SearchFormController.MainControls()
         self.searchFormMainControls.formCombobox = self.searchCombo
         self.searchFormMainControls.searchForms = self.searchForms
         self.searchFormMainControls.searchButton = self.searchButton
@@ -130,9 +130,8 @@ class MainApp(QDockWidget, Ui_MainApp):
         self.succesfullExport("HTML")
 
     def setSelectionChangedConnected(self, connected):
-        qWarning(".... setSelectionChangedConnected...........")
-        for i, id in enumerate(self.__mLoadedLayers):
-            vectorLayer = QgsVectorLayer(QgsMapLayerRegistry.instance().mapLayer(id))
+        for it in self.__mLoadedLayers:
+            vectorLayer = QgsVectorLayer(QgsMapLayerRegistry.instance().mapLayer(it))
 
             if connected:
                 self.connect(vectorLayer, SIGNAL("selectionChanged()"), self.showInfoAboutSelection)
@@ -140,11 +139,7 @@ class MainApp(QDockWidget, Ui_MainApp):
                 self.disconnect(vectorLayer, SIGNAL("selectionChanged()"), self.showInfoAboutSelection)
 
     def showInMap(self, ids, layerName):
-        qWarning("--jsem v showInMap--")
-        qWarning(str(ids))
-        qWarning("layerName: " + str(layerName))
         if layerName in self.__mLoadedLayers:
-        #if self.__mLoadedLayers.has_key(layerName):
             id = self.__mLoadedLayers[layerName]
             vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
             searchString = "ID IN ('{}')".format("','".join(ids))
@@ -191,7 +186,7 @@ class MainApp(QDockWidget, Ui_MainApp):
         fileName = self.vfkFileLineEdit.text()
 
         if self.__mLastVfkFile != fileName:
-            errorMsg = ""
+            errorMsg = ''
             fInfo = QFileInfo(fileName)
             self.__mDataSourceName = QDir(fInfo.absolutePath()).filePath(fInfo.baseName() + '.db')
 
@@ -209,8 +204,8 @@ class MainApp(QDockWidget, Ui_MainApp):
                 self.emit(SIGNAL("enableSearch"), False)
                 return
 
-            self.vfkBrowser.setConnectionName(str(self.property("connectionName")))
-            self.__mSearchController.setConnectionName(str(self.property("connectionName")))
+            self.vfkBrowser.setConnectionName(self.property("connectionName"))
+            self.__mSearchController.setConnectionName(self.property("connectionName"))
 
             self.emit(SIGNAL("enableSearch"), True)
             self.__mLastVfkFile = fileName
@@ -266,7 +261,7 @@ class MainApp(QDockWidget, Ui_MainApp):
 
     def __setSymbology(self, layer):
         name = layer.name()
-        symbologyFile = ""
+        symbologyFile = ''
 
         if name == 'PAR':
             symbologyFile = ':/parStyle.qml'
@@ -296,7 +291,7 @@ class MainApp(QDockWidget, Ui_MainApp):
 
     def loadVfkFile(self, fileName, errorMsg):
 
-        if self.__mOgrDataSource is not None:
+        if self.__mOgrDataSource:
             self.__mOgrDataSource.Destroy()
             self.__mOgrDataSource = 0
 
@@ -314,7 +309,7 @@ class MainApp(QDockWidget, Ui_MainApp):
 
         qDebug("Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
         self.__mOgrDataSource = ogr.Open(self.__fileName, 0)
-        if self.__mOgrDataSource is None:
+        if not self.__mOgrDataSource:
             errorMsg = u'Unable to set open OGR data source'
             return False
         else:
@@ -352,7 +347,7 @@ class MainApp(QDockWidget, Ui_MainApp):
     def showInfoAboutSelection(self):
         layers = ["PAR", "BUD"]
         layerIds = {}
-        qWarning("--showInfoAboutSelection")
+        qWarning("--ssssssssssssssssssssssssssss")
         qWarning("-------------------------------------------------")
         for layer in layers:
             if layer in self.__mLoadedLayers:
