@@ -56,7 +56,7 @@ class VfkTableModel(QSqlQueryModel):
                     "tel.katuze_kod tel_katuze_kod, " \
                     "tel.cislo_tel tel_cislo_tel " \
                     "FROM tel;"
-        query = unicode(query)
+
         return self.__evaluate(query)
 
     def telesoHlavicka(self, id):
@@ -74,7 +74,6 @@ class VfkTableModel(QSqlQueryModel):
                     "JOIN obce ON katuze.obce_kod = obce.kod " \
                     "JOIN okresy ON obce.okresy_kod = okresy.kod " \
                     "WHERE tel.id = {};".format(id)
-        query = unicode(query)
         return self.__evaluate(query)
 
     def telesoParcely(self, cisloTel, extended):
@@ -91,7 +90,6 @@ class VfkTableModel(QSqlQueryModel):
                 "LEFT JOIN drupoz ON par.drupoz_kod = drupoz.kod " \
                 "LEFT JOIN zpvypo ON par.zpvypa_kod = zpvypo.kod " \
                 "WHERE tel.id = {};".format(columns, cisloTel)
-        query = unicode(query)
         return self.__evaluate(query)
 
     def vlastnikParcely(self, opsubId, extended):
@@ -110,7 +108,6 @@ class VfkTableModel(QSqlQueryModel):
                 "LEFT JOIN drupoz ON par.drupoz_kod = drupoz.kod " \
                 "LEFT JOIN zpvypo ON par.zpvypa_kod = zpvypo.kod " \
                 "WHERE opsub.id = {};".format(columns, opsubId)
-        query = unicode(query)
         return self.__evaluate(query)
 
     def telesoBudovy(self, cisloTel, extended):
@@ -130,7 +127,6 @@ class VfkTableModel(QSqlQueryModel):
                 "LEFT JOIN casobc ON casobc.kod = bud.caobce_kod " \
                 "LEFT JOIN drupoz ON drupoz.kod = par.drupoz_kod " \
                 "WHERE tel.id = {};".format(columns, cisloTel)
-        query = unicode(query)
         return self.__evaluate(query)
 
     def vlastnikBudovy(self, opsubId, extended):
@@ -152,7 +148,6 @@ class VfkTableModel(QSqlQueryModel):
                 "LEFT JOIN casobc ON casobc.kod = bud.caobce_kod " \
                 "LEFT JOIN drupoz ON drupoz.kod = par.drupoz_kod " \
                 "WHERE opsub.id = {};".format(columns, opsubId)
-        query = unicode(query)
         return self.__evaluate(query)
 
     def telesoJednotky(self, cisloTel, extended):
@@ -172,7 +167,7 @@ class VfkTableModel(QSqlQueryModel):
                 "JOIN par ON par.bud_id = bud.id " \
                 "LEFT JOIN drupoz ON drupoz.kod = par.drupoz_kod " \
                 "WHERE tel.id = {};".format(columns, cisloTel)
-        query = unicode(query)
+
         return self.__evaluate(query)
 
     def vlastnikJednotky(self, opsubId, extended):
@@ -194,7 +189,7 @@ class VfkTableModel(QSqlQueryModel):
                "JOIN par ON par.bud_id = bud.id " \
                "LEFT JOIN drupoz ON drupoz.kod = par.drupoz_kod " \
                "WHERE opsub.id = {};".format(columns, opsubId)
-        query = unicode(query)
+
         return self.__evaluate(query)
 
     def parcela(self, id, extended):
@@ -216,7 +211,7 @@ class VfkTableModel(QSqlQueryModel):
                 "LEFT JOIN bud ON par.bud_id = bud.id " \
                 "LEFT JOIN typbud ON bud.typbud_kod = typbud.kod " \
                 "WHERE par.id = {};".format(columns, id)
-        query = unicode(query)
+
         return self.__evaluate(query)
 
     def budova(self, id, extended):
@@ -237,7 +232,7 @@ class VfkTableModel(QSqlQueryModel):
                 "JOIN katuze ON par.katuze_kod = katuze.kod " \
                 "LEFT JOIN drupoz ON drupoz.kod = par.drupoz_kod " \
                 "WHERE bud.id = {};".format(columns, id)
-        query = unicode(query)
+
         return self.__evaluate(query)
 
     def jednotka(self, id, extended):
@@ -259,7 +254,7 @@ class VfkTableModel(QSqlQueryModel):
                 "JOIN katuze ON par.katuze_kod = katuze.kod " \
                 "JOIN tel ON tel.id = jed.tel_id " \
                 "WHERE jed.id = {};".format(columns, id)
-        query = unicode(query)
+
         return self.__evaluate(query)
 
     def budovaJednotky(self, id):
@@ -274,7 +269,7 @@ class VfkTableModel(QSqlQueryModel):
                 "FROM bud " \
                 "JOIN jed ON bud.id = jed.bud_id " \
                 "WHERE bud.id = {};".format(id)
-        query = unicode(query)
+
         return self.__evaluate(query)
 
     def sousedniParcely(self, id):
@@ -288,7 +283,7 @@ class VfkTableModel(QSqlQueryModel):
                 "FROM hp " \
                 "WHERE hp.par_id_1 = {} " \
                 "OR hp.par_id_2 = {};".format(id, id)
-        query = unicode(query)
+
         return self.__evaluate(query)
 
     def opravnenySubjekt(self, id, extended):
@@ -303,7 +298,7 @@ class VfkTableModel(QSqlQueryModel):
                 "FROM opsub " \
                 "JOIN charos ON charos.kod = opsub.charos_kod " \
                 "WHERE opsub.id = {};".format(columns, id)
-        query = unicode(query)
+
         return self.__evaluate(query)
 
     def nemovitostTeleso(self, id, nemovitost):
@@ -318,7 +313,7 @@ class VfkTableModel(QSqlQueryModel):
                 "FROM tel " \
                 "JOIN {} ON {}.tel_id = tel.id " \
                 "WHERE {}.id = {};".format(table, table, table, id)
-        query = unicode(query)
+
         return self.__evaluate(query)
 
     def telesoVlastnici(self, id):
@@ -338,7 +333,7 @@ class VfkTableModel(QSqlQueryModel):
                 "JOIN tel ON vla.tel_id = tel.id " \
                 "JOIN typrav ON typrav.kod = vla.typrav_kod " \
                 "WHERE tel.id = {} ORDER BY typrav.sekce;".format(id)
-        query = unicode(query)
+
         return self.__evaluate(query)
 
     def nemovitostOchrana(self, id, nemovitost):
@@ -354,7 +349,7 @@ class VfkTableModel(QSqlQueryModel):
                 "JOIN {} ON rzo.{}_id = {}.id " \
                 "JOIN rzo ON rzo.zpochr_kod = zpochn.kod " \
                 "WHERE {}.id = {};".format(table, table, table, table, id)
-        query = unicode(query)
+
         return self.__evaluate(query)
 
     def vlastnikNemovitosti(self, id):
@@ -375,7 +370,7 @@ class VfkTableModel(QSqlQueryModel):
                 "LEFT JOIN bud ON bud.tel_id = tel.id " \
                 "LEFT JOIN jed ON jed.tel_id = tel.id " \
                 "WHERE opsub.id = {};".format(id)
-        query = unicode(query)
+
         return self.__evaluate(query)
 
     def parcelaBpej(self, id):
@@ -390,7 +385,7 @@ class VfkTableModel(QSqlQueryModel):
                 "JOIN par ON bdp.par_id = par.id " \
                 "LEFT JOIN drupoz ON drupoz.kod = par.drupoz_kod " \
                 "WHERE par.id = {};".format(columns, id)
-        query = unicode(query)
+
         return self.__evaluate(query)
 
     def nemovitostJpv(self, id, op, pravo, where):
@@ -411,7 +406,7 @@ class VfkTableModel(QSqlQueryModel):
                 "JOIN typrav ON typrav.kod = jpv.typrav_kod " \
                 "WHERE {}.id = {}{};".format(columns, table, table, table, columnNameSuffix,
                                              table, id, "" if not where else " AND {}".format(where))
-        query = unicode(query)
+
         return self.__evaluate(query)
 
     def jpvListiny(self, id):
@@ -429,7 +424,7 @@ class VfkTableModel(QSqlQueryModel):
                 "join dul ON dul.kod = ldu.dul_kod " \
                 "JOIN typlis ON typlis.kod=listin.typlist_kod " \
                 "WHERE jpv.id = {};".format(columns, id)
-        query = unicode(query)
+
         return self.__evaluate(query)
 
     def nabyvaciListiny(self, parIds, budIds, jedIds):
@@ -454,7 +449,7 @@ class VfkTableModel(QSqlQueryModel):
                 "OR bud.id in ({}) " \
                 "OR jed.id in ({}) " \
                 "ORDER BY rl.listin_id;".format(columns, ",".join(parIds), ",".join(budIds), ",".join(jedIds))
-        query = unicode(query)
+
         return self.__evaluate(query)
 
     def vlastnik(self, id, extended=False):
@@ -469,7 +464,6 @@ class VfkTableModel(QSqlQueryModel):
                 "FROM opsub " \
                 "JOIN charos ON opsub.charos_kod = charos.kod " \
                 "WHERE opsub.id = {};".format(columns, id)
-        query = unicode(query)
         return self.__evaluate(query)
 
     def dveRadyCislovani(self):
@@ -478,7 +472,6 @@ class VfkTableModel(QSqlQueryModel):
         :return: bool
         """
         query = "SELECT 1 FROM doci WHERE druh_cislovani_par = 1"
-        query = unicode(query)
         self.setQuery(query, QSqlDatabase.database(self.__mConnectionName))
 
         if self.rowCount() > 0:
@@ -498,7 +491,6 @@ class VfkTableModel(QSqlQueryModel):
                 "obdebo.souradnice_y obdebo_souradnice_y " \
                 "FROM obdebo " \
                 "WHERE {}_id = {};".format(tableName, id)
-        query = unicode(query)
         return self.__evaluate(query)
 
     def searchOpsub(self, jmeno, identifikator, sjm, opo, ofo, lv):
@@ -554,7 +546,7 @@ class VfkTableModel(QSqlQueryModel):
                 u"FROM opsub " \
                 u"{} {} " \
                 u"ORDER BY opsub.prijmeni, opsub.nazev;".format(join, where)
-        print(query)
+
         return self.__evaluate(query)
 
     def searchPar(self, parcelniCislo, typIndex, druhKod, lv):
@@ -598,7 +590,6 @@ class VfkTableModel(QSqlQueryModel):
                 u"JOIN drupoz ON par.drupoz_kod = drupoz.kod " \
                 u"{} {};".format(join, where)
 
-        qDebug(query)
         return self.__evaluate(query)
 
     def searchBud(self, domovniCislo, naParcele, zpusobVyuzitiKod, lv):
@@ -638,7 +629,7 @@ class VfkTableModel(QSqlQueryModel):
         query = u"SELECT DISTINCT bud.id bud_id " \
                 u"FROM bud " \
                 u"{} {};".format(join, where)
-        qDebug(query)
+
         return self.__evaluate(query)
 
     def searchJed(self, cisloJednotky, domovniCislo, naParcele, zpusobVyuzitiKod, lv):
@@ -683,7 +674,7 @@ class VfkTableModel(QSqlQueryModel):
                 u"FROM jed " \
                 u"JOIN bud ON bud.id = jed.bud_id " \
                 u"{} {};".format(join, where)
-        qDebug(query)
+
         return self.__evaluate(query)
 
     def parColumns(self, extended):
@@ -945,12 +936,10 @@ class VfkTableModel(QSqlQueryModel):
             self.fetchMore()
 
         if t.elapsed() > 500:
-            qDebug(query)
             qDebug("\nTime elapsed: {} ms\n".format(t.elapsed()))
 
         if self.lastError().isValid():
             qDebug(str(self.lastError()))
-            qDebug(query)
             return False
 
         return True

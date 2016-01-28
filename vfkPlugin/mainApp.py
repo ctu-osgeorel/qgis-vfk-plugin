@@ -22,23 +22,23 @@
 """
 
 # Import the PyQt, QGIS libraries and classes
-from PIL.PsdImagePlugin import _layerinfo
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup
-from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, pyqtSlot, qWarning, qDebug
+from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, qDebug
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import *
 from qgis.gui import *
 import ogr
 
 from ui_MainApp import Ui_MainApp
-from htmlDocument import *
-from domains import *
-from vfkTextBrowser import *
+# from htmlDocument import *
+# from domains import *
+# from vfkTextBrowser import *
 from searchFormController import *
-from budovySearchForm import *
-from jednotkySearchForm import *
-from parcelySearchForm import *
+# from vlastniciSearchForm import *
+# from budovySearchForm import *
+# from jednotkySearchForm import *
+# from parcelySearchForm import *
 
 
 class MainApp(QDockWidget, Ui_MainApp):
@@ -97,7 +97,7 @@ class MainApp(QDockWidget, Ui_MainApp):
         title = u'Načti soubor VFK'
         lastUsedDir = ''
         self.__fileName = QFileDialog.getOpenFileName(self, title, lastUsedDir, 'Soubor VFK (*.vfk)')
-        if self.__fileName == "":
+        if not self.__fileName:
             return
         else:
             self.vfkFileLineEdit.setText(self.__fileName)
@@ -130,8 +130,9 @@ class MainApp(QDockWidget, Ui_MainApp):
         self.succesfullExport("HTML")
 
     def setSelectionChangedConnected(self, connected):
-        for it in self.__mLoadedLayers:
-            vectorLayer = QgsVectorLayer(QgsMapLayerRegistry.instance().mapLayer(it))
+        for layer in self.__mLoadedLayers:
+            id = self.__mLoadedLayers[layer]
+            vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
 
             if connected:
                 self.connect(vectorLayer, SIGNAL("selectionChanged()"), self.showInfoAboutSelection)
@@ -175,7 +176,7 @@ class MainApp(QDockWidget, Ui_MainApp):
         f = QgsFeature()
 
         while fit.nextFeature(f):
-            if int(search.evaluate(f)) != 0:
+            if search.evaluate(f) != 0:
                 fIds.append(f.id())
             if search.hasEvalError():
                 break
@@ -347,11 +348,8 @@ class MainApp(QDockWidget, Ui_MainApp):
     def showInfoAboutSelection(self):
         layers = ["PAR", "BUD"]
         layerIds = {}
-        qWarning("--ssssssssssssssssssssssssssss")
-        qWarning("-------------------------------------------------")
         for layer in layers:
             if layer in self.__mLoadedLayers:
-                qWarning("Vrstva {} obsazena..".format(layer))
                 id = str(self.__mLoadedLayers[layer])
                 vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
                 layerIds[layer] = self.__selectedIds(vectorLayer)
@@ -359,7 +357,6 @@ class MainApp(QDockWidget, Ui_MainApp):
         self.vfkBrowser.showInfoAboutSelection(layerIds["PAR"], layerIds["BUD"])
 
     def showParInMap(self, ids):
-        qWarning("showParInMap")
         if self.actionShowInfoaboutSelection.isChecked():
             self.setSelectionChangedConnected(False)
             self.showInMap(ids, "PAR")
@@ -368,7 +365,6 @@ class MainApp(QDockWidget, Ui_MainApp):
             self.showInMap(ids, "PAR")
 
     def showBudInMap(self, ids):
-        qWarning("showBudInMap")
         if self.actionShowInfoaboutSelection.isChecked():
             self.setSelectionChangedConnected(False)
             self.showInMap(ids, "BUD")
@@ -395,7 +391,6 @@ class MainApp(QDockWidget, Ui_MainApp):
         self.actionVyhledavani.trigger()
         self.searchCombo.setCurrentIndex(searchType)
         #self.searchForms.setCurrentIndex(searchType)
-        qWarning("switched to search window..")
 
     def succesfullExport(self, export_format):
         QMessageBox.about(self, "Info", u"Export do formátu {} proběhl úspěšně.".format(export_format))
@@ -480,8 +475,8 @@ class MainApp(QDockWidget, Ui_MainApp):
         self.rightWidgetLayout.insertWidget(0, self.__mBrowserToolbar)
 
         # connect signals from vfkbrowser when changing history
-        self.connect(self.vfkBrowser, SIGNAL("currentParIdsChanged(bool)"), self.actionSelectParInMap.setEnabled)
-        self.connect(self.vfkBrowser, SIGNAL("currentBudIdsChanged(bool)"), self.actionSelectBudInMap.setEnabled)
-        self.connect(self.vfkBrowser, SIGNAL("historyBefore(bool)"), self.actionBack.setEnabled)
-        self.connect(self.vfkBrowser, SIGNAL("historyAfter(bool)"), self.actionForward.setEnabled)
-        self.connect(self.vfkBrowser, SIGNAL("definitionPointAvailable(bool)"), self.actionCuzkPage.setEnabled)
+        self.connect(self.vfkBrowser, SIGNAL("currentParIdsChanged"), self.actionSelectParInMap.setEnabled)
+        self.connect(self.vfkBrowser, SIGNAL("currentBudIdsChanged"), self.actionSelectBudInMap.setEnabled)
+        self.connect(self.vfkBrowser, SIGNAL("historyBefore"), self.actionBack.setEnabled)
+        self.connect(self.vfkBrowser, SIGNAL("historyAfter"), self.actionForward.setEnabled)
+        self.connect(self.vfkBrowser, SIGNAL("definitionPointAvailable"), self.actionCuzkPage.setEnabled)

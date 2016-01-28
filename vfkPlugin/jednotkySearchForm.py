@@ -57,5 +57,11 @@ class JednotkySearchForm(QWidget):
 
     def zpusobVyuzitiKod(self):
         row = self.ui.mZpVyuzitiCombo.currentIndex()
-        index = QModelIndex(self.ui.mZpVyuzitiCombo.model().index(row, 0))
-        return unicode(self.ui.mZpVyuzitiCombo.model().data(index))
+        #index = QModelIndex(self.ui.mZpVyuzitiCombo.model().index(row, 0))
+        index = QModelIndex(self.ui.mZpVyuzitiCombo.model().index(row, 1))
+        #return unicode(self.ui.mZpVyuzitiCombo.model().data(index))
+
+        if self.ui.mZpVyuzitiCombo.model().data(index) == u"libovolný":
+            return u''
+        else:
+            return u"'{}'".format(unicode(self.ui.mZpVyuzitiCombo.model().data(index)))

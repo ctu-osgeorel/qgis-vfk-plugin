@@ -42,7 +42,7 @@ class LatexDocument(VfkDocument):
 
     def header(self):
         self.__mPage += u'''
-\documentclass[a4paper,12pt]{article}
+\documentclass[a4paper,9pt]{article}
 \\usepackage[utf8]{inputenc}
 \\usepackage[czech]{babel}
 \\usepackage{a4wide}

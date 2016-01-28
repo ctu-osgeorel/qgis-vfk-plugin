@@ -85,7 +85,7 @@ class HtmlDocument(VfkDocument):
         self.__mPage += u"<h1>{}</h1>".format(text)
 
         if self.titleIsSet is False:
-          self.title( text )
+          self.title(text)
           
     def heading2(self, text):
         self.__mPage += u"<h2>{}</h2>".format(text)

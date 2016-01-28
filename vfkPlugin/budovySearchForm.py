@@ -58,5 +58,12 @@ class BudovySearchForm(QWidget):
 
     def zpusobVyuzitiKod(self):
         row = self.ui.mZpVyuzitiCombo.currentIndex()
-        index = QModelIndex(self.ui.mZpVyuzitiCombo.model().index(row, 0))
-        return unicode(self.ui.mZpVyuzitiCombo.model().data(index))
+        index = self.ui.mZpVyuzitiCombo.model().index(row,1)
+        print("deedededed")
+        print("rada: " + str(row))
+        print("index" + str(index))
+        #print("vystup: " + str(self.ui.mZpVyuzitiCombo.model().data(index)))
+        if self.ui.mZpVyuzitiCombo.model().data(index) == u"libovolný":
+            return u''
+        else:
+            return u"'{}'".format(unicode(self.ui.mZpVyuzitiCombo.model().data(index)))

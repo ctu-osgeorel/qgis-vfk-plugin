@@ -39,8 +39,9 @@ class TPair:
         self.second = second
 
 
-class HistoryRecord:
+class HistoryRecord(QObject):
     def __init__(self):
+        QObject.__init__(self)
         self.html = u''
         self.parIds = []
         self.budIds = []
@@ -78,7 +79,7 @@ class VfkTextBrowser(QTextBrowser):
         self.__mUrlHistory = []     # list of history records
         self.__mHistoryOrder = -1      # saving current index in history list
 
-        self.connect(self, SIGNAL("anchorClicked(QUrl)"), self.onLinkClicked) #, SLOT("oLinkClicked"))
+        self.connect(self, SIGNAL("anchorClicked(QUrl)"), self.onLinkClicked)
         self.connect(self, SIGNAL("updateHistory"), self.saveHistory)
 
         self.emit(SIGNAL("currentParIdsChanged"), False)
@@ -193,10 +194,10 @@ class VfkTextBrowser(QTextBrowser):
             return
 
         urlPart = u''
-        if len(parIds) > 0:
-            urlPart = u"&parcely={}".format(u", ".join(parIds))
-        if len(budIds) > 0:
-            urlPart = u"&budovy={}".format(u", ".join(budIds))
+        if parIds:
+            urlPart = u"&parcely={}".format(u",".join(parIds))
+        if budIds:
+            urlPart = u"&budovy={}".format(u",".join(budIds))
         if urlPart:
             url = u"showText?page=seznam&type=id{}".format(urlPart)
             self.processAction(QUrl(url))
@@ -211,7 +212,7 @@ class VfkTextBrowser(QTextBrowser):
     def documentFactory(self, format):
         """
 
-        :param format: VfkTextBrowser.ExportFormat
+        :type format: VfkTextBrowser.ExportFormat
         :rtype: VfkDocument
         """
         doc = VfkDocument
@@ -229,26 +230,26 @@ class VfkTextBrowser(QTextBrowser):
             qDebug("Nejsou podporovany jine formaty pro export")
 
     def updateButtonEnabledState(self):
-        self.emit(SIGNAL("currentParIdsChanged"), False if self.__mCurrentRecord.parIds else True)
-        self.emit(SIGNAL("currentBudIdsChanged"), False if self.__mCurrentRecord.budIds else True)
+        self.emit(SIGNAL("currentParIdsChanged"), True if self.__mCurrentRecord.parIds else False)
+        self.emit(SIGNAL("currentBudIdsChanged"), True if self.__mCurrentRecord.budIds else False)
 
         self.emit(SIGNAL("historyBefore"), self.__mHistoryOrder > 0)
         self.emit(SIGNAL("historyAfter"), len(self.__mUrlHistory) - self.__mHistoryOrder > 0)
 
-        self.emit(SIGNAL("definitionPointAvailable"), False if (self.__mCurrentRecord.definitionPoint.first
-                                                    and self.__mCurrentRecord.definitionPoint.second) else True)
+        self.emit(SIGNAL("definitionPointAvailable"), True if (self.__mCurrentRecord.definitionPoint.first
+                                                    and self.__mCurrentRecord.definitionPoint.second) else False)
 
     def onLinkClicked(self, task):
         """
 
-        :param task: QUrl
+        :type task: QUrl
         """
         self.processAction(task)
 
     def processAction(self, task):
         """
 
-        :param task: QUrl
+        :type task: QUrl
         """
         self.__mCurrentUrl = task
 
@@ -262,8 +263,6 @@ class VfkTextBrowser(QTextBrowser):
             qDebug("Total time elapsed: {} ms".format(t.elapsed()))
             QApplication.restoreOverrideCursor()
             self.setHtml(html)
-
-            #print(html)
 
             record = HistoryRecord()
             record.html = html
