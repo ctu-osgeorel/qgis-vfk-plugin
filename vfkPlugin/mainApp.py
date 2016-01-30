@@ -441,7 +441,7 @@ class MainApp(QDockWidget, Ui_MainApp):
         """
         self.actionVyhledavani.trigger()
         self.searchCombo.setCurrentIndex(searchType)
-        self.searchForms.setCurrentIndex(searchType)
+        self.searchFormMainControls.searchForms.setCurrentIndex(searchType)
 
     def succesfullExport(self, export_format):
         """
