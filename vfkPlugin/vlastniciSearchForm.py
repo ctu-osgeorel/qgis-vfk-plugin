@@ -23,7 +23,7 @@
 """
 
 from PyQt4.QtGui import *
-from PyQt4.QtCore import pyqtSignal, SIGNAL, SLOT
+from PyQt4.QtCore import pyqtSignal, SIGNAL
 
 from ui_vlastnicisearchform import *
 
@@ -50,7 +50,7 @@ class VlastniciSearchForm(QWidget):
         return unicode(self.ui.jmenoLineEdit.text().strip())
 
     def rcIco(self):
-        return unicode(self.ui.rcIcoLineEdit.text().strip())
+        return self.ui.rcIcoLineEdit.text().strip()
 
     def isSjm(self):
         return self.ui.sjmCheckBox.isChecked()
@@ -62,7 +62,7 @@ class VlastniciSearchForm(QWidget):
         return self.ui.ofoCheckBox.isChecked()
 
     def lv(self):
-        return unicode(self.ui.lvVlastniciLineEdit.text().strip())
+        return self.ui.lvVlastniciLineEdit.text().strip()
 
     def __vlastniciSearchEnabled(self):
         if self.ui.ofoCheckBox.isChecked() or self.ui.opoCheckBox.isChecked() or self.ui.sjmCheckBox.isChecked():

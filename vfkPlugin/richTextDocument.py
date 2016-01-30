@@ -24,6 +24,7 @@
 from PyQt4.QtCore import QRegExp
 from vfkDocument import *
 
+
 class RichTextDocument(VfkDocument):
     # static variables
     defaultTableAttributes = "border=\"0\" cellspacing=\"1px\" cellpadding=\"0\""

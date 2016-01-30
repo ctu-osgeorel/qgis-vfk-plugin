@@ -22,7 +22,7 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtCore import qWarning, qDebug
+from PyQt4.QtCore import qDebug
 from vfkDocument import VfkDocument
 
 

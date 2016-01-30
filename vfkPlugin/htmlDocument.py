@@ -21,8 +21,6 @@
  ***************************************************************************/
 """
 
-
-from PyQt4.QtCore import QRegExp
 from vfkDocument import VfkDocument
 
 

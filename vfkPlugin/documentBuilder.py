@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-from scipy.weave.build_tools import configure_temp_dir
 
-from PyQt4.QtCore import qWarning, qDebug, QObject
-
-from collections import defaultdict
+from PyQt4.QtCore import qDebug, QObject
 
 from vfkDocument import *
 from vfkTableModel import *
@@ -29,7 +26,7 @@ class DocumentBuilder:
         self.__mDocument = None
 
         # constructor depended decision
-        if connectionName != '':
+        if connectionName:
             self.__mHasConnection = True
             self.__mConnectionName = connectionName
             self.__mDveRadyCislovani = False
@@ -1219,7 +1216,7 @@ class DocumentBuilder:
         """
         model = VfkTableModel(self.__mConnectionName)
         ok = model.searchOpsub(jmeno, identifikator, sjm, opo, ofo, lv)
-        if ok is False:
+        if not ok:
             return
 
         ids = []
@@ -1363,7 +1360,7 @@ class DocumentBuilder:
         :type nemovitost: VfkTableModel.OpravnenyPovinny
         :return: str
         """
-        text = u""
+        text = u''
         if not id:
             return text
 
@@ -1527,6 +1524,7 @@ class DocumentBuilder:
         :type row: int
         :return: str
         """
+        print(u"showText?page=tel&id={}".format(model.value(row, u"tel_id")), model.value(row, u"tel_cislo_tel"))
         return self.__mDocument.link(u"showText?page=tel&id={}".format(model.value(row, u"tel_id")),
                                      model.value(row, u"tel_cislo_tel"))
 

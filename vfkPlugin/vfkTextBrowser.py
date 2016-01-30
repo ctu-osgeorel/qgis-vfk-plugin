@@ -105,9 +105,9 @@ class VfkTextBrowser(QTextBrowser):
     def exportDocument(self, task, fileName, format):
         """
 
-        :param task: QUrl
-        :param fileName: str
-        :param format: self.ExportFormat
+        :type task: QUrl
+        :type fileName: str
+        :type format: self.ExportFormat
         :return: bool
         """
         fileOut = QFile(fileName)
@@ -129,14 +129,14 @@ class VfkTextBrowser(QTextBrowser):
     def setConnectionName(self, connectionName):
         """
 
-        :param connectionName: str
+        :type connectionName: str
         """
         self.__mDocumentBuilder = DocumentBuilder(connectionName)
 
     def __parseTask(self, task):
         """
 
-        :param task: QUrl
+        :type task: QUrl
         :return: dict
         """
         taskMap = {u'action': task.path()}
@@ -179,8 +179,8 @@ class VfkTextBrowser(QTextBrowser):
     def showInfoAboutSelection(self, parIds, budIds):
         """
 
-        :param parIds: list
-        :param budIds: list
+        :type parIds: list
+        :type budIds: list
         :return:
         """
         url = u''
@@ -286,8 +286,8 @@ class VfkTextBrowser(QTextBrowser):
     def __documentContent(self, taskMap, format):
         """
 
-        :param taskMap: dict
-        :param format: VfkTextBrowser.ExportFormat
+        :type taskMap: dict
+        :type format: VfkTextBrowser.ExportFormat
         :return:
         """
         doc = self.documentFactory(format)

@@ -23,7 +23,7 @@
 """
 
 from PyQt4.QtGui import *
-from PyQt4.QtCore import QAbstractItemModel, QModelIndex
+from PyQt4.QtCore import QAbstractItemModel
 
 from ui_budovysearchform import *
 

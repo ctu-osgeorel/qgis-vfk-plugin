@@ -23,7 +23,8 @@
 
 # Import the PyQt, QGIS libraries and classes
 from PyQt4 import QtCore, QtGui
-from PyQt4.QtGui import QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup
+from PyQt4.QtGui import QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup, QDockWidget, QToolButton, \
+    QMenu, QPalette, QDesktopServices
 from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, qDebug
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import *
@@ -31,14 +32,7 @@ from qgis.gui import *
 import ogr
 
 from ui_MainApp import Ui_MainApp
-# from htmlDocument import *
-# from domains import *
-# from vfkTextBrowser import *
 from searchFormController import *
-# from vlastniciSearchForm import *
-# from budovySearchForm import *
-# from jednotkySearchForm import *
-# from parcelySearchForm import *
 
 
 class MainApp(QDockWidget, Ui_MainApp):
@@ -130,6 +124,11 @@ class MainApp(QDockWidget, Ui_MainApp):
         self.succesfullExport("HTML")
 
     def setSelectionChangedConnected(self, connected):
+        """
+
+        :type connected: bool
+        :return:
+        """
         for layer in self.__mLoadedLayers:
             id = self.__mLoadedLayers[layer]
             vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
@@ -140,6 +139,12 @@ class MainApp(QDockWidget, Ui_MainApp):
                 self.disconnect(vectorLayer, SIGNAL("selectionChanged()"), self.showInfoAboutSelection)
 
     def showInMap(self, ids, layerName):
+        """
+
+        :type ids: list
+        :type layerName: str
+        :return:
+        """
         if layerName in self.__mLoadedLayers:
             id = self.__mLoadedLayers[layerName]
             vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
@@ -156,9 +161,9 @@ class MainApp(QDockWidget, Ui_MainApp):
     def __search(self, layer, searchString, error):
         """
 
-        :param layer: QgsVectorLayer
-        :param searchString: str
-        :param error: str
+        :type layer: QgsVectorLayer
+        :type searchString: str
+        :type error: str
         :return:
         """
         search = QgsExpression(searchString)
@@ -179,6 +184,7 @@ class MainApp(QDockWidget, Ui_MainApp):
             if search.evaluate(f) != 0:
                 fIds.append(f.id())
             if search.hasEvalError():
+                qDebug(error)
                 break
 
         return fIds
@@ -223,6 +229,11 @@ class MainApp(QDockWidget, Ui_MainApp):
             self.__unLoadVfkLayer('BUD')
 
     def vfkFileLineEdit_textChanged(self, arg1):
+        """
+
+        :type arg1: str
+        :return:
+        """
         info = QFileInfo(arg1)
 
         if info.isFile():
@@ -235,6 +246,11 @@ class MainApp(QDockWidget, Ui_MainApp):
             self.vfkFileLineEdit.setPalette(pal)
 
     def __loadVfkLayer(self, vfkLayerName):
+        """
+
+        :type vfkLayerName: str
+        :return:
+        """
         qDebug("Loading vfk layer {}".format(vfkLayerName))
         if vfkLayerName in self.__mLoadedLayers:
             qDebug("Vfk layer {} is already loaded".format(vfkLayerName))
@@ -251,6 +267,11 @@ class MainApp(QDockWidget, Ui_MainApp):
         QgsMapLayerRegistry.instance().addMapLayer(layer)
 
     def __unLoadVfkLayer(self, vfkLayerName):
+        """
+
+        :type vfkLayerName: str
+        :return:
+        """
         qDebug("Unloading vfk layer {}".format(vfkLayerName))
 
         if vfkLayerName not in self.__mLoadedLayers:
@@ -261,6 +282,11 @@ class MainApp(QDockWidget, Ui_MainApp):
         del self.__mLoadedLayers[vfkLayerName]
 
     def __setSymbology(self, layer):
+        """
+
+        :type layer: QgsVectorLayer
+        :return:
+        """
         name = layer.name()
         symbologyFile = ''
 
@@ -280,6 +306,11 @@ class MainApp(QDockWidget, Ui_MainApp):
         return True
 
     def __openDatabase(self, dbPath):
+        """
+
+        :type dbPath: str
+        :return:
+        """
         connectionName = QUuid.createUuid().toString()
         db = QSqlDatabase.addDatabase("QSQLITE", connectionName)
         qDebug(dbPath)
@@ -291,6 +322,12 @@ class MainApp(QDockWidget, Ui_MainApp):
             return True
 
     def loadVfkFile(self, fileName, errorMsg):
+        """
+
+        :type fileName: str
+        :type errorMsg: str
+        :return:
+        """
 
         if self.__mOgrDataSource:
             self.__mOgrDataSource.Destroy()
@@ -317,6 +354,7 @@ class MainApp(QDockWidget, Ui_MainApp):
             layerCount = self.__mOgrDataSource.GetLayerCount()
             progress.setRange(0, layerCount -1)
 
+            extraMsg = u''
             if self.__mOgrDataSource.GetLayer().TestCapability('IsPreProcessed') is False:
                 extraMsg = u'Načítám data do SQLite databáze (může nějaký čas trvat...)'
 
@@ -337,6 +375,11 @@ class MainApp(QDockWidget, Ui_MainApp):
             return True
 
     def __selectedIds(self, layer):
+        """
+
+        :type layer: QgsVectorLayer
+        :return:
+        """
         ids = []
         flist = layer.selectedFeatures()
 
@@ -357,6 +400,11 @@ class MainApp(QDockWidget, Ui_MainApp):
         self.vfkBrowser.showInfoAboutSelection(layerIds["PAR"], layerIds["BUD"])
 
     def showParInMap(self, ids):
+        """
+
+        :type ids: list
+        :return:
+        """
         if self.actionShowInfoaboutSelection.isChecked():
             self.setSelectionChangedConnected(False)
             self.showInMap(ids, "PAR")
@@ -365,6 +413,11 @@ class MainApp(QDockWidget, Ui_MainApp):
             self.showInMap(ids, "PAR")
 
     def showBudInMap(self, ids):
+        """
+
+        :type ids: list
+        :return:
+        """
         if self.actionShowInfoaboutSelection.isChecked():
             self.setSelectionChangedConnected(False)
             self.showInMap(ids, "BUD")
@@ -384,31 +437,27 @@ class MainApp(QDockWidget, Ui_MainApp):
 
     def switchToSearch(self, searchType):
         """
-        :param searchType: int
+        :type searchType: int
         """
         self.actionVyhledavani.trigger()
         self.searchCombo.setCurrentIndex(searchType)
         self.searchForms.setCurrentIndex(searchType)
 
     def succesfullExport(self, export_format):
+        """
+
+        :type export_format: str
+        :return:
+        """
         QMessageBox.about(self, "Info", u"Export do formátu {} proběhl úspěšně.".format(export_format))
 
     def __createToolbarsAndConnect(self):
-
-        # Main toolbar
-        # ------------
-        # self.__mainToolBar = QToolBar(self)
-        # self.__mainToolBar.addAction(self.ui.actionImport)
-        # self.__mainToolBar.addAction(self.ui.actionVyhledavani)
-        # self.__mainToolBar.setOrientation(Qt.Vertical)
-        # self.addToolBar(Qt.LeftToolBarArea, self.__mainToolBar)
 
         actionGroup = QActionGroup(self)
         actionGroup.addAction(self.actionImport)
         actionGroup.addAction(self.actionVyhledavani)
 
         # QSignalMapper
-        # -------------
         self.signalMapper = QSignalMapper(self)
 
         # connect to 'clicked' on all buttons

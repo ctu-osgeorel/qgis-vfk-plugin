@@ -23,7 +23,7 @@
 """
 
 from PyQt4.QtGui import *
-from PyQt4.QtCore import QAbstractItemModel, QModelIndex, QRegExp, SIGNAL, SLOT
+from PyQt4.QtCore import QAbstractItemModel, QRegExp, SIGNAL
 
 from ui_parcelysearchform import *
 

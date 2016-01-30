@@ -21,13 +21,9 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtCore import QObject, QUrl, QRegExp, SIGNAL, SLOT, Qt, pyqtSignal, qWarning, qDebug, QVariant, QDataStream
-from PyQt4.QtGui import QStandardItemModel, QComboBox, QPushButton, QStackedWidget, QStandardItem
+from PyQt4.QtCore import QObject, QUrl, QRegExp, QModelIndex, SIGNAL, SLOT, Qt, pyqtSignal, qDebug
+from PyQt4.QtGui import QStandardItemModel, QStackedWidget, QStandardItem, QApplication
 
-from vlastniciSearchForm import *
-from parcelySearchForm import *
-from budovySearchForm import *
-from jednotkySearchForm import *
 from vfkTableModel import *
 
 
@@ -88,7 +84,7 @@ class SearchFormController(QObject):
     def setConnectionName(self, connectionName):
         """
 
-        :param connectionName:
+        :type connectionName: str
         """
         self.__mConnectionName = connectionName
         self.__initComboBoxModels()
@@ -126,8 +122,7 @@ class SearchFormController(QObject):
         ofo = self.__forms.vlastnici.isOfo()
 
         url = QUrl(u"showText?page=search&type=vlastnici&jmeno={}&rcIco={}&sjm={}&opo={}&ofo={}&lv={}"
-                   .format(jmeno, rcIco, 1 if sjm else 0, 1 if None else 0, 1 if ofo else 0, lv))
-        qWarning(str(url))
+                   .format(jmeno, rcIco, 1 if sjm else 0, 1 if opo else 0, 1 if ofo else 0, lv))
         self.actionTriggered.emit(url)
 
     def __searchParcely(self):
@@ -141,7 +136,6 @@ class SearchFormController(QObject):
 
         url = QUrl(u"showText?page=search&type=parcely&parcelniCislo={}&typ={}&druh={}&lv={}"
                    .format(parcelniCislo, typ, druh, lv))
-        qWarning(str(url))
         self.actionTriggered.emit(url)
 
     def __searchBudovy(self):
@@ -155,7 +149,6 @@ class SearchFormController(QObject):
 
         url = QUrl(u"showText?page=search&type=budovy&domovniCislo={}&naParcele={}&zpusobVyuziti={}&lv={}"
                    .format(domovniCislo, naParcele, zpusobVyuziti, lv))
-        qWarning(str(url))
         self.actionTriggered.emit(url)
 
     def __searchJednotky(self):
@@ -170,7 +163,6 @@ class SearchFormController(QObject):
 
         url = QUrl(u"showText?page=search&type=jednotky&cisloJednotky={}&domovniCislo={}&naParcele={}&zpusobVyuziti={}&lv={}"
                    .format(cisloJednotky, domovniCislo, naParcele, zpusobVyuziti, lv))
-        qWarning(str(url))
         self.actionTriggered.emit(url)
 
     def __initComboBoxModels(self):
@@ -205,8 +197,8 @@ class SearchFormController(QObject):
     def __addFirstRowToModel(self, oldModel, newRow):
         """
 
-        :param oldModel: QAbstractItemModel
-        :param newRow: list
+        :type oldModel: QAbstractItemModel
+        :type newRow: list
         :return: QStandardItemModel
         """
         model = QStandardItemModel(self)

@@ -22,7 +22,7 @@
 """
 
 from PyQt4.QtSql import QSqlQueryModel, QSqlRecord, QSqlField, QSqlDatabase
-from PyQt4.QtCore import qWarning, qDebug, QTime, QObject
+from PyQt4.QtCore import qDebug, QTime, QObject
 
 
 class VfkTableModel(QSqlQueryModel):
@@ -529,12 +529,12 @@ class VfkTableModel(QSqlQueryModel):
             whereIdent += u'0 '
 
         opsubType = []
-        if ofo:
-            opsubType.append(u"'OFO'")
-        if opo:
-            opsubType.append(u"'OPO'")
-        if sjm:
-            opsubType.append(u"'BSM'")
+        if ofo == u'1':
+            opsubType.append("'OFO'")
+        if opo == u'1':
+            opsubType.append("'OPO'")
+        if sjm == u'1':
+            opsubType.append("'BSM'")
         print(opsubType)
         where = u"WHERE "
         if whereJmeno:
@@ -547,12 +547,12 @@ class VfkTableModel(QSqlQueryModel):
             join += u"JOIN vla ON vla.opsub_id = opsub.id " \
                     u"JOIN tel ON vla.tel_id = tel.id "
 
-        where += u"opsub.opsub_type IN ({}) ".format(u", ".join(opsubType))
+        where += u"opsub.opsub_type IN ({}) ".format(", ".join(opsubType))
         query = u"SELECT DISTINCT opsub.id opsub_id " \
                 u"FROM opsub " \
                 u"{} {} " \
                 u"ORDER BY opsub.prijmeni, opsub.nazev;".format(join, where)
-
+        print(query)
         return self.__evaluate(query)
 
     def searchPar(self, parcelniCislo, typIndex, druhKod, lv):
@@ -932,7 +932,7 @@ class VfkTableModel(QSqlQueryModel):
     def __evaluate(self, query):
         """
 
-        :type query: str
+        :type query: unicode
         :return: bool
         """
         t = QTime()
