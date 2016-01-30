@@ -22,7 +22,7 @@
 """
 
 from PyQt4.QtSql import QSqlQueryModel, QSqlRecord, QSqlField, QSqlDatabase
-from PyQt4.QtCore import qWarning, qDebug, QTime
+from PyQt4.QtCore import qWarning, qDebug, QTime, QObject
 
 
 class VfkTableModel(QSqlQueryModel):
@@ -43,7 +43,13 @@ class VfkTableModel(QSqlQueryModel):
         Povinnost = 1
 
     def __init__(self, connectionName='', parent=None):
-        super(VfkTableModel, self).__init__(parent)
+        """
+
+        :type connectionName:str
+        :type parent: QObject
+        :return:
+        """
+        QSqlQueryModel.__init__(self, parent)
 
         self.__mConnectionName = connectionName
 
@@ -62,7 +68,7 @@ class VfkTableModel(QSqlQueryModel):
     def telesoHlavicka(self, id):
         """
 
-        :param id: str
+        :type id: str
         :return:
         """
         query = "SELECT tel.id tel_id, tel.cislo_tel tel_cislo_tel, " \
@@ -79,8 +85,8 @@ class VfkTableModel(QSqlQueryModel):
     def telesoParcely(self, cisloTel, extended):
         """
 
-        :param cisloTel: str
-        :param extended: bool
+        :type cisloTel: str
+        :type extended: bool
         :return:
         """
         columns = ", ".join(self.parColumns(extended))
@@ -95,8 +101,8 @@ class VfkTableModel(QSqlQueryModel):
     def vlastnikParcely(self, opsubId, extended):
         """
 
-        :param opsubId: str
-        :param extended: bool
+        :type opsubId: str
+        :type extended: bool
         :return:
         """
         columns = ", ".join(self.parColumns(extended))
@@ -113,8 +119,8 @@ class VfkTableModel(QSqlQueryModel):
     def telesoBudovy(self, cisloTel, extended):
         """
 
-        :param cisloTel: str
-        :param extended: bool
+        :type cisloTel: str
+        :type extended: bool
         :return:
         """
         columns = ", ".join(self.budColumns(extended))
@@ -132,8 +138,8 @@ class VfkTableModel(QSqlQueryModel):
     def vlastnikBudovy(self, opsubId, extended):
         """
 
-        :param opsubId: str
-        :param extended: bool
+        :type opsubId: str
+        :type extended: bool
         :return:
         """
         columns = ", ".join(self.budColumns(extended))
@@ -153,8 +159,8 @@ class VfkTableModel(QSqlQueryModel):
     def telesoJednotky(self, cisloTel, extended):
         """
 
-        :param cisloTel: str
-        :param extended: bool
+        :type cisloTel: str
+        :type extended: bool
         :return:
         """
         columns = ", ".join(self.jedColumns(extended))
@@ -173,8 +179,8 @@ class VfkTableModel(QSqlQueryModel):
     def vlastnikJednotky(self, opsubId, extended):
         """
 
-        :param opsubId: str
-        :param extended: bool
+        :type opsubId: str
+        :type extended: bool
         :return:
         """
         columns = ", ".join(self.jedColumns(extended))
@@ -195,8 +201,8 @@ class VfkTableModel(QSqlQueryModel):
     def parcela(self, id, extended):
         """
 
-        :param id: str
-        :param extended: bool
+        :type id: str
+        :type extended: bool
         :return:
         """
         columns = ", ".join(self.parColumns(extended))
@@ -217,8 +223,8 @@ class VfkTableModel(QSqlQueryModel):
     def budova(self, id, extended):
         """
 
-        :param id: str
-        :param extended: bool
+        :type id: str
+        :type extended: bool
         :return:
         """
         columns = ", ".join(self.budColumns(extended))
@@ -238,8 +244,8 @@ class VfkTableModel(QSqlQueryModel):
     def jednotka(self, id, extended):
         """
 
-        :param id: str
-        :param extended: bool
+        :type id: str
+        :type extended: bool
         :return:
         """
         columns = ", ".join(self.jedColumns(extended))
@@ -260,7 +266,7 @@ class VfkTableModel(QSqlQueryModel):
     def budovaJednotky(self, id):
         """
 
-        :param id: str
+        :type id: str
         :return:
         """
         query = "SELECT jed.id jed_id, " \
@@ -275,7 +281,7 @@ class VfkTableModel(QSqlQueryModel):
     def sousedniParcely(self, id):
         """
 
-        :param id: str
+        :type id: str
         :return:
         """
         query = "SELECT DISTINCT hp.par_id_1 hp_par_id_1, " \
@@ -289,8 +295,8 @@ class VfkTableModel(QSqlQueryModel):
     def opravnenySubjekt(self, id, extended):
         """
 
-        :param id: str
-        :param extended: bool
+        :type id: str
+        :type extended: bool
         :return:
         """
         columns = ", ".join(self.opsubColumns(extended))
@@ -304,8 +310,8 @@ class VfkTableModel(QSqlQueryModel):
     def nemovitostTeleso(self, id, nemovitost):
         """
 
-        :param id: str
-        :param nemovitost: Nemovitost
+        :type id: str
+        :type nemovitost: Nemovitost
         :return:
         """
         table = self.nemovitost2TableName(nemovitost)
@@ -319,7 +325,7 @@ class VfkTableModel(QSqlQueryModel):
     def telesoVlastnici(self, id):
         """
 
-        :param id: str
+        :type id: str
         :return:
         """
         query = "SELECT " \
@@ -339,8 +345,8 @@ class VfkTableModel(QSqlQueryModel):
     def nemovitostOchrana(self, id, nemovitost):
         """
 
-        :param id: str
-        :param nemovitost: Nemovitost
+        :type id: str
+        :type nemovitost: Nemovitost
         :return:
         """
         table = self.nemovitost2TableName(nemovitost)
@@ -355,7 +361,7 @@ class VfkTableModel(QSqlQueryModel):
     def vlastnikNemovitosti(self, id):
         """
 
-        :param id: str
+        :type id: str
         :return:
         """
         query = "SELECT tel.cislo_tel tel_cislo_tel, " \
@@ -376,7 +382,7 @@ class VfkTableModel(QSqlQueryModel):
     def parcelaBpej(self, id):
         """
 
-        :param id: str
+        :type id: str
         :return:
         """
         columns = ", ".join(self.bpejColumns())
@@ -391,10 +397,10 @@ class VfkTableModel(QSqlQueryModel):
     def nemovitostJpv(self, id, op, pravo, where):
         """
 
-        :param id: str
-        :param op: str
-        :param pravo: Pravo
-        :param where: str
+        :type id: str
+        :type op: str
+        :type pravo: Pravo
+        :type where: str
         :return:
         """
         table = self.opravnenyPovinny2TableName(op)
@@ -412,7 +418,7 @@ class VfkTableModel(QSqlQueryModel):
     def jpvListiny(self, id):
         """
 
-        :param id: id
+        :type id: id
         :return:
         """
         columns = ", ".join(self.listinyColumns())
@@ -430,9 +436,9 @@ class VfkTableModel(QSqlQueryModel):
     def nabyvaciListiny(self, parIds, budIds, jedIds):
         """
 
-        :param parIds: parcely ids
-        :param budIds: budovy ids
-        :param jedIds: jednotky ids
+        :type parIds: parcely ids
+        :type budIds: budovy ids
+        :type jedIds: jednotky ids
         :return:
         """
         columns = ", ".join(self.listinyColumns())
@@ -455,8 +461,8 @@ class VfkTableModel(QSqlQueryModel):
     def vlastnik(self, id, extended=False):
         """
 
-        :param id: str
-        :param extended: bool
+        :type id: str
+        :type extended: bool
         :return:
         """
         columns = ", ".join(self.opsubColumns(extended))
@@ -482,8 +488,8 @@ class VfkTableModel(QSqlQueryModel):
     def definicniBod(self, id, nemovitost):
         """
 
-        :param id: str
-        :param nemovitost: Nemovitost
+        :type id: str
+        :type nemovitost: Nemovitost
         :return:
         """
         tableName = self.nemovitost2TableName(nemovitost)
@@ -496,12 +502,12 @@ class VfkTableModel(QSqlQueryModel):
     def searchOpsub(self, jmeno, identifikator, sjm, opo, ofo, lv):
         """
 
-        :param jmeno: str
-        :param identifikator: str
-        :param sjm: bool
-        :param opo: bool
-        :param ofo: bool
-        :param lv: str
+        :type jmeno: str
+        :type identifikator: str
+        :type sjm: bool
+        :type opo: bool
+        :type ofo: bool
+        :type lv: str
         :return:
         """
         whereJmeno = u''
@@ -552,10 +558,10 @@ class VfkTableModel(QSqlQueryModel):
     def searchPar(self, parcelniCislo, typIndex, druhKod, lv):
         """
 
-        :param parcelniCislo: str
-        :param typIndex: str
-        :param druhKod: str
-        :param lv: str
+        :type parcelniCislo: str
+        :type typIndex: str
+        :type druhKod: str
+        :type lv: str
         :return:
         """
         where = u"WHERE "
@@ -569,36 +575,37 @@ class VfkTableModel(QSqlQueryModel):
                 where += u"par.poddeleni_cisla_par = {} AND ".format(kmenAPoddeleni[1])
 
         if druhKod:
-            where += u"drupoz.kod = {} AND ".format(druhKod)
+            where += u"drupoz.zkratka = '{}' AND ".format(druhKod)
 
-        if typIndex == u"1":
+        if typIndex == u'1':
             where += u"drupoz.stavebni_parcela = 'n' AND "
-        elif typIndex == u"2":
+        elif typIndex == u'2':
             where += u"drupoz.stavebni_parcela = 'a' AND "
 
         if druhKod:
-            where += u"par.drupoz_kod = {} AND ".format(druhKod)
+            #where += u"par.drupoz_kod = '{}' AND ".format(druhKod)
+            where += u"par.drupoz_kod = (SELECT kod FROM drupoz WHERE zkratka='{}') AND ".format(druhKod)
 
         if lv:
             where += u"tel.cislo_tel = {} AND ".format(lv)
             join += u"JOIN tel ON tel.id = par.tel_id "
 
-        where += u"1 "
+        where += u'1 '
 
         query = u"SELECT DISTINCT par.id par_id " \
                 u"FROM par " \
                 u"JOIN drupoz ON par.drupoz_kod = drupoz.kod " \
                 u"{} {};".format(join, where)
-
+        print(query)
         return self.__evaluate(query)
 
     def searchBud(self, domovniCislo, naParcele, zpusobVyuzitiKod, lv):
         """
 
-        :param domovniCislo: str
-        :param naParcele: str
-        :param zpusobVyuzitiKod: str
-        :param lv: str
+        :type domovniCislo: str
+        :type naParcele: str
+        :type zpusobVyuzitiKod: str
+        :type lv: str
         :return:
         """
         where = u"WHERE "
@@ -621,7 +628,7 @@ class VfkTableModel(QSqlQueryModel):
             join += u"JOIN tel ON tel.id = bud.tel_id "
 
         if zpusobVyuzitiKod:
-            where += u"zpvybu.kod = {} AND ".format(zpusobVyuzitiKod)
+            where += u"zpvybu.kod = (SELECT kod FROM zpvybu WHERE zkratka='{}') AND ".format(zpusobVyuzitiKod)
             join += u"JOIN zpvybu ON zpvybu.kod = bud.zpvybu_kod "
 
         where += u"1 "
@@ -635,11 +642,11 @@ class VfkTableModel(QSqlQueryModel):
     def searchJed(self, cisloJednotky, domovniCislo, naParcele, zpusobVyuzitiKod, lv):
         """
 
-        :param cisloJednotky: str
-        :param domovniCislo: str
-        :param naParcele: str
-        :param zpusobVyuzitiKod: str
-        :param lv: str
+        :type cisloJednotky: str
+        :type domovniCislo: str
+        :type naParcele: str
+        :type zpusobVyuzitiKod: str
+        :type lv: str
         :return:
         """
         where = u"WHERE "
@@ -665,7 +672,7 @@ class VfkTableModel(QSqlQueryModel):
             join += u"JOIN tel ON tel.id = jed.tel_id "
 
         if zpusobVyuzitiKod:
-            where += u"zpvyje.kod = {} AND ".format(zpusobVyuzitiKod)
+            where += u"zpvyje.nazev = '{}' AND ".format(zpusobVyuzitiKod)
             join += u"JOIN zpvyje ON zpvyje.kod = jed.zpvyje_kod "
 
         where += u"1 "
@@ -680,7 +687,7 @@ class VfkTableModel(QSqlQueryModel):
     def parColumns(self, extended):
         """
 
-        :param extended: bool
+        :type extended: bool
         :return: []
         """
         columns = [u"par.id par_id", u"par.kmenove_cislo_par par_kmenove_cislo_par",
@@ -706,7 +713,7 @@ class VfkTableModel(QSqlQueryModel):
     def budColumns(self, extended):
         """
 
-        :param extended: bool
+        :type extended: bool
         :return: []
         """
         columns = [u"bud.id bud_id", u"bud.typbud_kod bud_typbud_kod", u"casobc.nazev casobc_nazev",
@@ -726,7 +733,7 @@ class VfkTableModel(QSqlQueryModel):
     def jedColumns(self, extended):
         """
 
-        :param extended: bool
+        :type extended: bool
         :return: []
         """
         columns = [u"jed.id jed_id", u"bud.id bud_id", u"bud.cislo_domovni bud_cislo_domovni", u"typjed.nazev typjed_nazev",
@@ -752,7 +759,7 @@ class VfkTableModel(QSqlQueryModel):
     def opsubColumns(self, extended):
         """
 
-        :param extended: bool
+        :type extended: bool
         :return: []
         """
         columns = [u"opsub.opsub_type opsub_opsub_type", u"opsub.id opsub_id", u"charos.zkratka charos_zkratka",
@@ -776,7 +783,7 @@ class VfkTableModel(QSqlQueryModel):
     def jpvColumns(self, extended):
         """
 
-        :param extended: bool
+        :type extended: bool
         :return: []
         """
         columns = [u"typrav.nazev typrav_nazev", u"jpv.id jpv_id", u"jpv.popis_pravniho_vztahu jpv_popis_pravniho_vztahu",
@@ -812,7 +819,7 @@ class VfkTableModel(QSqlQueryModel):
     def nemovitost2TableName(self, nemovitost):
         """
 
-        :param nemovitost: Nemovitost
+        :type nemovitost: Nemovitost
         :return: str
         """
         table = u''
@@ -831,7 +838,7 @@ class VfkTableModel(QSqlQueryModel):
     def opravnenyPovinny2TableName(self, opravnenyPovinny):
         """
 
-        :param opravnenyPovinny: OpravnenyPovinny
+        :type opravnenyPovinny: OpravnenyPovinny
         :return: str
         """
         table = u''
@@ -852,7 +859,7 @@ class VfkTableModel(QSqlQueryModel):
     def pravo2ColumnSuffix(self, pravo):
         """
 
-        :param pravo: Pravo
+        :type pravo: Pravo
         :return: str
         """
         columnNameSuffix = u''
@@ -869,7 +876,7 @@ class VfkTableModel(QSqlQueryModel):
     def tableName2OpravnenyPovinny(self, name):
         """
 
-        :param name: str
+        :type name: str
         :return: OpravnenyPovinny
         """
         if unicode(name).find(u"par") > -1:
@@ -883,18 +890,18 @@ class VfkTableModel(QSqlQueryModel):
 
         return self.OpravnenyPovinny.OPParcela
 
-    def druhyPozemku(self, pozemkova=False, stavebni=False):
+    def druhyPozemku(self, pozemkova, stavebni):
         """
 
-        :param pozemkova: bool
-        :param stavebni: bool
+        :type pozemkova: bool
+        :type stavebni: bool
         :return: bool
         """
         where = ''
 
         if pozemkova and stavebni:
             pass
-        elif pozemkova is True:
+        elif pozemkova:
             where += "WHERE drupoz.stavebni_parcela = 'n'"
         else:
             where += "WHERE drupoz.stavebni_parcela = 'a'"
@@ -925,7 +932,7 @@ class VfkTableModel(QSqlQueryModel):
     def __evaluate(self, query):
         """
 
-        :param query: str
+        :type query: str
         :return: bool
         """
         t = QTime()
@@ -940,6 +947,7 @@ class VfkTableModel(QSqlQueryModel):
 
         if self.lastError().isValid():
             qDebug(str(self.lastError()))
+            print(query)
             return False
 
         return True
@@ -947,8 +955,8 @@ class VfkTableModel(QSqlQueryModel):
     def value(self, row, column):
         """
 
-        :param row:
-        :param column:
+        :type row:
+        :type column:
         :return: str
         """
         value = unicode(self.record(row).field(column).value())

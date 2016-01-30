@@ -33,7 +33,7 @@ from vfkTableModel import *
 
 class SearchFormController(QObject):
 
-    class SearchForms:
+    class SearchForms(QStackedWidget):
         vlastnici = None
         parcely = None
         budovy = None
@@ -53,24 +53,30 @@ class SearchFormController(QObject):
     # signals
     actionTriggered = pyqtSignal(QUrl)
 
-    def __init__(self, mainControls, searchForms, parent):
+    def __init__(self, mainControls, searchForms, parent=None):
+        """
 
-        super(SearchFormController, self).__init__()
+        :type mainControls: MainControls
+        :type searchForms: SearchForms
+        :type parent: QObject
+        :return:
+        """
 
+        QObject.__init__(self)
         self.__controls = mainControls
         self.__forms = searchForms
         self.__mConnectionName = ''
 
-        self.__mDruhParcely = None
-        self.__mDruhPozemkoveParcely = None
-        self.__mDruhStavebniParcely = None
-        self.__mZpusobVyuzitiBudovy = None
-        self.__mZpusobVyuzitiJednotek = None
+        self.__mDruhParcely = ''
+        self.__mDruhPozemkoveParcely = ''
+        self.__mDruhStavebniParcely = ''
+        self.__mZpusobVyuzitiBudovy = ''
+        self.__mZpusobVyuzitiJednotek = ''
 
-        self.__controls.formCombobox.addItem(QObject.trUtf8(self, u"vlastníky" ), self.Form.Vlastnici)
-        self.__controls.formCombobox.addItem(QObject.trUtf8(self, u"parcely"), self.Form.Parcely)
-        self.__controls.formCombobox.addItem(QObject.trUtf8(self, u"budovy"), self.Form.Budovy)
-        self.__controls.formCombobox.addItem(QObject.trUtf8(self, u"jednotky"), self.Form.Jednotky)
+        self.__controls.formCombobox.addItem(u"vlastníky", self.Form.Vlastnici)
+        self.__controls.formCombobox.addItem(u"parcely", self.Form.Parcely)
+        self.__controls.formCombobox.addItem(u"budovy", self.Form.Budovy)
+        self.__controls.formCombobox.addItem(u"jednotky", self.Form.Jednotky)
 
         self.connect(self.__controls.formCombobox, SIGNAL("activated(int)"), self.__controls.searchForms,
                      SLOT("setCurrentIndex(int)"))
@@ -171,22 +177,22 @@ class SearchFormController(QObject):
         """
 
         """
-        self.__mDruhParcely = VfkTableModel(self.__mConnectionName)
-        self.__mDruhParcely.druhyPozemku()
+        self.__mDruhParcely = VfkTableModel(self.__mConnectionName, self)
+        self.__mDruhParcely.druhyPozemku(True, True)
 
-        self.__mDruhPozemkoveParcely = VfkTableModel(self.__mConnectionName)
+        self.__mDruhPozemkoveParcely = VfkTableModel(self.__mConnectionName, self)
         self.__mDruhPozemkoveParcely.druhyPozemku(True, False)
 
-        self.__mDruhStavebniParcely = VfkTableModel(self.__mConnectionName)
+        self.__mDruhStavebniParcely = VfkTableModel(self.__mConnectionName, self)
         self.__mDruhStavebniParcely.druhyPozemku(False, True)
 
-        self.__mZpusobVyuzitiBudovy = VfkTableModel(self.__mConnectionName)
+        self.__mZpusobVyuzitiBudovy = VfkTableModel(self.__mConnectionName, self)
         self.__mZpusobVyuzitiBudovy.zpusobVyuzitiBudov()
 
-        self.__mZpusobVyuzitiJednotek = VfkTableModel(self.__mConnectionName)
+        self.__mZpusobVyuzitiJednotek = VfkTableModel(self.__mConnectionName, self)
         self.__mZpusobVyuzitiJednotek.zpusobVyuzitiJednotek()
 
-        falseKodForDefaultDruh = u''
+        falseKodForDefaultDruh = ''
         text = u'libovolný'
         fakeRow = [falseKodForDefaultDruh, text]
 

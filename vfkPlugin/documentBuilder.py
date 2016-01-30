@@ -10,6 +10,7 @@ from vfkTableModel import *
 from htmlDocument import *
 from domains import *
 
+
 class Coordinates(object):
     def __init__(self):
         self.first = u''
@@ -49,8 +50,8 @@ class DocumentBuilder:
     def buildHtml(self, document, taskMap):
         """
 
-        :param document: VfkDocument
-        :param taskMap: dict
+        :type document: VfkDocument
+        :type taskMap: dict
         """
         self.__mCurrentPageParIds = []
         self.__mCurrentPageBudIds = []
@@ -62,6 +63,8 @@ class DocumentBuilder:
 
         if taskMap["page"] == "help":
             self.pageHelp()
+
+        print(taskMap)
 
         if self.__mHasConnection:
             if taskMap["page"] == "tel":
@@ -86,8 +89,8 @@ class DocumentBuilder:
             elif taskMap["page"] == "search":
                 if taskMap["type"] == "vlastnici":
                     self.pageSearchVlastnici(taskMap["jmeno"], taskMap["rcIco"],
-                                             int(taskMap["sjm"]), int(taskMap["opo"]),
-                                             int(taskMap["ofo"]), taskMap["lv"])
+                                             taskMap["sjm"], taskMap["opo"],
+                                             taskMap["ofo"], taskMap["lv"])
                 elif taskMap["type"] == "parcely":
                     self.pageSearchParcely(taskMap["parcelniCislo"], taskMap["typ"], taskMap["druh"], taskMap["lv"])
                 elif taskMap["type"] == "budovy":
@@ -119,6 +122,11 @@ class DocumentBuilder:
             self.__mDocument.text(link)
 
     def pageTeleso(self, id):
+        """
+
+        :type id: str
+        :return:
+        """
         parIds = []
         budIds = []
         jedIds = []
@@ -135,6 +143,11 @@ class DocumentBuilder:
         self.partTelesoF(parIds, True)
 
     def partTelesoHlavicka(self, id):
+        """
+
+        :type id: str
+        :return:
+        """
         hlavickaModel = VfkTableModel(self.__mConnectionName)
 
         ok = hlavickaModel.telesoHlavicka(id)
@@ -156,6 +169,14 @@ class DocumentBuilder:
             self.__mDocument.paragraph(u"V kat. území jsou pozemky vedeny v jedné číselné řadě.")
 
     def partTelesoNemovitosti(self, id, parIds, budIds, jedIds):
+
+        """
+
+        :type id: str
+        :type parIds: list
+        :type budIds: list
+        :type jedIds: list
+        """
         self.__mDocument.heading2(u"B – Nemovitosti")
         self.partTelesoParcely(id, parIds)
         self.partTelesoBudovy(id, budIds)
@@ -165,12 +186,21 @@ class DocumentBuilder:
         self.__mCurrentPageBudIds = budIds
 
     def partVlastnikNemovitosti(self, opsubId):
+        """
+
+        :type opsubId: str
+        """
         self.__mDocument.heading2(u"Nemovitosti vlastníka")
         self.partVlastnikParcely(opsubId)
         self.partVlastnikBudovy(opsubId)
         self.partVlastnikJednotky(opsubId)
 
     def partTelesoParcely(self, opsubId, parIds):
+        """
+
+        :type opsubId: str
+        :type parIds: list
+        """
         model = VfkTableModel(self.__mConnectionName)
 
         ok = model.telesoParcely(opsubId, False)
@@ -180,6 +210,10 @@ class DocumentBuilder:
         self.tableParcely(model, parIds, False)
 
     def partVlastnikParcely(self, id):
+        """
+
+        :type id: str
+        """
         model = VfkTableModel(self.__mConnectionName)
 
         ok = model.vlastnikParcely(id, False)
@@ -191,6 +225,12 @@ class DocumentBuilder:
         self.__mCurrentPageParIds = parIds
 
     def tableParcely(self, model, parIds, LVColumn):
+        """
+
+        :type model: VfkTableModel
+        :type parIds: list
+        :type LVColumn: bool
+        """
         self.__mDocument.heading3(u"Pozemky")
         self.__mDocument.beginTable()
         header = [u"Parcela", u"Výměra [m{}]".format(self.__mDocument.superScript(u"2")), u"Druh pozemku", u"Způsob využití",
@@ -225,6 +265,12 @@ class DocumentBuilder:
         self.__mDocument.endTable()
 
     def partTelesoBudovy(self, opsubId, budIds):
+        """
+
+        :type opsubId: str
+        :type budIds: list
+        :return:
+        """
         model = VfkTableModel(self.__mConnectionName)
 
         ok = model.telesoBudovy(opsubId, False)
@@ -234,6 +280,11 @@ class DocumentBuilder:
         self.tableBudovy(model, budIds, False)
 
     def partVlastnikBudovy(self, id):
+        """
+
+        :type id: str
+        :return:
+        """
         model = VfkTableModel(self.__mConnectionName)
 
         ok = model.vlastnikBudovy(id, False)
@@ -245,6 +296,13 @@ class DocumentBuilder:
         self.__mCurrentPageBudIds.append(budIds)
 
     def tableBudovy(self, model, budIds, LVColumn):
+        """
+
+        :param model: VfkTableModel
+        :param budIds: list
+        :param LVColumn: bool
+        :return:
+        """
         self.__mDocument.heading3(u"Stavby")
         self.__mDocument.beginTable()
         header = [u"Typ stavby", u"Část obce", u"Č. budovy", u"Způsob využití", u"Způsob ochrany", u"Na parcele"]
@@ -261,9 +319,9 @@ class DocumentBuilder:
                 row.append(self.__mDocument.link(u"showText?page=bud&id={}".format(model.value(i, u"bud_id")),
                                                  model.value(i, u"typbud_zkratka")))
                 row.append(model.value(i, u"casobc_nazev"))
-                row.append(u"")
+                row.append(u'')
             else:
-                row.append(u"")
+                row.append(u'')
                 row.append(model.value(i, u"casobc_nazev"))
                 row.append(self.__mDocument.link(u"showText?page=bud&id={}".format(model.value(i, u"bud_id")),
                                                  u"{} {}".format(model.value(i, u"typbud_zkratka"),
@@ -292,6 +350,12 @@ class DocumentBuilder:
         self.__mDocument.endTable()
 
     def partTelesoJednotky(self, id, jedIds):
+        """
+
+        :type id: str
+        :type jedIds: list
+        :return:
+        """
         model = VfkTableModel(self.__mConnectionName)
 
         ok = model.telesoJednotky(id, False)
@@ -301,6 +365,11 @@ class DocumentBuilder:
         self.tableJednotky(model, jedIds, False)
 
     def partVlastnikJednotky(self, opsubId):
+        """
+
+        :type opsubId: str
+        :return:
+        """
         model = VfkTableModel(self.__mConnectionName)
 
         ok = model.vlastnikJednotky(opsubId, False)
@@ -311,6 +380,13 @@ class DocumentBuilder:
         self.tableJednotky(model, jedIds, True)
 
     def tableJednotky(self, model, jedIds, LVColumn):
+        """
+
+        :type model: VfkTableModel
+        :type jedIds: list
+        :type LVColumn: bool
+        :return:
+        """
         self.__mDocument.heading3(u"Jednotky")
         self.__mDocument.beginTable()
         header = [u"Č.p./Č.jednotky ", u"Způsob využití", u"Způsob ochrany",
@@ -360,7 +436,7 @@ class DocumentBuilder:
     def partTelesoJednotkaDetail(self, budId):
         """
 
-        :param budId: str
+        :type budId: str
         :return:
         """
         budInfo = u''
@@ -373,7 +449,7 @@ class DocumentBuilder:
 
         budInfo += u"Budova" + u" "
         casobc = budModel.value(0, u"casobc_nazev")
-        budInfo += casobc + u", " if casobc else u''
+        budInfo += u'' if casobc else casobc + u", "
 
         budova = u''
         budova += budModel.value(0, u"typbud_zkratka")
@@ -414,11 +490,11 @@ class DocumentBuilder:
     def partTelesoB1(self, parIds, budIds, jedIds, opsubIds, forLV):
         """
 
-        :param parIds: list
-        :param budIds: list
-        :param jedIds: list
-        :param opsubIds: list
-        :param forLV: bool
+        :type parIds: list
+        :type budIds: list
+        :type jedIds: list
+        :type opsubIds: list
+        :type forLV: bool
         """
 
         header = [u"Typ vztahu", u"Oprávnění pro", u"Povinnost k"]
@@ -453,11 +529,11 @@ class DocumentBuilder:
     def partTelesoC(self, parIds, budIds, jedIds, opsubIds, forLV):
         """
 
-        :param parIds: list
-        :param budIds: list
-        :param jedIds: list
-        :param opsubIds: list
-        :param forLV: bool
+        :type parIds: list
+        :type budIds: list
+        :type jedIds: list
+        :type opsubIds: list
+        :type forLV: bool
         """
         header = [u"Typ vztahu", u"Oprávnění pro", u"Povinnost k"]
 
@@ -491,11 +567,11 @@ class DocumentBuilder:
     def partTelesoD(self, parIds, budIds, jedIds, opsubIds, forLV):
         """
 
-        :param parIds: list
-        :param budIds: list
-        :param jedIds: list
-        :param opsubIds: list
-        :param forLV: bool
+        :type parIds: list
+        :type budIds: list
+        :type jedIds: list
+        :type opsubIds: list
+        :type forLV: bool
         """
         header = [u"Typ vztahu", u"Vztah pro", u"Vztah k"]
 
@@ -529,9 +605,9 @@ class DocumentBuilder:
     def partTelesoE(self, parIds, budIds, jedIds):
         """
 
-        :param parIds: list
-        :param budIds: list
-        :param jedIds: list
+        :type parIds: list
+        :type budIds: list
+        :type jedIds: list
         """
         self.__mDocument.heading2(u"E – Nabývací tituly a jiné podklady k zápisu")
 
@@ -570,8 +646,8 @@ class DocumentBuilder:
     def partTelesoF(self, parIds, forLV):
         """
 
-        :param parIds: list
-        :param forLV: bool
+        :type parIds: list
+        :type forLV: bool
         """
         if forLV:
             self.__mDocument.heading2(u"F – Vztah bonitovaných půdně ekologických jednotek (BPEJ) k parcelám")
@@ -609,8 +685,8 @@ class DocumentBuilder:
     def partNemovitostJinaPrava(self, ids, opravneny):
         """
 
-        :param ids: list
-        :param opravneny: VfkTableModel.OpravnenyPovinny
+        :type ids: list
+        :type opravneny: VfkTableModel.OpravnenyPovinny
         :return:
         """
         return self.partTelesoB1CDSubjekt(ids, opravneny, VfkTableModel.Pravo.Opravneni, False, False)
@@ -618,8 +694,8 @@ class DocumentBuilder:
     def partTelesoJinaPrava(self, ids, opravneny):
         """
 
-        :param ids: list
-        :param opravneny: VfkTableModel.OpravnenyPovinny
+        :type ids: list
+        :type opravneny: VfkTableModel.OpravnenyPovinny
         :return:
         """
         return self.partTelesoB1CDSubjekt(ids, opravneny, VfkTableModel.Pravo.Opravneni, False, True)
@@ -627,8 +703,8 @@ class DocumentBuilder:
     def partNemovitostOmezeniPrava(self, ids, povinny):
         """
 
-        :param ids: list
-        :param povinny: VfkTableModel.OpravnenyPovinny
+        :type ids: list
+        :type povinny: VfkTableModel.OpravnenyPovinny
         :return:
         """
         return self.partTelesoB1CDSubjekt(ids, povinny, VfkTableModel.Pravo.Povinnost, False, False)
@@ -636,8 +712,8 @@ class DocumentBuilder:
     def partTelesoOmezeniPrava(self, ids, povinny):
         """
 
-        :param ids: list
-        :param povinny: VfkTableModel.OpravnenyPovinny
+        :type ids: list
+        :type povinny: VfkTableModel.OpravnenyPovinny
         :return:
         """
         return self.partTelesoB1CDSubjekt(ids, povinny, VfkTableModel.Pravo.Povinnost, False, True)
@@ -645,8 +721,8 @@ class DocumentBuilder:
     def partNemovitostJineZapisy(self, ids, povinny):
         """
 
-        :param ids: list
-        :param povinny: VfkTableModel.OpravnenyPovinny
+        :type ids: list
+        :type povinny: VfkTableModel.OpravnenyPovinny
         :return: bool
         """
         test1 = self.partTelesoB1CDSubjekt(ids, povinny, VfkTableModel.Pravo.Opravneni, True, False)
@@ -656,8 +732,8 @@ class DocumentBuilder:
     def partTelesoJineZapisy(self, ids, povinny):
         """
 
-        :param ids: list
-        :param povinny: VfkTableModel.OpravnenyPovinny
+        :type ids: list
+        :type povinny: VfkTableModel.OpravnenyPovinny
         :return: bool
         """
         test1 = self.partTelesoB1CDSubjekt(ids, povinny, VfkTableModel.Pravo.Opravneni, True, True)
@@ -667,11 +743,11 @@ class DocumentBuilder:
     def partTelesoB1CDSubjekt(self, ids, pravniSubjekt, pravo, sekceD, showListiny):
         """
 
-        :param ids: list
-        :param pravniSubjekt: VfkTableModel.OpravnenyPovinny
-        :param pravo: VfkTableModel.Pravo
-        :param sekceD: bool
-        :param showListiny: bool
+        :type ids: list
+        :type pravniSubjekt: VfkTableModel.OpravnenyPovinny
+        :type pravo: VfkTableModel.Pravo
+        :type sekceD: bool
+        :type showListiny: bool
         :return: bool
         """
         isRecord = False
@@ -719,7 +795,7 @@ class DocumentBuilder:
     def partTelesoListiny(self, jpvId):
         """
 
-        :param jpvId: str
+        :type jpvId: str
         :return:
         """
         model = VfkTableModel(self.__mConnectionName)
@@ -733,7 +809,7 @@ class DocumentBuilder:
     def pageParcela(self, id):
         """
 
-        :param id: str
+        :type id: str
         :return:
         """
         model = VfkTableModel(self.__mConnectionName)
@@ -800,9 +876,9 @@ class DocumentBuilder:
     def partTelesoVlastnici(self, id, opsubIds, forLV):
         """
 
-        :param id: str
-        :param opsubIds: list
-        :param forLV: bool
+        :type id: str
+        :type opsubIds: list
+        :type forLV: bool
         :return:
         """
         vlastniciModel = VfkTableModel(self.__mConnectionName)
@@ -881,8 +957,8 @@ class DocumentBuilder:
     def partNemovitostOchrana(self, id, nemovitost):
         """
 
-        :param id: str
-        :param nemovitost: VfkTableModel.Nemovitost
+        :type id: str
+        :type nemovitost: VfkTableModel.Nemovitost
         :return:
         """
         ochrana = VfkTableModel(self.__mConnectionName)
@@ -907,7 +983,7 @@ class DocumentBuilder:
     def pageBudova(self, id):
         """
 
-        :param id: str
+        :type id: str
         :return:
         """
         model = VfkTableModel(self.__mConnectionName)
@@ -963,7 +1039,7 @@ class DocumentBuilder:
     def pageJednotka(self, id):
         """
 
-        :param id: str
+        :type id: str
         :return:
         """
         model = VfkTableModel(self.__mConnectionName)
@@ -1007,7 +1083,7 @@ class DocumentBuilder:
     def pageOpravnenySubjekt(self, id):
         """
 
-        :param id: str
+        :type id: str
         :return:
         """
         opsubModel = VfkTableModel(self.__mConnectionName)
@@ -1064,7 +1140,7 @@ class DocumentBuilder:
     def pageSeznamParcel(self, ids):
         """
 
-        :param ids: list
+        :type ids: list
         """
         self.__mDocument.heading2(u"Seznam parcel")
         self.__mDocument.beginItemize()
@@ -1084,7 +1160,7 @@ class DocumentBuilder:
     def pageSeznamOsob(self, ids):
         """
 
-        :param ids: list
+        :type ids: list
         """
         self.__mDocument.heading2(u"Seznam osob")
         self.__mDocument.beginItemize()
@@ -1104,7 +1180,7 @@ class DocumentBuilder:
     def pageSeznamBudov(self, ids):
         """
 
-        :param ids: list
+        :type ids: list
         """
         self.__mDocument.heading2(u"Seznam budov")
         self.__mDocument.beginItemize()
@@ -1119,7 +1195,7 @@ class DocumentBuilder:
     def pageSeznamJednotek(self, ids):
         """
 
-        :param ids: list
+        :type ids: list
         """
         self.__mDocument.heading2(u"Seznam jednotek")
         self.__mDocument.beginItemize()
@@ -1133,12 +1209,12 @@ class DocumentBuilder:
     def pageSearchVlastnici(self, jmeno, identifikator, sjm, opo, ofo, lv):
         """
 
-        :param jmeno: str
-        :param identifikator: str
-        :param sjm: bool
-        :param opo: bool
-        :param ofo: bool
-        :param lv: bool
+        :type jmeno: str
+        :type identifikator: str
+        :type sjm: bool
+        :type opo: bool
+        :type ofo: bool
+        :type lv: bool
         :return:
         """
         model = VfkTableModel(self.__mConnectionName)
@@ -1155,10 +1231,10 @@ class DocumentBuilder:
     def pageSearchParcely(self, parcelniCislo, typIndex, druhKod, lv):
         """
 
-        :param parcelniCislo: str
-        :param typIndex: str
-        :param druhKod: str
-        :param lv: str
+        :type parcelniCislo: str
+        :type typIndex: str
+        :type druhKod: str
+        :type lv: str
         :return:
         """
         model = VfkTableModel(self.__mConnectionName)
@@ -1175,10 +1251,10 @@ class DocumentBuilder:
     def pageSearchBudovy(self, domovniCislo, naParcele, zpusobVyuziti, lv):
         """
 
-        :param domovniCislo: str
-        :param naParcele: str
-        :param zpusobVyuziti: str
-        :param lv: str
+        :type domovniCislo: str
+        :type naParcele: str
+        :type zpusobVyuziti: str
+        :type lv: str
         :return:
         """
         model = VfkTableModel(self.__mConnectionName)
@@ -1195,16 +1271,17 @@ class DocumentBuilder:
     def pageSearchJednotky(self, cisloJednotky, domovniCislo, naParcele, zpusobVyuziti, lv):
         """
 
-        :param cisloJednotky: cislo jednotky
-        :param domovniCislo: domovni cislo
-        :param naParcele: cislo parcely
-        :param zpusobVyuziti: zpusob vyuziti
-        :param lv: list vlastnictvi
+        :type cisloJednotky: str
+        :type domovniCislo: str
+        :type naParcele: str
+        :type zpusobVyuziti: str
+        :type lv: str
         :return:
         """
         model = VfkTableModel(self.__mConnectionName)
         ok = model.searchJed(cisloJednotky, domovniCislo, naParcele, zpusobVyuziti, lv)
-        if ok is False:
+        if not ok:
+            qDebug("Nemohu najit danne jednotky, nekde se stala nejaka chyba")
             return
 
         ids = []
@@ -1248,8 +1325,8 @@ class DocumentBuilder:
     def makeShortDescription(self, id, nemovitost):
         """
 
-        :param id: str
-        :param nemovitost: VfkTableModel.OpravnenyPovinny
+        :type id: str
+        :type nemovitost: VfkTableModel.OpravnenyPovinny
         :return: str
         """
         text = u''
@@ -1263,10 +1340,10 @@ class DocumentBuilder:
             text += self.makeParcelniCislo(model, 0)
         elif nemovitost == VfkTableModel.OpravnenyPovinny.OPBudova:
             model.budova(id, False)
-            text = u"Budova: ".format(self.makeDomovniCislo(model, 0))
+            text = u"Budova: {}".format(self.makeDomovniCislo(model, 0))
         elif nemovitost == VfkTableModel.OpravnenyPovinny.OPJednotka:
             model.jednotka(id, False)
-            text = u"Jednotka: ".format(self.makeJednotka(model, 0))
+            text = u"Jednotka: {}".format(self.makeJednotka(model, 0))
         elif nemovitost == VfkTableModel.OpravnenyPovinny.OPOsoba:
             model.opravnenySubjekt(id, True)
             if model.value(0, u"opsub_opsub_type") == u"BSM":
@@ -1282,8 +1359,8 @@ class DocumentBuilder:
     def makeLongDescription(self, id, nemovitost):
         """
 
-        :param id: str
-        :param nemovitost: VfkTableModel.OpravnenyPovinny
+        :type id: str
+        :type nemovitost: VfkTableModel.OpravnenyPovinny
         :return: str
         """
         text = u""
@@ -1299,7 +1376,7 @@ class DocumentBuilder:
             text += u", LV {}".format(self.makeLVCislo(model, 0))
         elif nemovitost == VfkTableModel.OpravnenyPovinny.OPBudova:
             model.budova(id, False)
-            text = u"Budova: ".format(self.makeDomovniCislo(model, 0))
+            text = u"Budova: {}".format(self.makeDomovniCislo(model, 0))
             text += u" na parcele {}".format(self.makeParcelniCislo(model, 0))
             text += u", LV {}".format(self.makeLVCislo(model, 0))
         elif nemovitost == VfkTableModel.OpravnenyPovinny.OPJednotka:
@@ -1318,8 +1395,8 @@ class DocumentBuilder:
     def makeAdresa(self, model, row):
         """
 
-        :param model: VfkTableModel
-        :param row: int
+        :type model: VfkTableModel
+        :type row: int
         :return: str
         """
         cislo_domovni = model.value(row, u"opsub_cislo_domovni")
@@ -1359,11 +1436,11 @@ class DocumentBuilder:
     def makeJmeno(self, model, row):
         """
 
-        :param model: VfkTableModel
-        :param row: int
+        :type model: VfkTableModel
+        :type row: int
         :return: str
         """
-        jmeno = u""
+        jmeno = u''
         if model.value(row, u"opsub_opsub_type") == u"OFO":
             jmeno += model.value(row, u"opsub_titul_pred_jmenem") + u" "
             jmeno += model.value(row, u"opsub_prijmeni") + u" "
@@ -1377,8 +1454,8 @@ class DocumentBuilder:
     def makeIdentifikator(self, model, row):
         """
 
-        :param model: VfkTableModel
-        :param row: int
+        :type model: VfkTableModel
+        :type row: int
         :return: str
         """
         type = model.value(row, u"opsub_opsub_type")
@@ -1415,8 +1492,8 @@ class DocumentBuilder:
     def makeDomovniCislo(self, model, row):
         """
 
-        :param model: VfkTableModel
-        :param row: int
+        :type model: VfkTableModel
+        :type row: int
         :return: str
         """
         return self.__mDocument.link(u"showText?page=bud&id={}".format(model.value(row, u"bud_id")),
@@ -1426,8 +1503,8 @@ class DocumentBuilder:
     def makeJednotka(self, model, row):
         """
 
-        :param model: VfkTableModel
-        :param row: int
+        :type model: VfkTableModel
+        :type row: int
         :return: str
         """
         return self.__mDocument.link(u"showText?page=jed&id={}".format(model.value(row, u"jed_id")),
@@ -1437,8 +1514,8 @@ class DocumentBuilder:
     def makeListina(self, model, row):
         """
 
-        :param model: VfkTableModel
-        :param row: int
+        :type model: VfkTableModel
+        :type row: int
         :return: str
         """
         return u"Listina: {} {}".format(model.value(row, u"typlis_nazev"), model.value(row, u"dul_nazev"))
@@ -1446,8 +1523,8 @@ class DocumentBuilder:
     def makeLVCislo(self, model, row):
         """
 
-        :param model: VfkTableModel
-        :param row: int
+        :type model: VfkTableModel
+        :type row: int
         :return: str
         """
         return self.__mDocument.link(u"showText?page=tel&id={}".format(model.value(row, u"tel_id")),
@@ -1456,8 +1533,8 @@ class DocumentBuilder:
     def makeKatastrUzemi(self, model, row):
         """
 
-        :param model: VfkTableModel
-        :param row: int
+        :type model: VfkTableModel
+        :type row: int
         :return: str
         """
         return u"{} {}".format(model.value(row, u"katuze_nazev"), model.value(row, u"par_katuze_kod"))
@@ -1465,8 +1542,8 @@ class DocumentBuilder:
     def makeCastObce(self, model, row):
         """
 
-        :param model: VfkTableModel
-        :param row: int
+        :type model: VfkTableModel
+        :type row: int
         :return: str
         """
         return u"{} {}".format(model.value(row, u"casobc_nazev"), model.value(row, u"casobc_kod"))
@@ -1492,4 +1569,3 @@ class DocumentBuilder:
             return
         self.__mCurrentDefinitionPoint.first = model.value(0, u"obdebo_souradnice_x")
         self.__mCurrentDefinitionPoint.second = model.value(0, u"obdebo_souradnice_y")
-        qDebug("Definicni bod je: {}, {}".format(self.__mCurrentDefinitionPoint.first, self.__mCurrentDefinitionPoint.second))

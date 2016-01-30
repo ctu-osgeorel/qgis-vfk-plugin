@@ -256,7 +256,7 @@ class VfkTextBrowser(QTextBrowser):
         taskMap = self.__parseTask(task)
 
         if taskMap[u"action"] == u"showText":
-            QApplication.setOverrideCursor(QCursor(QtCore.Qt.WaitCursor))
+            QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
             t = QtCore.QTime()
             t.start()
             html = self.__documentContent(taskMap, self.ExportFormat.RichText)

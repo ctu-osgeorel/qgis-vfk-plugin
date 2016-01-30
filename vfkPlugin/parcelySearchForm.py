@@ -53,7 +53,7 @@ class ParcelySearchForm(QWidget):
     def setDruhPozemkuModel(self, model):
         """
 
-        :param model: QAbstractItemModel
+        :type model: QAbstractItemModel
         """
         self.__defaultModel = model
         self.__pozemkovaModel = model
@@ -87,13 +87,14 @@ class ParcelySearchForm(QWidget):
         return self.ui.typParcelyCombo.currentIndex()
 
     def druhPozemkuKod(self):
-        # row = self.ui.druhPozemkuCombo.currentIndex()
-        # index = self.ui.druhPozemkuCombo.model().index(row, 0)
-        # return self.ui.druhPozemkuCombo.model().data(index)
+        """
+
+        :return: str
+        """
         row = self.ui.druhPozemkuCombo.currentIndex()
         index = self.ui.druhPozemkuCombo.model().index(row, 1)
 
         if self.ui.druhPozemkuCombo.model().data(index) == u"libovolný":
             return u''
         else:
-            return u"'{}'".format(unicode(self.ui.druhPozemkuCombo.model().data(index)))
+            return u"{}".format(self.ui.druhPozemkuCombo.model().data(index))

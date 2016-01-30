@@ -379,10 +379,8 @@ class MainApp(QDockWidget, Ui_MainApp):
         url = "http://nahlizenidokn.cuzk.cz/MapaIdentifikace.aspx?&x=-{}&y=-{}".format(y, x)
         QDesktopServices.openUrl(QUrl(url, QUrl.TolerantMode))
 
-
     def switchToImport(self):
         self.actionImport.trigger()
-
 
     def switchToSearch(self, searchType):
         """
@@ -390,7 +388,7 @@ class MainApp(QDockWidget, Ui_MainApp):
         """
         self.actionVyhledavani.trigger()
         self.searchCombo.setCurrentIndex(searchType)
-        #self.searchForms.setCurrentIndex(searchType)
+        self.searchForms.setCurrentIndex(searchType)
 
     def succesfullExport(self, export_format):
         QMessageBox.about(self, "Info", u"Export do formátu {} proběhl úspěšně.".format(export_format))
