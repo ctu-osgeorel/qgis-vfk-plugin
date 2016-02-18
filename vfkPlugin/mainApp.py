@@ -363,11 +363,22 @@ class MainApp(QDockWidget, Ui_MainApp):
 
         qDebug("Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
         self.__mOgrDataSource = ogr.Open(self.__fileName, 0)
+        layerCount = self.__mOgrDataSource.GetLayerCount()
+
+        layers_names = []
+
+        for i in xrange(layerCount):
+            layers_names.append(self.__mOgrDataSource.GetLayer(i).GetLayerDefn().GetName())
+
+        if 'PAR' not in layers_names or 'BUD' not in layers_names:
+            progress.hide()
+            self.dataWithoutParBud()
+            return True
+
         if not self.__mOgrDataSource:
-            errorMsg = u'Unable to set open OGR data source'
+            errorMsg = u'Nemohu otevřít datový zdroj OGR!'
             return False
         else:
-            layerCount = self.__mOgrDataSource.GetLayerCount()
             progress.setRange(0, layerCount -1)
 
             extraMsg = u''
@@ -376,7 +387,7 @@ class MainApp(QDockWidget, Ui_MainApp):
 
             for i in xrange(layerCount):
                 if progress.wasCanceled():
-                    errorMsg = u'Opening database stopped'
+                    errorMsg = u'Otevírání databáze bylo zastaveno!'
                     return False
 
                 progress.setValue(i)
@@ -466,6 +477,16 @@ class MainApp(QDockWidget, Ui_MainApp):
         :return:
         """
         QMessageBox.about(self, "Info", u"Export do formátu {} proběhl úspěšně.".format(export_format))
+
+    def dataWithoutParBud(self):
+        """
+
+        :type export_format: str
+        :return:
+        """
+        QMessageBox.warning(self, "Warning", u"Zvolený VFK soubor neobsahuje vrstvy s geometrií (PAR, BUD), proto nemohou "
+                                           u"být pomocí VFK Pluginu načtena. Data je možné načíst v QGIS pomocí volby "
+                                           u"'Načíst vektorovou vrstvu.'")
 
     def __createToolbarsAndConnect(self):
 
