@@ -113,15 +113,13 @@ class MainApp(QDockWidget, Ui_MainApp):
         fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", ".tex", "LaTeX (*.tex)")
         if fileName:
             self.vfkBrowser.exportDocument(self.vfkBrowser.currentUrl(), fileName, self.vfkBrowser.ExportFormat.Latex)
-
-        self.succesfullExport("LaTeX")
+            self.succesfullExport("LaTeX")
 
     def htmlExport(self):
         fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", ".html", "HTML (*.html)")
         if fileName:
             self.vfkBrowser.exportDocument(self.vfkBrowser.currentUrl(), fileName, self.vfkBrowser.ExportFormat.Html)
-
-        self.succesfullExport("HTML")
+            self.succesfullExport("HTML")
 
     def setSelectionChangedConnected(self, connected):
         """
