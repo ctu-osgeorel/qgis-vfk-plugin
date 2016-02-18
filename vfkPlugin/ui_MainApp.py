@@ -245,7 +245,6 @@ class Ui_MainApp(object):
         self.actionBack.setIcon(icon2)
         self.actionBack.setObjectName(_fromUtf8("actionBack"))
         self.actionForward = QtGui.QAction(MainApp)
-        self.actionForward.setEnabled(True)
         icon3 = QtGui.QIcon()
         icon3.addPixmap(QtGui.QPixmap(_fromUtf8(":/arrowForward.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionForward.setIcon(icon3)

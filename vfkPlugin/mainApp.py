@@ -85,6 +85,24 @@ class MainApp(QDockWidget, Ui_MainApp):
         self.connect(self.vfkBrowser, SIGNAL("showParcely"), self.showParInMap)
         self.connect(self.vfkBrowser, SIGNAL("showBudovy"), self.showBudInMap)
 
+        # connect lineEdits and returnPressed action
+        self.connect(self.vfkFileLineEdit, SIGNAL("returnPressed()"), self.loadVfkButton_clicked)
+        self.connect(self.vlastniciSearchForm.ui.jmenoLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.vlastniciSearchForm.ui.rcIcoLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.vlastniciSearchForm.ui.lvVlastniciLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
+
+        self.connect(self.parcelySearchForm.ui.parCisloLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.parcelySearchForm.ui.lvParcelyLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
+
+        self.connect(self.budovySearchForm.ui.cisloDomovniLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.budovySearchForm.ui.naParceleLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.budovySearchForm.ui.lvBudovyLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
+
+        self.connect(self.jednotkySearchForm.ui.mCisloJednotkyLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.jednotkySearchForm.ui.mCisloDomovniLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.jednotkySearchForm.ui.mNaParceleLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.jednotkySearchForm.ui.mLvJednotkyLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
+
         self.vfkBrowser.showHelpPage()
 
     def browseButton_clicked(self):
