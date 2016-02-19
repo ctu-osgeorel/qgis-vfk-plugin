@@ -234,7 +234,7 @@ class VfkTextBrowser(QTextBrowser):
         self.emit(SIGNAL("currentBudIdsChanged"), True if self.__mCurrentRecord.budIds else False)
 
         self.emit(SIGNAL("historyBefore"), self.__mHistoryOrder > 0)
-        self.emit(SIGNAL("historyAfter"), len(self.__mUrlHistory) - self.__mHistoryOrder > 0)
+        self.emit(SIGNAL("historyAfter"), len(self.__mUrlHistory) - self.__mHistoryOrder > 1)
 
         self.emit(SIGNAL("definitionPointAvailable"), True if (self.__mCurrentRecord.definitionPoint.first
                                                     and self.__mCurrentRecord.definitionPoint.second) else False)
