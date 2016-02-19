@@ -379,7 +379,7 @@ class MainApp(QDockWidget, Ui_MainApp):
             errorMsg = u'Nemohu otevřít datový zdroj OGR!'
             return False
         else:
-            progress.setRange(0, layerCount -1)
+            progress.setRange(0, layerCount - 1)
 
             extraMsg = u''
             if self.__mOgrDataSource.GetLayer().TestCapability('IsPreProcessed') is False:
@@ -476,7 +476,8 @@ class MainApp(QDockWidget, Ui_MainApp):
         :type export_format: str
         :return:
         """
-        QMessageBox.about(self, "Info", u"Export do formátu {} proběhl úspěšně.".format(export_format))
+        QMessageBox.information(self, u'Export', u"Export do formátu {} proběhl úspěšně.".format(export_format),
+                                QMessageBox.Yes | QMessageBox.Yes)
 
     def dataWithoutParBud(self):
         """
@@ -484,9 +485,9 @@ class MainApp(QDockWidget, Ui_MainApp):
         :type export_format: str
         :return:
         """
-        QMessageBox.warning(self, "Warning", u"Zvolený VFK soubor neobsahuje vrstvy s geometrií (PAR, BUD), proto nemohou "
+        QMessageBox.warning(self, u'Upozornění', u"Zvolený VFK soubor neobsahuje vrstvy s geometrií (PAR, BUD), proto nemohou "
                                            u"být pomocí VFK Pluginu načtena. Data je možné načíst v QGIS pomocí volby "
-                                           u"'Načíst vektorovou vrstvu.'")
+                                           u"'Načíst vektorovou vrstvu.'", QMessageBox.Yes | QMessageBox.Yes)
 
     def __createToolbarsAndConnect(self):
 

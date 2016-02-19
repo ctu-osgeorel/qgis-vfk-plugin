@@ -60,8 +60,6 @@ class vfkPlugin(object):
                 QCoreApplication.installTranslator(self.translator)
 
         # Create the dialog (after translation) and keep reference
-        #self.app = MainApp(self.iface)
-
 
         # Declare instance attributes
         self.actions = []
@@ -70,7 +68,6 @@ class vfkPlugin(object):
         self.toolbar = self.iface.addToolBar(u'vfk')
         self.toolbar.setObjectName(u'vfk')
 
-    # noinspection PyMethodMayBeStatic
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
 
@@ -84,7 +81,6 @@ class vfkPlugin(object):
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('vfk', message)
-
 
     def add_action(
         self,

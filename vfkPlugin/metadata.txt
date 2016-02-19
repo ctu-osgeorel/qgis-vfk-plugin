@@ -9,8 +9,8 @@
 [general]
 name=Vfk Plugin
 qgisMinimumVersion=2.0
-description=Plugin umoznujici praci s daty katastru nemovitosti
-version=0.1
+description=Plugin umoznujici praci s daty ceskeho katastru nemovitosti
+version=1.0
 author=Stepan Bambula
 email=stepan.bambula@gmail.com
 # End of mandatory metadata
@@ -21,7 +21,7 @@ email=stepan.bambula@gmail.com
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=vfk, iskn, katastr nemovitosti, cadastre
+tags=vfk, cuzk, iskn, katastr nemovitosti, cadastre
 
 homepage=http://freegis.fsv.cvut.cz/gwiki/VFK_/_QGIS_plugin
 tracker=
