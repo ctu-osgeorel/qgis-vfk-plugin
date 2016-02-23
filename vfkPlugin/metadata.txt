@@ -9,7 +9,7 @@
 [general]
 name=Vfk Plugin
 qgisMinimumVersion=2.0
-description=Plugin umoznujici praci s daty ceskeho katastru nemovitosti
+description=Plugin umoznujici praci s daty ceskeho katastru nemovitosti ve formatu VFK. Plugin podporuje vyhledavani parcel, budov, vlastniku a jednotek. Vysledky vyhledavani je nasledne mozne exportovat a zobrazit v mape.
 version=1.0
 author=Stepan Bambula
 email=stepan.bambula@gmail.com
