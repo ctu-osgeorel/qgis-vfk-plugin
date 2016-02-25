@@ -23,8 +23,7 @@
 
 # Import the PyQt, QGIS libraries and classes
 from PyQt4 import QtCore, QtGui
-from PyQt4.QtGui import QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup, QDockWidget, QToolButton, \
-    QMenu, QPalette, QDesktopServices
+from PyQt4.QtGui import QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup, QDockWidget, QToolButton, QMenu, QPalette, QDesktopServices
 from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, qDebug, QThread
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import *
