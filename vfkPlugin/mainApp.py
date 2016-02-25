@@ -25,7 +25,7 @@
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup, QDockWidget, QToolButton, \
     QMenu, QPalette, QDesktopServices
-from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, qDebug
+from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, qDebug, QThread
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import *
 from qgis.gui import *
@@ -33,6 +33,8 @@ import ogr
 
 from ui_MainApp import Ui_MainApp
 from searchFormController import *
+from importThread import *
+from openThread import *
 
 
 class MainApp(QDockWidget, Ui_MainApp):
@@ -213,15 +215,15 @@ class MainApp(QDockWidget, Ui_MainApp):
             fInfo = QFileInfo(fileName)
             self.__mDataSourceName = QDir(fInfo.absolutePath()).filePath(fInfo.baseName() + '.db')
 
-            if self.loadVfkFile(fileName, errorMsg) is False:
+            if not self.loadVfkFile(fileName, errorMsg):
                 msg2 = u'Nepodařilo se získat OGR provider'
                 QMessageBox.critical(self, u'Nepodařilo se získat data provider', msg2)
                 self.emit(SIGNAL("enableSearch"), False)
                 return
 
-            if self.__openDatabase(self.__mDataSourceName) is False:
+            if not self.__openDatabase(self.__mDataSourceName):
                 msg1 = u'Nepodařilo se otevřít databázi.'
-                if QSqlDatabase.isDriverAvailable('QSQLITE') is False:
+                if not QSqlDatabase.isDriverAvailable('QSQLITE'):
                     msg1 += u'\nDatabázový ovladač QSQLITE není dostupný.'
                 QMessageBox.critical(self, u'Chyba', msg1)
                 self.emit(SIGNAL("enableSearch"), False)
@@ -351,55 +353,51 @@ class MainApp(QDockWidget, Ui_MainApp):
 
         QgsApplication.registerOgrDrivers()
 
-        progress = QProgressDialog(self)
-        progress.setWindowTitle(u'Načítám VFK data...')
-        progress.setLabelText(u'Načítám data do SQLite databáze (může nějaký čas trvat...)')
-        progress.setRange(0, 1)
-        progress.setModal(True)
-        progress.show()
-
         QgsApplication.processEvents()
-        progress.setValue(1)
 
-        qDebug("Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
-        self.__mOgrDataSource = ogr.Open(self.__fileName, 0)
+        self.openThread = OpenThread()
+        self.connect(self.openThread, SIGNAL("importStat()"), self.__openThreadStatus)
+
+        qDebug("Opening OGR datasource (using DB: {})".format(self.__mDataSourceName))
+        self.labelLoading.setText(u'Otevírám datasource {}...'.format(self.__fileName))
+        if not self.openThread.isRunning():
+            self.openThread.start()
+            self.__mOgrDataSource = ogr.Open(self.__fileName, 0)
+
         layerCount = self.__mOgrDataSource.GetLayerCount()
-
         layers_names = []
 
         for i in xrange(layerCount):
             layers_names.append(self.__mOgrDataSource.GetLayer(i).GetLayerDefn().GetName())
 
         if 'PAR' not in layers_names or 'BUD' not in layers_names:
-            progress.hide()
-            self.dataWithoutParBud()
+            self.__dataWithoutParBud()
             return True
 
         if not self.__mOgrDataSource:
             errorMsg = u'Nemohu otevřít datový zdroj OGR!'
             return False
         else:
-            progress.setRange(0, layerCount - 1)
-
             extraMsg = u''
-            if self.__mOgrDataSource.GetLayer().TestCapability('IsPreProcessed') is False:
+            if not self.__mOgrDataSource.GetLayer().TestCapability('IsPreProcessed'):
                 extraMsg = u'Načítám data do SQLite databáze (může nějaký čas trvat...)'
 
-            for i in xrange(layerCount):
-                if progress.wasCanceled():
-                    errorMsg = u'Otevírání databáze bylo zastaveno!'
-                    return False
+            self.progressBar.setRange(0, layerCount - 1)
 
-                progress.setValue(i)
+            self.importThread = ImportThread(layers_names)
+            self.connect(self.importThread, SIGNAL("importStatus(int, int)"), self.__importStatus)
+            self.connect(self.importThread, SIGNAL("importFinished()"), self.__importFinished)
 
-                theLayerName = self.__mOgrDataSource.GetLayer(i).GetLayerDefn().GetName()
-
-                progress.setLabelText(u"VFK data {}/{}: {}\n{}".format(i, layerCount, theLayerName, extraMsg))
-                self.__mOgrDataSource.GetLayer(i).GetFeatureCount(1)
-
-            progress.hide()
+            if not self.importThread.isRunning():
+                self.importThread.start()
 
             return True
+
+    def __openThreadStatus(self):
+        """
+
+        :return:
+        """
 
     def __selectedIds(self, layer):
         """
@@ -479,7 +477,7 @@ class MainApp(QDockWidget, Ui_MainApp):
         QMessageBox.information(self, u'Export', u"Export do formátu {} proběhl úspěšně.".format(export_format),
                                 QMessageBox.Yes | QMessageBox.Yes)
 
-    def dataWithoutParBud(self):
+    def __dataWithoutParBud(self):
         """
 
         :type export_format: str
@@ -488,6 +486,29 @@ class MainApp(QDockWidget, Ui_MainApp):
         QMessageBox.warning(self, u'Upozornění', u"Zvolený VFK soubor neobsahuje vrstvy s geometrií (PAR, BUD), proto nemohou "
                                            u"být pomocí VFK Pluginu načtena. Data je možné načíst v QGIS pomocí volby "
                                            u"'Načíst vektorovou vrstvu.'", QMessageBox.Yes | QMessageBox.Yes)
+
+    def __importFinished(self):
+        """
+
+        :return:
+        """
+        self.importThread.quit()
+        QtGui.QMessageBox.information(self, u'Import', u"Import dat VFK proběhl úspěšně",QtGui.QMessageBox.Yes | QtGui.QMessageBox.Yes)
+        self.progressBar.setValue(0)
+        self.labelLoading.setText(u'Data úspěšně načtena.')
+
+    def __importStatus(self, i, layerCount):
+        """
+
+        :return:
+        """
+        extraMsg = u'Načítám data do SQLite databáze (může nějaký čas trvat...)'
+        theLayerName = self.__mOgrDataSource.GetLayer(i).GetLayerDefn().GetName()
+
+        self.progressBar.setValue(self.progressBar.value() + 1)
+        self.labelLoading.setText(u"VFK data {}/{}: {}\n{}".format(i+1, layerCount, theLayerName, extraMsg))
+        self.__mOgrDataSource.GetLayer(i).GetFeatureCount(1)
+
 
     def __createToolbarsAndConnect(self):
 

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_MainApp.ui'
 #
-# Created: Sun Dec 13 11:16:11 2015
+# Created: Thu Feb 25 15:20:29 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -28,7 +28,6 @@ class Ui_MainApp(object):
         MainApp.setObjectName(_fromUtf8("MainApp"))
         MainApp.resize(890, 408)
         MainApp.setLayoutDirection(QtCore.Qt.LeftToRight)
-        #MainApp.setTabShape(QtGui.QTabWidget.Rounded)
         self.centralWidget = QtGui.QWidget(MainApp)
         self.centralWidget.setObjectName(_fromUtf8("centralWidget"))
         self.gridLayout_4 = QtGui.QGridLayout(self.centralWidget)
@@ -51,7 +50,7 @@ class Ui_MainApp(object):
         self.scrollArea_5.setWidgetResizable(True)
         self.scrollArea_5.setObjectName(_fromUtf8("scrollArea_5"))
         self.scrollAreaWidgetContents_5 = QtGui.QWidget()
-        self.scrollAreaWidgetContents_5.setGeometry(QtCore.QRect(0, 0, 390, 370))
+        self.scrollAreaWidgetContents_5.setGeometry(QtCore.QRect(0, 0, 371, 370))
         self.scrollAreaWidgetContents_5.setObjectName(_fromUtf8("scrollAreaWidgetContents_5"))
         self.gridLayout_11 = QtGui.QGridLayout(self.scrollAreaWidgetContents_5)
         self.gridLayout_11.setObjectName(_fromUtf8("gridLayout_11"))
@@ -88,10 +87,16 @@ class Ui_MainApp(object):
         self.verticalLayout_2.addLayout(self.gridLayout_12)
         spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout_2.addItem(spacerItem)
+        self.labelLoading = QtGui.QLabel(self.widget)
+        self.labelLoading.setText(_fromUtf8(""))
+        self.labelLoading.setObjectName(_fromUtf8("labelLoading"))
+        self.verticalLayout_2.addWidget(self.labelLoading)
         self.horizontalLayout_2 = QtGui.QHBoxLayout()
         self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
-        spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_2.addItem(spacerItem1)
+        self.progressBar = QtGui.QProgressBar(self.widget)
+        self.progressBar.setProperty("value", 0)
+        self.progressBar.setObjectName(_fromUtf8("progressBar"))
+        self.horizontalLayout_2.addWidget(self.progressBar)
         self.loadVfkButton = QtGui.QPushButton(self.widget)
         self.loadVfkButton.setObjectName(_fromUtf8("loadVfkButton"))
         self.horizontalLayout_2.addWidget(self.loadVfkButton)
@@ -138,7 +143,7 @@ class Ui_MainApp(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName(_fromUtf8("scrollArea"))
         self.scrollAreaWidgetContents = QtGui.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 372, 282))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.scrollAreaWidgetContents.setObjectName(_fromUtf8("scrollAreaWidgetContents"))
         self.gridLayout_5 = QtGui.QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_5.setObjectName(_fromUtf8("gridLayout_5"))
@@ -156,7 +161,7 @@ class Ui_MainApp(object):
         self.scrollArea_3.setWidgetResizable(True)
         self.scrollArea_3.setObjectName(_fromUtf8("scrollArea_3"))
         self.scrollAreaWidgetContents_2 = QtGui.QWidget()
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 372, 282))
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.scrollAreaWidgetContents_2.setObjectName(_fromUtf8("scrollAreaWidgetContents_2"))
         self.gridLayout_7 = QtGui.QGridLayout(self.scrollAreaWidgetContents_2)
         self.gridLayout_7.setObjectName(_fromUtf8("gridLayout_7"))
@@ -174,7 +179,7 @@ class Ui_MainApp(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollArea_2.setObjectName(_fromUtf8("scrollArea_2"))
         self.scrollAreaWidgetContents_3 = QtGui.QWidget()
-        self.scrollAreaWidgetContents_3.setGeometry(QtCore.QRect(0, 0, 372, 282))
+        self.scrollAreaWidgetContents_3.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.scrollAreaWidgetContents_3.setObjectName(_fromUtf8("scrollAreaWidgetContents_3"))
         self.gridLayout_3 = QtGui.QGridLayout(self.scrollAreaWidgetContents_3)
         self.gridLayout_3.setObjectName(_fromUtf8("gridLayout_3"))
@@ -192,7 +197,7 @@ class Ui_MainApp(object):
         self.scrollArea_4.setWidgetResizable(True)
         self.scrollArea_4.setObjectName(_fromUtf8("scrollArea_4"))
         self.scrollAreaWidgetContents_4 = QtGui.QWidget()
-        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, 0, 372, 282))
+        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.scrollAreaWidgetContents_4.setObjectName(_fromUtf8("scrollAreaWidgetContents_4"))
         self.gridLayout_9 = QtGui.QGridLayout(self.scrollAreaWidgetContents_4)
         self.gridLayout_9.setObjectName(_fromUtf8("gridLayout_9"))
@@ -205,8 +210,8 @@ class Ui_MainApp(object):
         self.verticalLayout_3.addWidget(self.searchForms)
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
-        spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout.addItem(spacerItem2)
+        spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem1)
         self.searchButton = QtGui.QPushButton(self.searchPage)
         self.searchButton.setObjectName(_fromUtf8("searchButton"))
         self.horizontalLayout.addWidget(self.searchButton)
@@ -245,6 +250,7 @@ class Ui_MainApp(object):
         self.actionBack.setIcon(icon2)
         self.actionBack.setObjectName(_fromUtf8("actionBack"))
         self.actionForward = QtGui.QAction(MainApp)
+        self.actionForward.setEnabled(True)
         icon3 = QtGui.QIcon()
         icon3.addPixmap(QtGui.QPixmap(_fromUtf8(":/arrowForward.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionForward.setIcon(icon3)
@@ -281,7 +287,7 @@ class Ui_MainApp(object):
         self.actionShowHelpPage.setObjectName(_fromUtf8("actionShowHelpPage"))
 
         self.retranslateUi(MainApp)
-        self.stackedWidget.setCurrentIndex(1)
+        self.stackedWidget.setCurrentIndex(0)
         self.searchForms.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainApp)
 
