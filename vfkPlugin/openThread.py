@@ -25,19 +25,17 @@ from PyQt4.QtCore import QThread, pyqtSignal
 
 
 class OpenThread(QThread):
-    importStat = pyqtSignal()
+    working = pyqtSignal(str)
 
-    def __init__(self):
+    def __init__(self, fileName):
         """
         Class for using multi-thread import of layers
-        :type layers: list
+        :type fileName: str
         :return:
         """
         QThread.__init__(self)
 
-    def __del__(self):
-        ##  No exceptions
-        self.wait()
+        self.fileName = fileName
 
     def run(self):
-        self.importStat.emit()
+        self.working.emit(self.fileName)

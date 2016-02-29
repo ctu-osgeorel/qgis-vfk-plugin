@@ -61,8 +61,6 @@ class DocumentBuilder:
         if taskMap["page"] == "help":
             self.pageHelp()
 
-        print(taskMap)
-
         if self.__mHasConnection:
             if taskMap["page"] == "tel":
                 self.pageTeleso(taskMap["id"])
@@ -1524,7 +1522,6 @@ class DocumentBuilder:
         :type row: int
         :return: str
         """
-        print(u"showText?page=tel&id={}".format(model.value(row, u"tel_id")), model.value(row, u"tel_cislo_tel"))
         return self.__mDocument.link(u"showText?page=tel&id={}".format(model.value(row, u"tel_id")),
                                      model.value(row, u"tel_cislo_tel"))
 

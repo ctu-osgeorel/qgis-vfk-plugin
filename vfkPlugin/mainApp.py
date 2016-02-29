@@ -23,25 +23,26 @@
 
 # Import the PyQt, QGIS libraries and classes
 from PyQt4 import QtCore, QtGui
-from PyQt4.QtGui import QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup, QDockWidget, QToolButton, QMenu, QPalette, QDesktopServices
+from PyQt4.QtGui import QMainWindow, QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup, QDockWidget, QToolButton, QMenu, QPalette, QDesktopServices
 from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, qDebug, QThread
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import *
 from qgis.gui import *
 import ogr
+import time
 
 from ui_MainApp import Ui_MainApp
 from searchFormController import *
-from importThread import *
 from openThread import *
 
 
-class MainApp(QDockWidget, Ui_MainApp):
+class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
     # signals
     goBack = pyqtSignal()
     searchOpsubByName = pyqtSignal(str)
     enableSearch = pyqtSignal(bool)
     refreshLegend = pyqtSignal(QgsMapLayer)
+    ogrDatasourceLoaded = pyqtSignal(bool)
 
     class VfkLayer(object):
         Par = 0
@@ -190,7 +191,7 @@ class MainApp(QDockWidget, Ui_MainApp):
         if search.hasParserError():
             error += "Parsing error:" + search.parserErrorString()
             return fIds
-        if search.prepare(layer.pendingFields()) is False:
+        if not search.prepare(layer.pendingFields()):
             error + "Evaluation error:" + search.evalErrorString()
 
         layer.select(rect, False)
@@ -209,6 +210,18 @@ class MainApp(QDockWidget, Ui_MainApp):
     def loadVfkButton_clicked(self):
         fileName = self.vfkFileLineEdit.text()
 
+        self.labelLoading.setText(u'Otevírám datasource {}...'.format(fileName))
+        QgsApplication.processEvents()
+
+        self.vlakno = OpenThread(fileName)
+        self.vlakno.working.connect(self.runLoadingLayer)
+        self.vlakno.start()
+
+    def runLoadingLayer(self, fileName):
+        """
+
+        :return:
+        """
         if self.__mLastVfkFile != fileName:
             errorMsg = ''
             fInfo = QFileInfo(fileName)
@@ -314,7 +327,7 @@ class MainApp(QDockWidget, Ui_MainApp):
 
         resultFlag = True
         errorMsg = layer.loadNamedStyle(symbologyFile, resultFlag)
-        if resultFlag is False:
+        if not resultFlag:
             QMessageBox.information(self, 'Load Style', errorMsg)
 
         layer.triggerRepaint()
@@ -332,7 +345,7 @@ class MainApp(QDockWidget, Ui_MainApp):
         db = QSqlDatabase.addDatabase("QSQLITE", connectionName)
         qDebug(dbPath)
         db.setDatabaseName(dbPath)
-        if db.open() is False:
+        if not db.open():
             return False
         else:
             self.setProperty("connectionName", connectionName)
@@ -348,22 +361,21 @@ class MainApp(QDockWidget, Ui_MainApp):
 
         if self.__mOgrDataSource:
             self.__mOgrDataSource.Destroy()
-            self.__mOgrDataSource = 0
+            self.__mOgrDataSource = None
 
         QgsApplication.registerOgrDrivers()
 
+        self.progressBar.setRange(0, 1)
+        self.progressBar.setValue(0)
+
         QgsApplication.processEvents()
 
-        self.openThread = OpenThread()
-        self.connect(self.openThread, SIGNAL("importStat()"), self.__openThreadStatus)
+        qDebug("Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
 
-        qDebug("Opening OGR datasource (using DB: {})".format(self.__mDataSourceName))
-        self.labelLoading.setText(u'Otevírám datasource {}...'.format(self.__fileName))
-        if not self.openThread.isRunning():
-            self.openThread.start()
-            self.__mOgrDataSource = ogr.Open(self.__fileName, 0)
+        self.__mOgrDataSource = ogr.Open(fileName, 0)
 
         layerCount = self.__mOgrDataSource.GetLayerCount()
+
         layers_names = []
 
         for i in xrange(layerCount):
@@ -371,32 +383,35 @@ class MainApp(QDockWidget, Ui_MainApp):
 
         if 'PAR' not in layers_names or 'BUD' not in layers_names:
             self.__dataWithoutParBud()
+            self.labelLoading.setText(u'Data nemohla být načtena.')
+            QgsApplication.processEvents()
             return True
 
         if not self.__mOgrDataSource:
             errorMsg = u'Nemohu otevřít datový zdroj OGR!'
             return False
         else:
+            self.progressBar.setRange(0, layerCount - 1)
+
             extraMsg = u''
             if not self.__mOgrDataSource.GetLayer().TestCapability('IsPreProcessed'):
                 extraMsg = u'Načítám data do SQLite databáze (může nějaký čas trvat...)'
 
-            self.progressBar.setRange(0, layerCount - 1)
+            for i in xrange(layerCount):
 
-            self.importThread = ImportThread(layers_names)
-            self.connect(self.importThread, SIGNAL("importStatus(int, int)"), self.__importStatus)
-            self.connect(self.importThread, SIGNAL("importFinished()"), self.__importFinished)
+                self.progressBar.setValue(i)
 
-            if not self.importThread.isRunning():
-                self.importThread.start()
+                theLayerName = self.__mOgrDataSource.GetLayer(i).GetLayerDefn().GetName()
+
+                self.labelLoading.setText(u"VFK data {}/{}: {}\n{}".format(i+1, layerCount, theLayerName, extraMsg))
+                QgsApplication.processEvents()
+                self.__mOgrDataSource.GetLayer(i).GetFeatureCount(1)
+
+                time.sleep(0.02)
+
+            self.labelLoading.setText(u'Data byla úspěšně načtena.')
 
             return True
-
-    def __openThreadStatus(self):
-        """
-
-        :return:
-        """
 
     def __selectedIds(self, layer):
         """
@@ -485,29 +500,6 @@ class MainApp(QDockWidget, Ui_MainApp):
         QMessageBox.warning(self, u'Upozornění', u"Zvolený VFK soubor neobsahuje vrstvy s geometrií (PAR, BUD), proto nemohou "
                                            u"být pomocí VFK Pluginu načtena. Data je možné načíst v QGIS pomocí volby "
                                            u"'Načíst vektorovou vrstvu.'", QMessageBox.Yes | QMessageBox.Yes)
-
-    def __importFinished(self):
-        """
-
-        :return:
-        """
-        self.importThread.quit()
-        QtGui.QMessageBox.information(self, u'Import', u"Import dat VFK proběhl úspěšně",QtGui.QMessageBox.Yes | QtGui.QMessageBox.Yes)
-        self.progressBar.setValue(0)
-        self.labelLoading.setText(u'Data úspěšně načtena.')
-
-    def __importStatus(self, i, layerCount):
-        """
-
-        :return:
-        """
-        extraMsg = u'Načítám data do SQLite databáze (může nějaký čas trvat...)'
-        theLayerName = self.__mOgrDataSource.GetLayer(i).GetLayerDefn().GetName()
-
-        self.progressBar.setValue(self.progressBar.value() + 1)
-        self.labelLoading.setText(u"VFK data {}/{}: {}\n{}".format(i+1, layerCount, theLayerName, extraMsg))
-        self.__mOgrDataSource.GetLayer(i).GetFeatureCount(1)
-
 
     def __createToolbarsAndConnect(self):
 

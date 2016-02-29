@@ -535,7 +535,6 @@ class VfkTableModel(QSqlQueryModel):
             opsubType.append("'OPO'")
         if sjm == u'1':
             opsubType.append("'BSM'")
-        print(opsubType)
         where = u"WHERE "
         if whereJmeno:
             where += u"({}) AND ".format(whereJmeno)
@@ -552,7 +551,6 @@ class VfkTableModel(QSqlQueryModel):
                 u"FROM opsub " \
                 u"{} {} " \
                 u"ORDER BY opsub.prijmeni, opsub.nazev;".format(join, where)
-        print(query)
         return self.__evaluate(query)
 
     def searchPar(self, parcelniCislo, typIndex, druhKod, lv):
@@ -596,7 +594,6 @@ class VfkTableModel(QSqlQueryModel):
                 u"FROM par " \
                 u"JOIN drupoz ON par.drupoz_kod = drupoz.kod " \
                 u"{} {};".format(join, where)
-        print(query)
         return self.__evaluate(query)
 
     def searchBud(self, domovniCislo, naParcele, zpusobVyuzitiKod, lv):
@@ -947,7 +944,6 @@ class VfkTableModel(QSqlQueryModel):
 
         if self.lastError().isValid():
             qDebug(str(self.lastError()))
-            print(query)
             return False
 
         return True
