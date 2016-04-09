@@ -7,11 +7,11 @@
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
-name=Vfk Plugin
-qgisMinimumVersion=2.0
+name=VFK Plugin
+qgisMinimumVersion=2.8
 description=Plugin umoznujici praci s daty ceskeho katastru nemovitosti ve formatu VFK. Plugin podporuje vyhledavani parcel, budov, vlastniku a jednotek. Vysledky vyhledavani je nasledne mozne exportovat a zobrazit v mape.
-version=1.0
-author=Stepan Bambula
+version=2.0alfa
+author=Anna Petrasova, Vaclav Petras, Stepan Bambula
 email=stepan.bambula@gmail.com
 # End of mandatory metadata
 
@@ -24,8 +24,8 @@ email=stepan.bambula@gmail.com
 tags=vfk, cuzk, iskn, katastr nemovitosti, cadastre
 
 homepage=http://freegis.fsv.cvut.cz/gwiki/VFK_/_QGIS_plugin
-tracker=
-repository=https://github.com/bambuste/qgis-vfk-plugin.git
+tracker=https://github.com/ctu-osgeorel/qgis-vfk-plugin/issues
+repository=https://github.com/ctu-osgeorel/qgis-vfk-plugin.git
 category=Plugins
 icon=icon.png
 # experimental flag
@@ -33,4 +33,3 @@ experimental=False
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
-
