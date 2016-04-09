@@ -12,7 +12,6 @@ qgisMinimumVersion=2.8
 description=Plugin umoznujici praci s daty ceskeho katastru nemovitosti ve formatu VFK. Plugin podporuje vyhledavani parcel, budov, vlastniku a jednotek. Vysledky vyhledavani je nasledne mozne exportovat a zobrazit v mape.
 version=2.0alfa
 author=Anna Petrasova, Vaclav Petras, Stepan Bambula
-email=stepan.bambula@gmail.com
 # End of mandatory metadata
 
 # Recommended items:
