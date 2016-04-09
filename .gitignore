@@ -1,3 +1,4 @@
+# Created by .ignore support plugin (hsz.mobi)
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -16,7 +17,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-.idea/
+/.idea
 lib/
 lib64/
 parts/
@@ -59,4 +60,3 @@ docs/_build/
 # PyBuilder
 target/
 
-# Created by .ignore support plugin (hsz.mobi)
