@@ -158,7 +158,7 @@ class vfkPlugin(object):
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/icon.png'
+        icon_path = ':/vfkPluginIcon.png'
         self.add_action(
             icon_path,
             text=self.tr(u'VFK Plugin'),

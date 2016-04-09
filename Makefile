@@ -50,7 +50,7 @@ PY_FILES = \
 
 UI_FILES = vfkPlugin_dialog_base.ui
 
-EXTRAS = icon.png metadata.txt
+EXTRAS = vfkPluginIcon.png metadata.txt
 
 COMPILED_RESOURCE_FILES = resources_rc.py
 

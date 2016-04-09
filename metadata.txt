@@ -27,7 +27,7 @@ homepage=http://freegis.fsv.cvut.cz/gwiki/VFK_/_QGIS_plugin
 tracker=https://github.com/ctu-osgeorel/qgis-vfk-plugin/issues
 repository=https://github.com/ctu-osgeorel/qgis-vfk-plugin.git
 category=Plugins
-icon=icon.png
+icon=vfkPluginIcon.png
 # experimental flag
 experimental=False
 
