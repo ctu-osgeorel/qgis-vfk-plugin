@@ -1,6 +1,6 @@
 <RCC>
   <qresource>
-    <file alias="icon.png">data/icon.png</file>
+    <file alias="vfkPluginIcon.png">data/vfkPluginIcon.png</file>
     <file alias="arrowBack.png">data/arrowBack.png</file>
     <file alias="arrowForward.png">data/arrowForward.png</file>
     <file alias="budStyle.qml">data/budStyle.qml</file>
