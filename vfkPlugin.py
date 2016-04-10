@@ -22,7 +22,7 @@
 """
 
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
-from PyQt4.QtGui import QAction, QIcon
+from PyQt4.QtGui import QAction, QIcon, QToolButton, QMenu
 # Initialize Qt resources from file resources.py
 import resources_rc
 # Import the code for the dialog
@@ -63,10 +63,12 @@ class vfkPlugin(object):
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&Vfk Plugin')
+        self.menu = self.tr(u'&VFK Plugin')
         # TODO: We are going to let the user set this up in a future iteration
-        self.toolbar = self.iface.addToolBar(u'vfk')
-        self.toolbar.setObjectName(u'vfk')
+
+        # add plugin icon into plugin toolbar
+        self.toolButton = QToolButton()
+        self.iface.addToolBarWidget(self.toolButton)
 
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
@@ -82,17 +84,8 @@ class vfkPlugin(object):
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('vfk', message)
 
-    def add_action(
-        self,
-        icon_path,
-        text,
-        callback,
-        enabled_flag=True,
-        add_to_menu=True,
-        add_to_toolbar=True,
-        status_tip=None,
-        whats_this=None,
-        parent=None):
+    def add_action(self, icon_path, text, callback, enabled_flag=True, add_to_menu=True, add_to_toolbar=True,
+                   status_tip=None, whats_this=None, parent=None):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -134,6 +127,9 @@ class vfkPlugin(object):
 
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
+
+        self.toolButton.setDefaultAction(action)
+
         action.triggered.connect(callback)
         action.setEnabled(enabled_flag)
 
@@ -144,7 +140,7 @@ class vfkPlugin(object):
             action.setWhatsThis(whats_this)
 
         if add_to_toolbar:
-            self.toolbar.addAction(action)
+            pass
 
         if add_to_menu:
             self.iface.addPluginToMenu(
@@ -163,6 +159,7 @@ class vfkPlugin(object):
             icon_path,
             text=self.tr(u'VFK Plugin'),
             callback=self.run,
+            whats_this=u'VFK Plugin',
             parent=self.iface.mainWindow())
 
         self.myDockWidget = MainApp(self.iface)
@@ -173,9 +170,9 @@ class vfkPlugin(object):
             self.iface.removePluginMenu(
                 self.tr(u'&Vfk Plugin'),
                 action)
+            self.iface.removePluginMenu(self.menu, action)
             self.iface.removeToolBarIcon(action)
-        # remove the toolbar
-        del self.toolbar
+            self.iface.unregisterMainWindowAction(action)
 
         if self.myDockWidget:
             self.myDockWidget.close()
