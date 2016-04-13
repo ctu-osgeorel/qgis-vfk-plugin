@@ -23,6 +23,9 @@
 
 # Import the PyQt, QGIS libraries and classes
 from PyQt4 import QtCore, QtGui
+from re import search
+import os
+
 from PyQt4.QtGui import QMainWindow, QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup, QDockWidget, QToolButton, QMenu, QPalette, QDesktopServices
 from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, qDebug, QThread
 from PyQt4.QtSql import QSqlDatabase
@@ -54,12 +57,18 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.iface = iface
 
         # variables
-        self.__mLastVfkFile = ''
+        self.__mLastVfkFile = []
         self.__mOgrDataSource = None
         self.__mDataSourceName = ''
-        self.__fileName = ''
+        self.__fileName = []
         self.__mLoadedLayers = {}
         self.__mDefaultPalette = self.vfkFileLineEdit.palette()
+
+        # new lineEdits variables
+        self.lineEditsCount = 1
+
+        self.__browseButtons = {}
+        self.__vfkLineEdits = {}
 
         # Connect ui with functions
         self.__createToolbarsAndConnect()
@@ -107,15 +116,24 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         self.vfkBrowser.showHelpPage()
 
-    def browseButton_clicked(self):
+    def browseButton_clicked(self, browseButton_id=1):
+        """
+        :param browseButton_id: ID of clicked browse button.
+        :return:
+        """
         title = u'Načti soubor VFK'
         lastUsedDir = ''
-        self.__fileName = QFileDialog.getOpenFileName(self, title, lastUsedDir, 'Soubor VFK (*.vfk)')
+        self.__fileName.append(QFileDialog.getOpenFileName(self, title, lastUsedDir, 'Soubor VFK (*.vfk)'))
         if not self.__fileName:
             return
         else:
-            self.vfkFileLineEdit.setText(self.__fileName)
-            self.loadVfkButton.setEnabled(True)
+            if browseButton_id == 1:
+                self.vfkFileLineEdit.setText(self.__fileName[0])
+            else:
+                self.__vfkLineEdits['vfkLineEdit_{}'.format(len(self.__vfkLineEdits))].setText(
+                    self.__fileName[browseButton_id-1])
+
+        self.loadVfkButton.setEnabled(True)
 
     def browserGoBack(self):
         self.vfkBrowser.goBack()
@@ -166,7 +184,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         if layerName in self.__mLoadedLayers:
             id = self.__mLoadedLayers[layerName]
             vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
-            searchString = "ID IN ('{}')".format("','".join(ids))
+            searchString = "ID IN ({})".format(", ".join(ids))
             qDebug(searchString)
             error = ''
             fIds = self.__search(vectorLayer, searchString, error)
@@ -184,6 +202,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type error: str
         :return:
         """
+        # parse search string and build parsed tree
         search = QgsExpression(searchString)
         rect = QgsRectangle()
         fIds = []
@@ -197,39 +216,68 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         layer.select(rect, False)
         fit = QgsFeatureIterator(layer.getFeatures())
         f = QgsFeature()
+        qDebug('ssssssssssss')
+        qDebug(searchString)
 
         while fit.nextFeature(f):
-            if search.evaluate(f) != 0:
+            qDebug(str(search.evaluate(f)))
+
+            if search.evaluate(f):
                 fIds.append(f.id())
+            # check if there were errors during evaluating
             if search.hasEvalError():
                 qDebug(error)
                 break
 
+        qDebug(str(fIds))
         return fIds
 
     def loadVfkButton_clicked(self):
         fileName = self.vfkFileLineEdit.text()
 
-        self.labelLoading.setText(u'Otevírám datasource {}...'.format(fileName))
-        QgsApplication.processEvents()
+        fileNames = []
 
-        self.vlakno = OpenThread(fileName)
-        self.vlakno.working.connect(self.runLoadingLayer)
-        self.vlakno.start()
+        i = 0
+
+        for le in self.__vfkLineEdits:
+            vfkFile = self.__vfkLineEdits[le].text()
+
+            if i == 0:
+                os.environ['OGR_VFK_DB_NAME'] = os.path.join(os.path.dirname(os.path.dirname(vfkFile)), 'zmenaDB.db')
+
+            fileNames.append(vfkFile)
+            self.labelLoading.setText(u'Otevírám datasource {}...'.format(vfkFile))
+            QgsApplication.processEvents()
+
+            self.vlakno = OpenThread(vfkFile)
+            self.vlakno.working.connect(self.runLoadingLayer)
+            self.vlakno.start()
+
+            i += 1
+
+        # self.labelLoading.setText(u'Otevírám datasource {}...'.format(fileName))
+        # QgsApplication.processEvents()
+        #
+        # self.vlakno = OpenThread(fileName)
+        # self.vlakno.working.connect(self.runLoadingLayer)
+        # self.vlakno.start()
 
     def runLoadingLayer(self, fileName):
         """
 
         :return:
         """
-        if self.__mLastVfkFile != fileName:
+        if fileName not in self.__mLastVfkFile:
             errorMsg = ''
             fInfo = QFileInfo(fileName)
-            self.__mDataSourceName = QDir(fInfo.absolutePath()).filePath(fInfo.baseName() + '.db')
+            if 'OGR_VFK_DB_NAME' in os.environ:
+                self.__mDataSourceName = os.environ['OGR_VFK_DB_NAME']
+            else:
+                self.__mDataSourceName = QDir(fInfo.absolutePath()).filePath(fInfo.baseName() + '.db')
 
             if not self.loadVfkFile(fileName, errorMsg):
                 msg2 = u'Nepodařilo se získat OGR provider'
-                QMessageBox.critical(self, u'Nepodařilo se získat data provider', msg2)
+                QMessageBox.critical(self, u'Nepodařilo se získat data provider', msg2, QMessageBox.Ok)
                 self.emit(SIGNAL("enableSearch"), False)
                 return
 
@@ -237,7 +285,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                 msg1 = u'Nepodařilo se otevřít databázi.'
                 if not QSqlDatabase.isDriverAvailable('QSQLITE'):
                     msg1 += u'\nDatabázový ovladač QSQLITE není dostupný.'
-                QMessageBox.critical(self, u'Chyba', msg1)
+                QMessageBox.critical(self, u'Chyba', msg1, QMessageBox.Ok)
                 self.emit(SIGNAL("enableSearch"), False)
                 return
 
@@ -245,7 +293,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             self.__mSearchController.setConnectionName(self.property("connectionName"))
 
             self.emit(SIGNAL("enableSearch"), True)
-            self.__mLastVfkFile = fileName
+            self.__mLastVfkFile.append(fileName)
             self.__mLoadedLayers.clear()
 
         if self.parCheckBox.isChecked():
@@ -286,7 +334,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             qDebug("Vfk layer {} is already loaded".format(vfkLayerName))
             return
 
-        composedURI = self.__mLastVfkFile + "|layername=" + vfkLayerName
+        composedURI = self.__mLastVfkFile[-1] + "|layername=" + vfkLayerName
         layer = QgsVectorLayer(composedURI, vfkLayerName, "ogr")
         if not layer.isValid():
             qDebug("Layer failed to load!")
@@ -328,7 +376,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         resultFlag = True
         errorMsg = layer.loadNamedStyle(symbologyFile, resultFlag)
         if not resultFlag:
-            QMessageBox.information(self, 'Load Style', errorMsg)
+            QMessageBox.information(self, 'Load Style', errorMsg, QMessageBox.Ok)
 
         layer.triggerRepaint()
         self.emit(SIGNAL("refreshLegend"), layer)
@@ -341,9 +389,9 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type dbPath: str
         :return:
         """
+        qDebug("\n(VFK) Open DB: {}".format(dbPath))
         connectionName = QUuid.createUuid().toString()
         db = QSqlDatabase.addDatabase("QSQLITE", connectionName)
-        qDebug(dbPath)
         db.setDatabaseName(dbPath)
         if not db.open():
             return False
@@ -359,9 +407,9 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :return:
         """
 
-        if self.__mOgrDataSource:
-            self.__mOgrDataSource.Destroy()
-            self.__mOgrDataSource = None
+        # if self.__mOgrDataSource:
+        #     self.__mOgrDataSource.Destroy()
+        #     self.__mOgrDataSource = None
 
         QgsApplication.registerOgrDrivers()
 
@@ -370,9 +418,9 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         QgsApplication.processEvents()
 
-        qDebug("Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
+        qDebug("(VFK) Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
 
-        self.__mOgrDataSource = ogr.Open(fileName, 0)
+        self.__mOgrDataSource = ogr.Open(fileName, 0)   # 0 - datasource is open in read-only mode
 
         layerCount = self.__mOgrDataSource.GetLayerCount()
 
@@ -381,7 +429,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         for i in xrange(layerCount):
             layers_names.append(self.__mOgrDataSource.GetLayer(i).GetLayerDefn().GetName())
 
-        if 'PAR' not in layers_names or 'BUD' not in layers_names:
+        if ('PAR' not in layers_names or 'BUD' not in layers_names) and len(self.__vfkLineEdits) == 1:
             self.__dataWithoutParBud()
             self.labelLoading.setText(u'Data nemohla být načtena.')
             QgsApplication.processEvents()
@@ -489,7 +537,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :return:
         """
         QMessageBox.information(self, u'Export', u"Export do formátu {} proběhl úspěšně.".format(export_format),
-                                QMessageBox.Yes | QMessageBox.Yes)
+                                QMessageBox.Ok)
 
     def __dataWithoutParBud(self):
         """
@@ -499,7 +547,54 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         """
         QMessageBox.warning(self, u'Upozornění', u"Zvolený VFK soubor neobsahuje vrstvy s geometrií (PAR, BUD), proto nemohou "
                                            u"být pomocí VFK Pluginu načtena. Data je možné načíst v QGIS pomocí volby "
-                                           u"'Načíst vektorovou vrstvu.'", QMessageBox.Yes | QMessageBox.Yes)
+                                           u"'Načíst vektorovou vrstvu.'", QMessageBox.Ok)
+
+    def __addRowToGridLayout(self):
+        qDebug("tvorim")
+
+        if len(self.__vfkLineEdits) >= 5:
+            self.__maximumLineEditsReached()
+            return
+
+        # update label
+        self.label.setText('VFK soubory:')
+
+        # new layout
+        horizontalLayout = QtGui.QHBoxLayout()
+
+        # create new objects
+        self.__browseButtons['browseButton_{}'.format(len(self.__vfkLineEdits)+1)] = QtGui.QPushButton(u"Procházet")
+        self.__vfkLineEdits['vfkLineEdit_{}'.format(len(self.__vfkLineEdits)+1)] = QtGui.QLineEdit()
+
+        horizontalLayout.addWidget(self.__vfkLineEdits['vfkLineEdit_{}'.format(len(self.__vfkLineEdits))])
+        horizontalLayout.addWidget(self.__browseButtons['browseButton_{}'.format(len(self.__vfkLineEdits))])
+
+        # number of lines in gridLayout
+        rows_count = self.gridLayout_12.rowCount()  # count of rows in gridLayout
+
+        # export objects from gridLayout
+        item_label = self.gridLayout_12.itemAtPosition(rows_count - 2, 0)
+        item_par = self.gridLayout_12.itemAtPosition(rows_count - 2, 1)
+        item_bud = self.gridLayout_12.itemAtPosition(rows_count - 1, 1)
+
+        # remove objects from gridLayout
+        self.gridLayout_12.removeItem(self.gridLayout_12.itemAtPosition(rows_count - 2, 0))
+        self.gridLayout_12.removeItem(self.gridLayout_12.itemAtPosition(rows_count - 2, 1))
+        self.gridLayout_12.removeItem(self.gridLayout_12.itemAtPosition(rows_count - 1, 1))
+
+        # re-build gridLayout
+        self.gridLayout_12.addLayout(horizontalLayout, rows_count - 2, 1)
+        self.gridLayout_12.addItem(item_label, rows_count - 1, 0)
+        self.gridLayout_12.addItem(item_par, rows_count - 1, 1)
+        self.gridLayout_12.addItem(item_bud, rows_count, 1)
+
+        self.__browseButtons['browseButton_{}'.format(len(self.__vfkLineEdits))].clicked.\
+            connect(lambda: self.browseButton_clicked(int('{}'.format(len(self.__vfkLineEdits)))))
+
+    def __maximumLineEditsReached(self):
+        QMessageBox.information(self, u'Upozornění', u"Byl dosažen maximální počet ({}) VFK souboru pro zpracování."
+                                                     u"\nNačítání dalších souborů není povoleno!".
+                                format(self.lineEditsCount), QMessageBox.Ok)
 
     def __createToolbarsAndConnect(self):
 
@@ -541,8 +636,14 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.connect(self.actionShowInfoaboutSelection, SIGNAL("toggled(bool)"), self.setSelectionChangedConnected)
         self.connect(self.actionShowHelpPage, SIGNAL("triggered()"), self.vfkBrowser.showHelpPage)
 
-        self.browseButton.clicked.connect(self.browseButton_clicked)
+        #self.browseButton.clicked.connect(self.browseButton_clicked)
         self.loadVfkButton.clicked.connect(self.loadVfkButton_clicked)
+
+        self.__browseButtons['browseButton_1'] = self.browseButton
+        self.__browseButtons['browseButton_1'].clicked.connect(
+            lambda: self.browseButton_clicked(int('{}'.format(len(self.__vfkLineEdits)))))
+
+        self.__vfkLineEdits['vfkLineEdit_1'] = self.vfkFileLineEdit
 
         bt = QToolButton(self.__mBrowserToolbar)
         bt.setPopupMode(QToolButton.InstantPopup)
@@ -577,3 +678,11 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.connect(self.vfkBrowser, SIGNAL("historyBefore"), self.actionBack.setEnabled)
         self.connect(self.vfkBrowser, SIGNAL("historyAfter"), self.actionForward.setEnabled)
         self.connect(self.vfkBrowser, SIGNAL("definitionPointAvailable"), self.actionCuzkPage.setEnabled)
+
+        # add toolTips
+        self.pb_nextFile.setToolTip(u'Přidej další soubor VFK')
+        self.parCheckBox.setToolTip(u'Načti vrstvu parcel')
+        self.budCheckBox.setToolTip(u'Načti vrstvu budov')
+
+        # add new VFK file
+        self.pb_nextFile.clicked.connect(self.__addRowToGridLayout)

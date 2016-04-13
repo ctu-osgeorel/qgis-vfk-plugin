@@ -934,13 +934,15 @@ class VfkTableModel(QSqlQueryModel):
         """
         t = QTime()
         t.start()
+
+        qDebug("\n(VFK) SQL: {}\n".format(query))
         self.setQuery(query, QSqlDatabase.database(self.__mConnectionName))
 
         while self.canFetchMore():
             self.fetchMore()
 
         if t.elapsed() > 500:
-            qDebug("\nTime elapsed: {} ms\n".format(t.elapsed()))
+            qDebug("\n(VFK) Time elapsed: {} ms\n".format(t.elapsed()))
 
         if self.lastError().isValid():
             qDebug(str(self.lastError()))

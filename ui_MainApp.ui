@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>890</width>
+    <width>918</width>
     <height>408</height>
    </rect>
   </property>
@@ -48,7 +48,7 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>371</width>
+              <width>383</width>
               <height>370</height>
              </rect>
             </property>
@@ -58,6 +58,50 @@
                <layout class="QVBoxLayout" name="verticalLayout_2">
                 <item>
                  <layout class="QGridLayout" name="gridLayout_12">
+                  <item row="0" column="2">
+                   <widget class="QPushButton" name="pb_nextFile">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>27</width>
+                      <height>27</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>9</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                      <underline>false</underline>
+                      <strikeout>false</strikeout>
+                      <kerning>false</kerning>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true"/>
+                    </property>
+                    <property name="text">
+                     <string>+</string>
+                    </property>
+                    <property name="autoRepeat">
+                     <bool>false</bool>
+                    </property>
+                    <property name="autoDefault">
+                     <bool>false</bool>
+                    </property>
+                    <property name="default">
+                     <bool>false</bool>
+                    </property>
+                    <property name="flat">
+                     <bool>false</bool>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="1" column="0">
                    <widget class="QLabel" name="label_2">
                     <property name="text">
@@ -65,15 +109,19 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="1">
-                   <widget class="QCheckBox" name="parCheckBox">
-                    <property name="text">
-                     <string>Parcely (PAR)</string>
-                    </property>
-                    <property name="checked">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
+                  <item row="0" column="1">
+                   <layout class="QHBoxLayout" name="horizontalLayout_3">
+                    <item>
+                     <widget class="QLineEdit" name="vfkFileLineEdit"/>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="browseButton">
+                      <property name="text">
+                       <string>Procházet</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </item>
                   <item row="2" column="1">
                    <widget class="QCheckBox" name="budCheckBox">
@@ -92,19 +140,15 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="1">
-                   <layout class="QHBoxLayout" name="horizontalLayout_3">
-                    <item>
-                     <widget class="QLineEdit" name="vfkFileLineEdit"/>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="browseButton">
-                      <property name="text">
-                       <string>Procházet</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
+                  <item row="1" column="1">
+                   <widget class="QCheckBox" name="parCheckBox">
+                    <property name="text">
+                     <string>Parcely (PAR)</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </item>
@@ -207,8 +251,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
-                  <height>28</height>
+                  <width>353</width>
+                  <height>276</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_5">
@@ -233,7 +277,7 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
+                  <width>66</width>
                   <height>28</height>
                  </rect>
                 </property>
@@ -259,7 +303,7 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
+                  <width>66</width>
                   <height>28</height>
                  </rect>
                 </property>
@@ -285,7 +329,7 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
+                  <width>66</width>
                   <height>28</height>
                  </rect>
                 </property>
