@@ -21,6 +21,10 @@
  ***************************************************************************/
 """
 
+# GIS.lab hack - please remove after 15/4
+import os
+os.environ['GDAL_DATA'] = '/usr/local/share/gdal'
+
 # Import the PyQt, QGIS libraries and classes
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QMainWindow, QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup, QDockWidget, QToolButton, QMenu, QPalette, QDesktopServices
@@ -28,7 +32,7 @@ from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIG
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import *
 from qgis.gui import *
-import ogr
+from osgeo import ogr
 import time
 
 from ui_MainApp import Ui_MainApp
