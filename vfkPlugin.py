@@ -157,7 +157,7 @@ class vfkPlugin(object):
         icon_path = ':/vfkPluginIcon.png'
         self.add_action(
             icon_path,
-            text=u'Otevřít VFK',
+            text=u'Otevřít prohlížeč VFK',
             callback=self.run,
             whats_this=u'VFK Plugin',
             parent=self.iface.mainWindow())
