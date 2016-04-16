@@ -63,7 +63,7 @@ class vfkPlugin(object):
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&VFK Plugin')
+        self.menu = u'&VFK'
         # TODO: We are going to let the user set this up in a future iteration
 
         # add plugin icon into plugin toolbar
@@ -157,7 +157,7 @@ class vfkPlugin(object):
         icon_path = ':/vfkPluginIcon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'VFK Plugin'),
+            text=u'Otevřít VFK',
             callback=self.run,
             whats_this=u'VFK Plugin',
             parent=self.iface.mainWindow())
@@ -167,9 +167,7 @@ class vfkPlugin(object):
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
-            self.iface.removePluginMenu(
-                self.tr(u'&Vfk Plugin'),
-                action)
+            self.iface.removePluginMenu(u'&VFK', action)
             self.iface.removePluginMenu(self.menu, action)
             self.iface.removeToolBarIcon(action)
             self.iface.unregisterMainWindowAction(action)
