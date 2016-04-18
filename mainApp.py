@@ -31,13 +31,15 @@ from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIG
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import *
 from qgis.gui import *
-import ogr
+from osgeo import ogr
 import time
 
 from ui_MainApp import Ui_MainApp
 from searchFormController import *
 from openThread import *
 
+class VFKError(StandardError):
+    pass
 
 class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
     # signals
@@ -275,9 +277,10 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             else:
                 self.__mDataSourceName = QDir(fInfo.absolutePath()).filePath(fInfo.baseName() + '.db')
 
-            if not self.loadVfkFile(fileName, errorMsg):
-                msg2 = u'Nepodařilo se získat OGR provider'
-                QMessageBox.critical(self, u'Nepodařilo se získat data provider', msg2, QMessageBox.Ok)
+            try:
+                self.loadVfkFile(fileName)
+            except VFKError as e:
+                QMessageBox.critical(self, u'Chyba', u'{}'.format(e), QMessageBox.Ok)
                 self.emit(SIGNAL("enableSearch"), False)
                 return
 
@@ -399,7 +402,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             self.setProperty("connectionName", connectionName)
             return True
 
-    def loadVfkFile(self, fileName, errorMsg):
+    def loadVfkFile(self, fileName):
         """
 
         :type fileName: str
@@ -421,45 +424,37 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         qDebug("(VFK) Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
 
         self.__mOgrDataSource = ogr.Open(fileName, 0)   # 0 - datasource is open in read-only mode
+        if not self.__mOgrDataSource:
+            raise VFKError(u"Nelze otevřít VFK soubor '{}' jako platný OGR datasource.".format(fileName))
 
         layerCount = self.__mOgrDataSource.GetLayerCount()
-
         layers_names = []
-
         for i in xrange(layerCount):
             layers_names.append(self.__mOgrDataSource.GetLayer(i).GetLayerDefn().GetName())
 
         if ('PAR' not in layers_names or 'BUD' not in layers_names) and len(self.__vfkLineEdits) == 1:
             self.__dataWithoutParBud()
-            self.labelLoading.setText(u'Data nemohla být načtena.')
+            self.labelLoading.setText(u'Data nemohla být načtena. Vstupní soubor neobsahuje bloky PAR a BUD')
             QgsApplication.processEvents()
-            return True
+            return
 
-        if not self.__mOgrDataSource:
-            errorMsg = u'Nemohu otevřít datový zdroj OGR!'
-            return False
-        else:
-            self.progressBar.setRange(0, layerCount - 1)
+        if not self.__mOgrDataSource.GetLayer().TestCapability('IsPreProcessed'):
+            self.labelLoading.setText(u'Načítám data do SQLite databáze (může nějaký čas trvat...)')
 
-            extraMsg = u''
-            if not self.__mOgrDataSource.GetLayer().TestCapability('IsPreProcessed'):
-                extraMsg = u'Načítám data do SQLite databáze (může nějaký čas trvat...)'
+        self.progressBar.setRange(0, layerCount - 1)
+        for i in xrange(layerCount):
 
-            for i in xrange(layerCount):
+            self.progressBar.setValue(i)
 
-                self.progressBar.setValue(i)
+            theLayerName = self.__mOgrDataSource.GetLayer(i).GetLayerDefn().GetName()
 
-                theLayerName = self.__mOgrDataSource.GetLayer(i).GetLayerDefn().GetName()
+            self.labelLoading.setText(u"VFK data {}/{}: {}".format(i+1, layerCount, theLayerName))
+            QgsApplication.processEvents()
+            self.__mOgrDataSource.GetLayer(i).GetFeatureCount(1)
 
-                self.labelLoading.setText(u"VFK data {}/{}: {}\n{}".format(i+1, layerCount, theLayerName, extraMsg))
-                QgsApplication.processEvents()
-                self.__mOgrDataSource.GetLayer(i).GetFeatureCount(1)
+            time.sleep(0.02)
 
-                time.sleep(0.02)
-
-            self.labelLoading.setText(u'Data byla úspěšně načtena.')
-
-            return True
+        self.labelLoading.setText(u'Data byla úspěšně načtena.')
 
     def __selectedIds(self, layer):
         """
