@@ -248,7 +248,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                 os.environ['OGR_VFK_DB_NAME'] = os.path.join(os.path.dirname(os.path.dirname(vfkFile)), 'zmenaDB.db')
 
             fileNames.append(vfkFile)
-            self.labelLoading.setText(u'Otevírám datasource {}...'.format(vfkFile))
+            self.labelLoading.setText(u'Načítám {}...'.format(vfkFile))
             QgsApplication.processEvents()
 
             self.vlakno = OpenThread(vfkFile)
@@ -256,13 +256,6 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             self.vlakno.start()
 
             i += 1
-
-        # self.labelLoading.setText(u'Otevírám datasource {}...'.format(fileName))
-        # QgsApplication.processEvents()
-        #
-        # self.vlakno = OpenThread(fileName)
-        # self.vlakno.working.connect(self.runLoadingLayer)
-        # self.vlakno.start()
 
     def runLoadingLayer(self, fileName):
         """
