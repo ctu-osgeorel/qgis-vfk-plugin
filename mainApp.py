@@ -348,7 +348,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         # TODO: tak se spatne vytvori geometrie, ale atributova tabulka je spravna
         # TODO: Pri zadani soucasneho composedURI se spravne vytvori geometrie, ale atributova tabulka obsahuje pouze hodnoty NULL
         # TODO: Podezreni -> v databazi vytvorene pomoci GDAL je nespravne vytvorena geometrie, proto funguje pouze atributove vyhledavani, nikoli vyhledavani pomoci vyberu geom. prvku
-        composedURI = self.__mLastVfkFile[-1] + "|layername=" + vfkLayerName
+        composedURI = self.__mDataSourceName + "|layername=" + vfkLayerName
         layer = QgsVectorLayer(composedURI, vfkLayerName, "ogr")
         if not layer.isValid():
             qDebug("\n(VFK) Layer failed to load!")

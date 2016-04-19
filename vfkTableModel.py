@@ -873,7 +873,7 @@ class VfkTableModel(QSqlQueryModel):
     def tableName2OpravnenyPovinny(self, name):
         """
 
-        :type name: str
+        :type name: unicode
         :return: OpravnenyPovinny
         """
         if unicode(name).find(u"par") > -1:

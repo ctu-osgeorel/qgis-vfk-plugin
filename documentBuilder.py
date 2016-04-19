@@ -1121,7 +1121,9 @@ class DocumentBuilder:
                 nemovitostDesc.append(self.makeLongDescription(nemovitostiModel.value(i, column),
                                                                VfkTableModel().tableName2OpravnenyPovinny(column)))
 
-        content.append(TPair(u"Listy vlastnictví:", u", ".join(telesaDesc)))
+        telesaDesc = list(set(telesaDesc))
+        if telesaDesc:
+            content.append(TPair(u"Listy vlastnictví:", u", ".join(telesaDesc)))
         self.__mDocument.heading1(u"Informace o oprávněné osobě")
         self.__mDocument.keyValueTable(content)
 
