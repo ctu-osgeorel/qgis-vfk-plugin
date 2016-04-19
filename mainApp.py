@@ -247,10 +247,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :return:
         """
         os.environ['OGR_VFK_DB_NAME'] = os.path.join(os.path.dirname(os.path.dirname(self.__fileName[0])), 'vfkDB.db')
-        self.__mDataSourceName = os.environ['OGR_VFK_DB_NAME']
-
-        if 'OGR_VFK_DB_NAME' in os.environ:
-            qDebug('\n(VFK) Environmental variable: {}'.format(os.environ['OGR_VFK_DB_NAME']))
+        self.__mDataSourceName = self.__fileName[0] # os.environ['OGR_VFK_DB_NAME']
 
         self.labelLoading.setText(u'Otevírám VFK soubory...')
         QgsApplication.processEvents()
@@ -290,7 +287,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         """
         qDebug('\n(VFK) Uz je konec')
         try:
-            self.__openDatabase(self.__mDataSourceName)
+            self.__openDatabase(os.environ['OGR_VFK_DB_NAME']) # self.__mDataSourceName)
         except VFKError as e:
             err_msg = u''
             if not QSqlDatabase.isDriverAvailable('QSQLITE'):
@@ -344,10 +341,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         if vfkLayerName in self.__mLoadedLayers:
             qDebug("\n(VFK) Vfk layer {} is already loaded".format(vfkLayerName))
             return
-        # TODO: kdyz zadam nastedujici tvar composedURI (composedURI = self.__mDataSourceName + "|layername=" + vfkLayerName),
-        # TODO: tak se spatne vytvori geometrie, ale atributova tabulka je spravna
-        # TODO: Pri zadani soucasneho composedURI se spravne vytvori geometrie, ale atributova tabulka obsahuje pouze hodnoty NULL
-        # TODO: Podezreni -> v databazi vytvorene pomoci GDAL je nespravne vytvorena geometrie, proto funguje pouze atributove vyhledavani, nikoli vyhledavani pomoci vyberu geom. prvku
+
         composedURI = self.__mDataSourceName + "|layername=" + vfkLayerName
         layer = QgsVectorLayer(composedURI, vfkLayerName, "ogr")
         if not layer.isValid():

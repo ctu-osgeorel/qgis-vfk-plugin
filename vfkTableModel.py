@@ -945,7 +945,7 @@ class VfkTableModel(QSqlQueryModel):
             qDebug("\n(VFK) Time elapsed: {} ms\n".format(t.elapsed()))
 
         if self.lastError().isValid():
-            qDebug('\n(VFK) SQL ERROR: '.format(self.lastError()))
+            qDebug('\n(VFK) SQL ERROR: {}'.format(self.lastError().text()))
             return False
 
         return True
