@@ -107,7 +107,7 @@ class DocumentBuilder:
         model = VfkTableModel(self.__mConnectionName)
 
         ok = model.telesa()
-        if ok is False:
+        if not ok:
             return
 
         for i in xrange(model.rowCount()):
@@ -146,7 +146,7 @@ class DocumentBuilder:
         hlavickaModel = VfkTableModel(self.__mConnectionName)
 
         ok = hlavickaModel.telesoHlavicka(id)
-        if ok is False:
+        if not ok:
             return
 
         self.__mDocument.heading1(u"List vlastnictví")
@@ -199,7 +199,7 @@ class DocumentBuilder:
         model = VfkTableModel(self.__mConnectionName)
 
         ok = model.telesoParcely(opsubId, False)
-        if ok is False or model.rowCount() == 0:
+        if not ok or model.rowCount() == 0:
             return
 
         self.tableParcely(model, parIds, False)
@@ -212,7 +212,7 @@ class DocumentBuilder:
         model = VfkTableModel(self.__mConnectionName)
 
         ok = model.vlastnikParcely(id, False)
-        if ok is False or model.rowCount() == 0:
+        if not ok or model.rowCount() == 0:
             return
 
         parIds = []
@@ -243,7 +243,7 @@ class DocumentBuilder:
             ochranaModel = VfkTableModel(self.__mConnectionName)
 
             ok = ochranaModel.nemovitostOchrana(parcelaId, VfkTableModel.Nemovitost.NParcela)
-            if ok is False:
+            if not ok:
                 break
 
             ochranaNazev = []
@@ -269,7 +269,7 @@ class DocumentBuilder:
         model = VfkTableModel(self.__mConnectionName)
 
         ok = model.telesoBudovy(opsubId, False)
-        if ok is False or model.rowCount() == 0:
+        if not ok or model.rowCount() == 0:
             return
 
         self.tableBudovy(model, budIds, False)
@@ -283,7 +283,7 @@ class DocumentBuilder:
         model = VfkTableModel(self.__mConnectionName)
 
         ok = model.vlastnikBudovy(id, False)
-        if ok is False or model.rowCount() == 0:
+        if not ok or model.rowCount() == 0:
             return
 
         budIds = []
@@ -327,7 +327,7 @@ class DocumentBuilder:
             ochranaModel = VfkTableModel(self.__mConnectionName)
 
             ok = ochranaModel.nemovitostOchrana(budId, VfkTableModel.Nemovitost.NBudova)
-            if ok is False:
+            if not ok:
                 break
 
             ochranaNazev = []
@@ -368,7 +368,7 @@ class DocumentBuilder:
         model = VfkTableModel(self.__mConnectionName)
 
         ok = model.vlastnikJednotky(opsubId, False)
-        if ok is False or model.rowCount() == 0:
+        if not ok or model.rowCount() == 0:
             return
 
         jedIds = []
@@ -401,7 +401,7 @@ class DocumentBuilder:
             ochranaModel = VfkTableModel(self.__mConnectionName)
 
             ok = ochranaModel.nemovitostOchrana(jedId, VfkTableModel.Nemovitost.NJednotka)
-            if ok is False:
+            if not ok:
                 break
 
             ochranaNazev = []
@@ -439,7 +439,7 @@ class DocumentBuilder:
 
         budModel = VfkTableModel(self.__mConnectionName)
         ok = budModel.budova(budId, False)
-        if ok is False or budModel.rowCount() == 0:
+        if not ok or budModel.rowCount() == 0:
             return
 
         budInfo += u"Budova" + u" "
@@ -467,7 +467,7 @@ class DocumentBuilder:
         parcelaId = budModel.value(0, u"par_id")
         parModel = VfkTableModel(self.__mConnectionName)
         ok = parModel.parcela(parcelaId, False)
-        if ok is False:
+        if not ok:
             return
 
         parInfo += u"Parcela {}".format(self.makeParcelniCislo(parModel, 0))
@@ -608,7 +608,7 @@ class DocumentBuilder:
 
         model = VfkTableModel(self.__mConnectionName)
         ok = model.nabyvaciListiny(parIds, budIds, jedIds)
-        if ok is False:
+        if not ok:
             return
 
         if model.rowCount() == 0:
@@ -658,7 +658,7 @@ class DocumentBuilder:
             row = []
             model = VfkTableModel(self.__mConnectionName)
             ok = model.parcelaBpej(id)
-            if ok is False:
+            if not ok:
                 break
 
             if model.rowCount() == 0:
@@ -753,7 +753,7 @@ class DocumentBuilder:
             model = VfkTableModel(self.__mConnectionName)
             where = u"typrav.sekce {}= 'D'".format(u'' if sekceD else u'!')
             ok = model.nemovitostJpv(id, pravniSubjekt, pravo, where)
-            if ok is False or model.rowCount() == 0:
+            if not ok or model.rowCount() == 0:
                 continue
 
             isRecord = True
@@ -795,7 +795,7 @@ class DocumentBuilder:
         """
         model = VfkTableModel(self.__mConnectionName)
         ok = model.jpvListiny(jpvId)
-        if ok is False:
+        if not ok:
             return
 
         for i in xrange(model.rowCount()):
@@ -809,7 +809,7 @@ class DocumentBuilder:
         """
         model = VfkTableModel(self.__mConnectionName)
         ok = model.parcela(id, True)
-        if ok is False:
+        if not ok:
             return
 
         self.__mCurrentPageParIds.append(id)
@@ -878,7 +878,7 @@ class DocumentBuilder:
         """
         vlastniciModel = VfkTableModel(self.__mConnectionName)
         ok = vlastniciModel.telesoVlastnici(id)
-        if ok is False:
+        if not ok:
             return
         if forLV:
             self.__mDocument.heading2(u"A – Vlastníci, jiní oprávnění")
@@ -911,7 +911,7 @@ class DocumentBuilder:
 
             vlastnikModel = VfkTableModel(self.__mConnectionName)
             ok = vlastnikModel.vlastnik(opsubId, True)
-            if ok is False:
+            if not ok:
                 return
 
             opsub_type = vlastnikModel.value(0, u"opsub_opsub_type")
@@ -937,7 +937,7 @@ class DocumentBuilder:
                 sjmModel = VfkTableModel(self.__mConnectionName)
                 for j in xrange(len(manzeleId)):
                     ok = sjmModel.vlastnik(manzeleId[j])
-                    if ok is False:
+                    if not ok:
                         break
 
                     identifikatorSJM = sjmModel.value(0, u"opsub_rodne_cislo")
@@ -958,7 +958,7 @@ class DocumentBuilder:
         """
         ochrana = VfkTableModel(self.__mConnectionName)
         ok = ochrana.nemovitostOchrana(id, nemovitost)
-        if ok is False:
+        if not ok:
             return
 
         self.__mDocument.heading2(u"Způsob ochrany nemovitosti")
@@ -983,7 +983,7 @@ class DocumentBuilder:
         """
         model = VfkTableModel(self.__mConnectionName)
         ok = model.budova(id, True)
-        if ok is False:
+        if not ok:
             return
 
         self.__mCurrentPageBudIds.append(id)
@@ -1039,7 +1039,7 @@ class DocumentBuilder:
         """
         model = VfkTableModel(self.__mConnectionName)
         ok = model.jednotka(id, True)
-        if ok is False:
+        if not ok:
             return
 
         content = [TPair(u"Číslo jednotky:", self.makeJednotka(model, 0)),
@@ -1083,7 +1083,7 @@ class DocumentBuilder:
         """
         opsubModel = VfkTableModel(self.__mConnectionName)
         ok = opsubModel.opravnenySubjekt(id, True)
-        if ok is False:
+        if not ok:
             return
 
         content = []
@@ -1145,7 +1145,7 @@ class DocumentBuilder:
         for id in ids:
             model = VfkTableModel(self.__mConnectionName)
             ok = model.parcela(id, False)
-            if ok is False:
+            if not ok:
                 continue
 
             self.__mDocument.item(self.makeLongDescription(id, VfkTableModel.OpravnenyPovinny.OPParcela))
@@ -1165,7 +1165,7 @@ class DocumentBuilder:
         for id in ids:
             model = VfkTableModel(self.__mConnectionName)
             ok = model.opravnenySubjekt(id, True)
-            if ok is False:
+            if not ok:
                 continue
 
             self.__mDocument.item(self.makeLongDescription(id, VfkTableModel.OpravnenyPovinny.OPOsoba))
@@ -1234,7 +1234,7 @@ class DocumentBuilder:
         """
         model = VfkTableModel(self.__mConnectionName)
         ok = model.searchPar(parcelniCislo, typIndex, druhKod, lv)
-        if ok is False:
+        if not ok:
             return
 
         ids = []
@@ -1254,7 +1254,7 @@ class DocumentBuilder:
         """
         model = VfkTableModel(self.__mConnectionName)
         ok = model.searchBud(domovniCislo, naParcele, zpusobVyuziti, lv)
-        if ok is False:
+        if not ok:
             return
 
         ids = []
@@ -1560,7 +1560,7 @@ class DocumentBuilder:
         """
         model = VfkTableModel(self.__mConnectionName)
         ok = model.definicniBod(id, nemovitost)
-        if ok is False:
+        if not ok:
             return
         self.__mCurrentDefinitionPoint.first = model.value(0, u"obdebo_souradnice_x")
         self.__mCurrentDefinitionPoint.second = model.value(0, u"obdebo_souradnice_y")

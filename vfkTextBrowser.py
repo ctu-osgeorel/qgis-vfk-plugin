@@ -112,7 +112,7 @@ class VfkTextBrowser(QTextBrowser):
         """
         fileOut = QFile(fileName)
 
-        if fileOut.open(QIODevice.WriteOnly | QIODevice.Text) is False:
+        if not fileOut.open(QIODevice.WriteOnly | QIODevice.Text):
             return False
 
         taskMap = self.__parseTask(task)

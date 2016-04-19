@@ -43,6 +43,10 @@ class VFKError(StandardError):
     pass
 
 
+class VFKWarning(Warning):
+    pass
+
+
 class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
     # signals
     goBack = pyqtSignal()
@@ -154,14 +158,16 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
     def latexExport(self):
         fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", ".tex", "LaTeX (*.tex)")
         if fileName:
-            self.vfkBrowser.exportDocument(self.vfkBrowser.currentUrl(), fileName, self.vfkBrowser.ExportFormat.Latex)
-            self.succesfullExport("LaTeX")
+            export_succesfull = self.vfkBrowser.exportDocument(self.vfkBrowser.currentUrl(), fileName, self.vfkBrowser.ExportFormat.Latex)
+            if export_succesfull:
+                self.succesfullExport("LaTeX")
 
     def htmlExport(self):
         fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", ".html", "HTML (*.html)")
         if fileName:
-            self.vfkBrowser.exportDocument(self.vfkBrowser.currentUrl(), fileName, self.vfkBrowser.ExportFormat.Html)
-            self.succesfullExport("HTML")
+            export_succesfull = self.vfkBrowser.exportDocument(self.vfkBrowser.currentUrl(), fileName, self.vfkBrowser.ExportFormat.Html)
+            if export_succesfull:
+                self.succesfullExport("HTML")
 
     def setSelectionChangedConnected(self, connected):
         """
@@ -261,7 +267,6 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :return:
         """
         if fileName not in self.__mLastVfkFile:
-            errorMsg = ''
 
             qDebug('\n(VFK) runLoadingLayer: {}'.format(fileName))
 
@@ -271,8 +276,6 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                 QMessageBox.critical(self, u'Chyba', u'{}'.format(e), QMessageBox.Ok)
                 self.emit(SIGNAL("enableSearch"), False)
                 return
-
-
 
             self.__mLastVfkFile.append(fileName)
             self.importThread.nextLayer = False
@@ -286,11 +289,13 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :return:
         """
         qDebug('\n(VFK) Uz je konec')
-        if not self.__openDatabase(self.__mDataSourceName):
-            msg1 = u'Nepodařilo se otevřít databázi.'
+        try:
+            self.__openDatabase(self.__mDataSourceName)
+        except VFKError as e:
+            err_msg = u''
             if not QSqlDatabase.isDriverAvailable('QSQLITE'):
-                msg1 += u'\nDatabázový ovladač QSQLITE není dostupný.'
-            QMessageBox.critical(self, u'Chyba', msg1, QMessageBox.Ok)
+                err_msg = u'\nDatabázový ovladač QSQLITE není dostupný.'
+            QMessageBox.critical(self, u'Chyba', u'{}{}'.format(e, err_msg), QMessageBox.Ok)
             self.emit(SIGNAL("enableSearch"), False)
             return
 
@@ -310,7 +315,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         else:
             self.__unLoadVfkLayer('BUD')
 
-        self.labelLoading.setText(u'Všechny soubory VFK byly úspěšně načteny.')
+        self.labelLoading.setText(u'Načítání souborů VFK bylo dokončeno.')
 
     def vfkFileLineEdit_textChanged(self, arg1):
         """
@@ -342,14 +347,18 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         # TODO: kdyz zadam nastedujici tvar composedURI (composedURI = self.__mDataSourceName + "|layername=" + vfkLayerName),
         # TODO: tak se spatne vytvori geometrie, ale atributova tabulka je spravna
         # TODO: Pri zadani soucasneho composedURI se spravne vytvori geometrie, ale atributova tabulka obsahuje pouze hodnoty NULL
-        # TODO: Podezreni -> v databazi vytvorene pomoxi GDAL je nespravne vytvorena geometrie, proto funguje pouze atributove vyhledavani, nikoli vyhledavani pomoci vyberu geom. prvku
+        # TODO: Podezreni -> v databazi vytvorene pomoci GDAL je nespravne vytvorena geometrie, proto funguje pouze atributove vyhledavani, nikoli vyhledavani pomoci vyberu geom. prvku
         composedURI = self.__mLastVfkFile[-1] + "|layername=" + vfkLayerName
         layer = QgsVectorLayer(composedURI, vfkLayerName, "ogr")
         if not layer.isValid():
             qDebug("\n(VFK) Layer failed to load!")
 
         self.__mLoadedLayers[vfkLayerName] = layer.id()
-        self.__setSymbology(layer)
+
+        try:
+            self.__setSymbology(layer)
+        except VFKWarning as e:
+            QMessageBox.information(self, 'Load Style', e, QMessageBox.Ok)
 
         QgsMapLayerRegistry.instance().addMapLayer(layer)
 
@@ -382,15 +391,13 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         elif name == 'BUD':
             symbologyFile = ':/budStyle.qml'
 
-        resultFlag = True
-        errorMsg = layer.loadNamedStyle(symbologyFile, resultFlag)
+        errorMsg, resultFlag = layer.loadNamedStyle(symbologyFile)
+
         if not resultFlag:
-            QMessageBox.information(self, 'Load Style', errorMsg, QMessageBox.Ok)
+            raise VFKWarning(u'Load style: {}'.format(errorMsg))
 
         layer.triggerRepaint()
         self.emit(SIGNAL("refreshLegend"), layer)
-
-        return True
 
     def __openDatabase(self, dbPath):
         """
@@ -403,10 +410,9 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         db = QSqlDatabase.addDatabase("QSQLITE", connectionName)
         db.setDatabaseName(dbPath)
         if not db.open():
-            return False
-        else:
-            self.setProperty("connectionName", connectionName)
-            return True
+            raise VFKError(u'Nepodařilo se otevřít databázi. ')
+
+        self.setProperty("connectionName", connectionName)
 
     def loadVfkFile(self, fileName):
         """
