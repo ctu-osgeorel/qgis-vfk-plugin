@@ -21,13 +21,15 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtCore import QThread, pyqtSignal
+from PyQt4.QtCore import QThread, pyqtSignal, qDebug
 
 
 class OpenThread(QThread):
     working = pyqtSignal(str)
+    finished = pyqtSignal()
+    nextLayer = True
 
-    def __init__(self, fileName):
+    def __init__(self, vfk_files):
         """
         Class for using multi-thread import of layers
         :type fileName: str
@@ -35,7 +37,17 @@ class OpenThread(QThread):
         """
         QThread.__init__(self)
 
-        self.fileName = fileName
+        self.vfk_files = vfk_files
+
+    def __del__(self):
+        self.wait()
 
     def run(self):
-        self.working.emit(self.fileName)
+        for i, vfkFile in enumerate(self.vfk_files):
+            qDebug('\n(VFK) pracuju se souborem: {}'.format(vfkFile))
+            qDebug('(VFK) threadID: {}'.format(self.currentThreadId()))
+            self.working.emit(vfkFile)
+            self.nextLayer = True
+
+            while self.nextLayer:
+                self.sleep(1)

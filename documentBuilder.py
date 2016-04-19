@@ -1276,7 +1276,7 @@ class DocumentBuilder:
         model = VfkTableModel(self.__mConnectionName)
         ok = model.searchJed(cisloJednotky, domovniCislo, naParcele, zpusobVyuziti, lv)
         if not ok:
-            qDebug("Nemohu najit danne jednotky, nekde se stala nejaka chyba")
+            qDebug("\n(VFK) ERROR: Nemohu najit danne jednotky, nekde se stala nejaka chyba")
             return
 
         ids = []
@@ -1477,7 +1477,7 @@ class DocumentBuilder:
 
         st = u''
         if not model.value(row, u"drupoz_stavebni_parcela"):
-            qDebug("neni drupoz_stavebni_parcela")
+            qDebug("\n(VFK) ERROR: neni drupoz_stavebni_parcela")
         if self.__mDveRadyCislovani and Domains.anoNe(model.value(row, u"drupoz_stavebni_parcela")):
             st = u"st."
 

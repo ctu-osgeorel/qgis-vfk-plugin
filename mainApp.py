@@ -38,8 +38,10 @@ from ui_MainApp import Ui_MainApp
 from searchFormController import *
 from openThread import *
 
+
 class VFKError(StandardError):
     pass
+
 
 class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
     # signals
@@ -187,7 +189,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             id = self.__mLoadedLayers[layerName]
             vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
             searchString = "ID IN ({})".format(", ".join(ids))
-            qDebug(searchString)
+            qDebug('\n (VFK) searchString in showInMap: {}'.format(searchString))
             error = ''
             fIds = self.__search(vectorLayer, searchString, error)
             if error:
@@ -218,44 +220,40 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         layer.select(rect, False)
         fit = QgsFeatureIterator(layer.getFeatures())
         f = QgsFeature()
-        qDebug('ssssssssssss')
-        qDebug(searchString)
+        qDebug('\n (VFK) searchString in search: {}'.format(searchString))
 
         while fit.nextFeature(f):
-            qDebug(str(search.evaluate(f)))
+            qDebug('\n (VFK) evaluate: {}'.format(search.evaluate(f)))
 
             if search.evaluate(f):
                 fIds.append(f.id())
             # check if there were errors during evaluating
             if search.hasEvalError():
-                qDebug(error)
+                qDebug('\n (VFK) Evaluate error: {}'.format(error))
                 break
 
-        qDebug(str(fIds))
+        qDebug('\n (VFK) Feature Ids: {}'.format(str(fIds)))
         return fIds
 
     def loadVfkButton_clicked(self):
-        fileName = self.vfkFileLineEdit.text()
+        """
 
-        fileNames = []
+        :return:
+        """
+        os.environ['OGR_VFK_DB_NAME'] = os.path.join(os.path.dirname(os.path.dirname(self.__fileName[0])), 'vfkDB.db')
+        self.__mDataSourceName = os.environ['OGR_VFK_DB_NAME']
 
-        i = 0
+        if 'OGR_VFK_DB_NAME' in os.environ:
+            qDebug('\n(VFK) Environmental variable: {}'.format(os.environ['OGR_VFK_DB_NAME']))
 
-        for le in self.__vfkLineEdits:
-            vfkFile = self.__vfkLineEdits[le].text()
+        self.labelLoading.setText(u'Otevírám VFK soubory...')
+        QgsApplication.processEvents()
 
-            if i == 0:
-                os.environ['OGR_VFK_DB_NAME'] = os.path.join(os.path.dirname(os.path.dirname(vfkFile)), 'zmenaDB.db')
-
-            fileNames.append(vfkFile)
-            self.labelLoading.setText(u'Načítám {}...'.format(vfkFile))
-            QgsApplication.processEvents()
-
-            self.vlakno = OpenThread(vfkFile)
-            self.vlakno.working.connect(self.runLoadingLayer)
-            self.vlakno.start()
-
-            i += 1
+        self.importThread = OpenThread(self.__fileName)
+        self.importThread.working.connect(self.runLoadingLayer)
+        if not self.importThread.isRunning():
+            qDebug('\n(VFK) loadVfkButton_clicked')
+            self.importThread.start()
 
     def runLoadingLayer(self, fileName):
         """
@@ -264,11 +262,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         """
         if fileName not in self.__mLastVfkFile:
             errorMsg = ''
-            fInfo = QFileInfo(fileName)
-            if 'OGR_VFK_DB_NAME' in os.environ:
-                self.__mDataSourceName = os.environ['OGR_VFK_DB_NAME']
-            else:
-                self.__mDataSourceName = QDir(fInfo.absolutePath()).filePath(fInfo.baseName() + '.db')
+
+            qDebug('\n(VFK) runLoadingLayer: {}'.format(fileName))
 
             try:
                 self.loadVfkFile(fileName)
@@ -277,20 +272,33 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                 self.emit(SIGNAL("enableSearch"), False)
                 return
 
-            if not self.__openDatabase(self.__mDataSourceName):
-                msg1 = u'Nepodařilo se otevřít databázi.'
-                if not QSqlDatabase.isDriverAvailable('QSQLITE'):
-                    msg1 += u'\nDatabázový ovladač QSQLITE není dostupný.'
-                QMessageBox.critical(self, u'Chyba', msg1, QMessageBox.Ok)
-                self.emit(SIGNAL("enableSearch"), False)
-                return
 
-            self.vfkBrowser.setConnectionName(self.property("connectionName"))
-            self.__mSearchController.setConnectionName(self.property("connectionName"))
 
-            self.emit(SIGNAL("enableSearch"), True)
             self.__mLastVfkFile.append(fileName)
-            self.__mLoadedLayers.clear()
+            self.importThread.nextLayer = False
+
+            if fileName == self.__fileName[-1]:
+                self.loadingLayersFinished()
+
+    def loadingLayersFinished(self):
+        """
+
+        :return:
+        """
+        qDebug('\n(VFK) Uz je konec')
+        if not self.__openDatabase(self.__mDataSourceName):
+            msg1 = u'Nepodařilo se otevřít databázi.'
+            if not QSqlDatabase.isDriverAvailable('QSQLITE'):
+                msg1 += u'\nDatabázový ovladač QSQLITE není dostupný.'
+            QMessageBox.critical(self, u'Chyba', msg1, QMessageBox.Ok)
+            self.emit(SIGNAL("enableSearch"), False)
+            return
+
+        self.vfkBrowser.setConnectionName(self.property("connectionName"))
+        self.__mSearchController.setConnectionName(self.property("connectionName"))
+
+        self.emit(SIGNAL("enableSearch"), True)
+        self.__mLoadedLayers.clear()
 
         if self.parCheckBox.isChecked():
             self.__loadVfkLayer('PAR')
@@ -301,6 +309,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             self.__loadVfkLayer('BUD')
         else:
             self.__unLoadVfkLayer('BUD')
+
+        self.labelLoading.setText(u'Všechny soubory VFK byly úspěšně načteny.')
 
     def vfkFileLineEdit_textChanged(self, arg1):
         """
@@ -325,15 +335,18 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type vfkLayerName: str
         :return:
         """
-        qDebug("Loading vfk layer {}".format(vfkLayerName))
+        qDebug("\n(VFK) Loading vfk layer {}".format(vfkLayerName))
         if vfkLayerName in self.__mLoadedLayers:
-            qDebug("Vfk layer {} is already loaded".format(vfkLayerName))
+            qDebug("\n(VFK) Vfk layer {} is already loaded".format(vfkLayerName))
             return
-
+        # TODO: kdyz zadam nastedujici tvar composedURI (composedURI = self.__mDataSourceName + "|layername=" + vfkLayerName),
+        # TODO: tak se spatne vytvori geometrie, ale atributova tabulka je spravna
+        # TODO: Pri zadani soucasneho composedURI se spravne vytvori geometrie, ale atributova tabulka obsahuje pouze hodnoty NULL
+        # TODO: Podezreni -> v databazi vytvorene pomoxi GDAL je nespravne vytvorena geometrie, proto funguje pouze atributove vyhledavani, nikoli vyhledavani pomoci vyberu geom. prvku
         composedURI = self.__mLastVfkFile[-1] + "|layername=" + vfkLayerName
         layer = QgsVectorLayer(composedURI, vfkLayerName, "ogr")
         if not layer.isValid():
-            qDebug("Layer failed to load!")
+            qDebug("\n(VFK) Layer failed to load!")
 
         self.__mLoadedLayers[vfkLayerName] = layer.id()
         self.__setSymbology(layer)
@@ -346,10 +359,10 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type vfkLayerName: str
         :return:
         """
-        qDebug("Unloading vfk layer {}".format(vfkLayerName))
+        qDebug("\n(VFK) Unloading vfk layer {}".format(vfkLayerName))
 
         if vfkLayerName not in self.__mLoadedLayers:
-            qDebug("Vfk layer {} is already unloaded".format(vfkLayerName))
+            qDebug("\n(VFK) Vfk layer {} is already unloaded".format(vfkLayerName))
             return
 
         QgsMapLayerRegistry.instance().removeMapLayer(self.__mLoadedLayers[vfkLayerName])
@@ -399,13 +412,12 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         """
 
         :type fileName: str
-        :type errorMsg: str
         :return:
         """
 
-        # if self.__mOgrDataSource:
-        #     self.__mOgrDataSource.Destroy()
-        #     self.__mOgrDataSource = None
+        if self.__mOgrDataSource:
+            self.__mOgrDataSource.Destroy()
+            self.__mOgrDataSource = None
 
         QgsApplication.registerOgrDrivers()
 
@@ -414,14 +426,18 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         QgsApplication.processEvents()
 
-        qDebug("(VFK) Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
+        #qDebug("(VFK) Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
+        qDebug("(VFK) Open VFK file: {}".format(fileName))
 
         self.__mOgrDataSource = ogr.Open(fileName, 0)   # 0 - datasource is open in read-only mode
+
         if not self.__mOgrDataSource:
             raise VFKError(u"Nelze otevřít VFK soubor '{}' jako platný OGR datasource.".format(fileName))
 
         layerCount = self.__mOgrDataSource.GetLayerCount()
+
         layers_names = []
+
         for i in xrange(layerCount):
             layers_names.append(self.__mOgrDataSource.GetLayer(i).GetLayerDefn().GetName())
 
@@ -431,23 +447,19 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             QgsApplication.processEvents()
             return
 
+        # load all layers
         if not self.__mOgrDataSource.GetLayer().TestCapability('IsPreProcessed'):
             self.labelLoading.setText(u'Načítám data do SQLite databáze (může nějaký čas trvat...)')
+            self.progressBar.setRange(0, layerCount - 1)
+            for i in xrange(layerCount):
+                self.progressBar.setValue(i)
+                theLayerName = self.__mOgrDataSource.GetLayer(i).GetLayerDefn().GetName()
+                self.labelLoading.setText(u"VFK data {}/{}: {}".format(i+1, layerCount, theLayerName))
+                QgsApplication.processEvents()
+                self.__mOgrDataSource.GetLayer(i).GetFeatureCount(1)
+                time.sleep(0.02)
 
-        self.progressBar.setRange(0, layerCount - 1)
-        for i in xrange(layerCount):
-
-            self.progressBar.setValue(i)
-
-            theLayerName = self.__mOgrDataSource.GetLayer(i).GetLayerDefn().GetName()
-
-            self.labelLoading.setText(u"VFK data {}/{}: {}".format(i+1, layerCount, theLayerName))
-            QgsApplication.processEvents()
-            self.__mOgrDataSource.GetLayer(i).GetFeatureCount(1)
-
-            time.sleep(0.02)
-
-        self.labelLoading.setText(u'Data byla úspěšně načtena.')
+        self.labelLoading.setText(u'Soubor {} úspěšně načten.'.format(fileName))
 
     def __selectedIds(self, layer):
         """
@@ -538,8 +550,6 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                                            u"'Načíst vektorovou vrstvu.'", QMessageBox.Ok)
 
     def __addRowToGridLayout(self):
-        qDebug("tvorim")
-
         if len(self.__vfkLineEdits) >= 5:
             self.__maximumLineEditsReached()
             return

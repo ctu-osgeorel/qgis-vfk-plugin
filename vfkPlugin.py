@@ -63,7 +63,7 @@ class vfkPlugin(object):
 
         # Declare instance attributes
         self.actions = []
-        self.menu = u'&VFK'
+        self.menu = self.tr(u'&VFK')
         # TODO: We are going to let the user set this up in a future iteration
 
         # add plugin icon into plugin toolbar
