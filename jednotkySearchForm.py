@@ -29,6 +29,7 @@ from ui_jednotkysearchform import *
 
 
 class JednotkySearchForm(QWidget):
+
     def __init__(self, parent=None):
         super(JednotkySearchForm, self).__init__(parent)
 

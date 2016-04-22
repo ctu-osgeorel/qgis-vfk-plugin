@@ -27,6 +27,7 @@ from vfkDocument import VfkDocument
 
 
 class LatexDocument(VfkDocument):
+
     def __init__(self):
         super(LatexDocument, self).__init__()
 
@@ -84,7 +85,8 @@ class LatexDocument(VfkDocument):
         table = u''
 
         if self.__mLastColumnNumber > 0:
-            tooLongTable = False if len(self.__mLastTableContent) < self.__mMaxRows else True
+            tooLongTable = False if len(
+                self.__mLastTableContent) < self.__mMaxRows else True
             beginTable = u"\\begin{tabulary}{\\textwidth}{"
             endTable = u"\end{tabulary}\n"
             header = self.__mLastTableHeader + u"\\\\ \hline \hline\n"
@@ -119,7 +121,8 @@ class LatexDocument(VfkDocument):
             else:
                 table += beginTable
                 table += header
-                table += u"\\\\ \n".join(map(unicode, self.__mLastTableContent))
+                table += u"\\\\ \n".join(
+                    map(unicode, self.__mLastTableContent))
                 table += endTable
         self.__mPage += table
 
@@ -140,7 +143,8 @@ class LatexDocument(VfkDocument):
 
     def tableRow(self, columns):
         if self.__mLastColumnNumber != len(columns):
-            qDebug("inconsistent number of columns: {} {}".format(self.__mLastColumnNumber, len(columns)))
+            qDebug("inconsistent number of columns: {} {}".format(
+                self.__mLastColumnNumber, len(columns)))
             return
         if self.__mLastColumnNumber > 0:
             tableRow = u'{} '.format(columns[0])
@@ -152,7 +156,8 @@ class LatexDocument(VfkDocument):
 
     def tableRowOneColumnSpan(self, text):
         if self.__mLastColumnNumber != 0:
-            self.__mLastTableContent.append(u"\multicolumn{%s}{l}{%s}" % (self.__mLastColumnNumber, text))
+            self.__mLastTableContent.append(
+                u"\multicolumn{%s}{l}{%s}" % (self.__mLastColumnNumber, text))
 
     def link(self, href, text):
         return text
@@ -167,7 +172,8 @@ class LatexDocument(VfkDocument):
         self.__mPage += u"\\begin{tabulary}{\\textwidth}{LL}\n"
 
         for it in content:
-            self.__mPage += u"\\textbf{%s} & %s \\\\ \n" % (it.first, it.second)
+            self.__mPage += u"\\textbf{%s} & %s \\\\ \n" % (
+                it.first, it.second)
 
         self.__mPage += u"\end{tabulary}\n"
 

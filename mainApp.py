@@ -79,38 +79,55 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.searchForms.jednotky = self.jednotkySearchForm
 
         # search form controller
-        self.__mSearchController = SearchFormController(self.searchFormMainControls, self.searchForms, self)
+        self.__mSearchController = SearchFormController(
+            self.searchFormMainControls, self.searchForms, self)
 
-        self.connect(self.__mSearchController, SIGNAL("actionTriggered(QUrl)"), self.vfkBrowser.processAction)
-        self.connect(self, SIGNAL("enableSearch"), self.searchButton.setEnabled)
+        self.connect(self.__mSearchController, SIGNAL(
+            "actionTriggered(QUrl)"), self.vfkBrowser.processAction)
+        self.connect(
+            self, SIGNAL("enableSearch"), self.searchButton.setEnabled)
 
         self.connect(self.vfkBrowser, SIGNAL("showParcely"), self.showParInMap)
         self.connect(self.vfkBrowser, SIGNAL("showBudovy"), self.showBudInMap)
 
         # connect lineEdits and returnPressed action
-        self.connect(self.vfkFileLineEdit, SIGNAL("returnPressed()"), self.loadVfkButton_clicked)
-        self.connect(self.vlastniciSearchForm.ui.jmenoLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
-        self.connect(self.vlastniciSearchForm.ui.rcIcoLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
-        self.connect(self.vlastniciSearchForm.ui.lvVlastniciLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.vfkFileLineEdit, SIGNAL(
+            "returnPressed()"), self.loadVfkButton_clicked)
+        self.connect(self.vlastniciSearchForm.ui.jmenoLineEdit,
+                     SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.vlastniciSearchForm.ui.rcIcoLineEdit,
+                     SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.vlastniciSearchForm.ui.lvVlastniciLineEdit,
+                     SIGNAL("returnPressed()"), self.__mSearchController.search)
 
-        self.connect(self.parcelySearchForm.ui.parCisloLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
-        self.connect(self.parcelySearchForm.ui.lvParcelyLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.parcelySearchForm.ui.parCisloLineEdit,
+                     SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.parcelySearchForm.ui.lvParcelyLineEdit,
+                     SIGNAL("returnPressed()"), self.__mSearchController.search)
 
-        self.connect(self.budovySearchForm.ui.cisloDomovniLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
-        self.connect(self.budovySearchForm.ui.naParceleLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
-        self.connect(self.budovySearchForm.ui.lvBudovyLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.budovySearchForm.ui.cisloDomovniLineEdit,
+                     SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.budovySearchForm.ui.naParceleLineEdit,
+                     SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.budovySearchForm.ui.lvBudovyLineEdit,
+                     SIGNAL("returnPressed()"), self.__mSearchController.search)
 
-        self.connect(self.jednotkySearchForm.ui.mCisloJednotkyLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
-        self.connect(self.jednotkySearchForm.ui.mCisloDomovniLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
-        self.connect(self.jednotkySearchForm.ui.mNaParceleLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
-        self.connect(self.jednotkySearchForm.ui.mLvJednotkyLineEdit, SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.jednotkySearchForm.ui.mCisloJednotkyLineEdit,
+                     SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.jednotkySearchForm.ui.mCisloDomovniLineEdit,
+                     SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.jednotkySearchForm.ui.mNaParceleLineEdit,
+                     SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.connect(self.jednotkySearchForm.ui.mLvJednotkyLineEdit,
+                     SIGNAL("returnPressed()"), self.__mSearchController.search)
 
         self.vfkBrowser.showHelpPage()
 
     def browseButton_clicked(self):
         title = u'Načti soubor VFK'
         lastUsedDir = ''
-        self.__fileName = QFileDialog.getOpenFileName(self, title, lastUsedDir, 'Soubor VFK (*.vfk)')
+        self.__fileName = QFileDialog.getOpenFileName(
+            self, title, lastUsedDir, 'Soubor VFK (*.vfk)')
         if not self.__fileName:
             return
         else:
@@ -130,15 +147,19 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.showInMap(self.vfkBrowser.currentBudIds(), "BUD")
 
     def latexExport(self):
-        fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", ".tex", "LaTeX (*.tex)")
+        fileName = QFileDialog.getSaveFileName(
+            self, u"Jméno exportovaného souboru", ".tex", "LaTeX (*.tex)")
         if fileName:
-            self.vfkBrowser.exportDocument(self.vfkBrowser.currentUrl(), fileName, self.vfkBrowser.ExportFormat.Latex)
+            self.vfkBrowser.exportDocument(
+                self.vfkBrowser.currentUrl(), fileName, self.vfkBrowser.ExportFormat.Latex)
             self.succesfullExport("LaTeX")
 
     def htmlExport(self):
-        fileName = QFileDialog.getSaveFileName(self, u"Jméno exportovaného souboru", ".html", "HTML (*.html)")
+        fileName = QFileDialog.getSaveFileName(
+            self, u"Jméno exportovaného souboru", ".html", "HTML (*.html)")
         if fileName:
-            self.vfkBrowser.exportDocument(self.vfkBrowser.currentUrl(), fileName, self.vfkBrowser.ExportFormat.Html)
+            self.vfkBrowser.exportDocument(
+                self.vfkBrowser.currentUrl(), fileName, self.vfkBrowser.ExportFormat.Html)
             self.succesfullExport("HTML")
 
     def setSelectionChangedConnected(self, connected):
@@ -152,9 +173,11 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
 
             if connected:
-                self.connect(vectorLayer, SIGNAL("selectionChanged()"), self.showInfoAboutSelection)
+                self.connect(
+                    vectorLayer, SIGNAL("selectionChanged()"), self.showInfoAboutSelection)
             else:
-                self.disconnect(vectorLayer, SIGNAL("selectionChanged()"), self.showInfoAboutSelection)
+                self.disconnect(
+                    vectorLayer, SIGNAL("selectionChanged()"), self.showInfoAboutSelection)
 
     def showInMap(self, ids, layerName):
         """
@@ -210,7 +233,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
     def loadVfkButton_clicked(self):
         fileName = self.vfkFileLineEdit.text()
 
-        self.labelLoading.setText(u'Otevírám datasource {}...'.format(fileName))
+        self.labelLoading.setText(
+            u'Otevírám datasource {}...'.format(fileName))
         QgsApplication.processEvents()
 
         self.vlakno = OpenThread(fileName)
@@ -225,11 +249,13 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         if self.__mLastVfkFile != fileName:
             errorMsg = ''
             fInfo = QFileInfo(fileName)
-            self.__mDataSourceName = QDir(fInfo.absolutePath()).filePath(fInfo.baseName() + '.db')
+            self.__mDataSourceName = QDir(
+                fInfo.absolutePath()).filePath(fInfo.baseName() + '.db')
 
             if not self.loadVfkFile(fileName, errorMsg):
                 msg2 = u'Nepodařilo se získat OGR provider'
-                QMessageBox.critical(self, u'Nepodařilo se získat data provider', msg2)
+                QMessageBox.critical(
+                    self, u'Nepodařilo se získat data provider', msg2)
                 self.emit(SIGNAL("enableSearch"), False)
                 return
 
@@ -242,7 +268,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                 return
 
             self.vfkBrowser.setConnectionName(self.property("connectionName"))
-            self.__mSearchController.setConnectionName(self.property("connectionName"))
+            self.__mSearchController.setConnectionName(
+                self.property("connectionName"))
 
             self.emit(SIGNAL("enableSearch"), True)
             self.__mLastVfkFile = fileName
@@ -308,7 +335,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             qDebug("Vfk layer {} is already unloaded".format(vfkLayerName))
             return
 
-        QgsMapLayerRegistry.instance().removeMapLayer(self.__mLoadedLayers[vfkLayerName])
+        QgsMapLayerRegistry.instance().removeMapLayer(
+            self.__mLoadedLayers[vfkLayerName])
         del self.__mLoadedLayers[vfkLayerName]
 
     def __setSymbology(self, layer):
@@ -370,7 +398,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         QgsApplication.processEvents()
 
-        qDebug("Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
+        qDebug(
+            "Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
 
         self.__mOgrDataSource = ogr.Open(fileName, 0)
 
@@ -379,7 +408,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         layers_names = []
 
         for i in xrange(layerCount):
-            layers_names.append(self.__mOgrDataSource.GetLayer(i).GetLayerDefn().GetName())
+            layers_names.append(
+                self.__mOgrDataSource.GetLayer(i).GetLayerDefn().GetName())
 
         if 'PAR' not in layers_names or 'BUD' not in layers_names:
             self.__dataWithoutParBud()
@@ -401,9 +431,11 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
                 self.progressBar.setValue(i)
 
-                theLayerName = self.__mOgrDataSource.GetLayer(i).GetLayerDefn().GetName()
+                theLayerName = self.__mOgrDataSource.GetLayer(
+                    i).GetLayerDefn().GetName()
 
-                self.labelLoading.setText(u"VFK data {}/{}: {}\n{}".format(i+1, layerCount, theLayerName, extraMsg))
+                self.labelLoading.setText(
+                    u"VFK data {}/{}: {}\n{}".format(i + 1, layerCount, theLayerName, extraMsg))
                 QgsApplication.processEvents()
                 self.__mOgrDataSource.GetLayer(i).GetFeatureCount(1)
 
@@ -436,7 +468,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                 vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
                 layerIds[layer] = self.__selectedIds(vectorLayer)
 
-        self.vfkBrowser.showInfoAboutSelection(layerIds["PAR"], layerIds["BUD"])
+        self.vfkBrowser.showInfoAboutSelection(
+            layerIds["PAR"], layerIds["BUD"])
 
     def showParInMap(self, ids):
         """
@@ -468,7 +501,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         x = self.vfkBrowser.currentDefinitionPoint().first.split(".")[0]
         y = self.vfkBrowser.currentDefinitionPoint().second.split(".")[0]
 
-        url = "http://nahlizenidokn.cuzk.cz/MapaIdentifikace.aspx?&x=-{}&y=-{}".format(y, x)
+        url = "http://nahlizenidokn.cuzk.cz/MapaIdentifikace.aspx?&x=-{}&y=-{}".format(
+            y, x)
         QDesktopServices.openUrl(QUrl(url, QUrl.TolerantMode))
 
     def switchToImport(self):
@@ -488,7 +522,9 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type export_format: str
         :return:
         """
-        QMessageBox.information(self, u'Export', u"Export do formátu {} proběhl úspěšně.".format(export_format),
+        QMessageBox.information(
+            self, u'Export', u"Export do formátu {} proběhl úspěšně.".format(
+                export_format),
                                 QMessageBox.Yes | QMessageBox.Yes)
 
     def __dataWithoutParBud(self):
@@ -498,8 +534,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :return:
         """
         QMessageBox.warning(self, u'Upozornění', u"Zvolený VFK soubor neobsahuje vrstvy s geometrií (PAR, BUD), proto nemohou "
-                                           u"být pomocí VFK Pluginu načtena. Data je možné načíst v QGIS pomocí volby "
-                                           u"'Načíst vektorovou vrstvu.'", QMessageBox.Yes | QMessageBox.Yes)
+                            u"být pomocí VFK Pluginu načtena. Data je možné načíst v QGIS pomocí volby "
+                            u"'Načíst vektorovou vrstvu.'", QMessageBox.Yes | QMessageBox.Yes)
 
     def __createToolbarsAndConnect(self):
 
@@ -511,35 +547,50 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.signalMapper = QSignalMapper(self)
 
         # connect to 'clicked' on all buttons
-        self.connect(self.actionImport, SIGNAL("triggered()"), self.signalMapper, SLOT("map()"))
-        self.connect(self.actionVyhledavani, SIGNAL("triggered()"), self.signalMapper, SLOT("map()"))
+        self.connect(self.actionImport, SIGNAL(
+            "triggered()"), self.signalMapper, SLOT("map()"))
+        self.connect(self.actionVyhledavani, SIGNAL(
+            "triggered()"), self.signalMapper, SLOT("map()"))
 
-        # setMapping on each button to the QStackedWidget index we'd like to switch to
+        # setMapping on each button to the QStackedWidget index we'd like to
+        # switch to
         self.signalMapper.setMapping(self.actionImport, 0)
         self.signalMapper.setMapping(self.actionVyhledavani, 1)
 
         # connect mapper to stackedWidget
-        self.connect(self.signalMapper, SIGNAL("mapped(int)"), self.stackedWidget, SLOT("setCurrentIndex(int)"))
+        self.connect(self.signalMapper, SIGNAL("mapped(int)"),
+                     self.stackedWidget, SLOT("setCurrentIndex(int)"))
         self.actionImport.trigger()
 
-        self.connect(self.vfkBrowser, SIGNAL("switchToPanelImport"), self.switchToImport)
-        self.connect(self.vfkBrowser, SIGNAL("switchToPanelSearch"), self.switchToSearch)
+        self.connect(self.vfkBrowser, SIGNAL(
+            "switchToPanelImport"), self.switchToImport)
+        self.connect(self.vfkBrowser, SIGNAL(
+            "switchToPanelSearch"), self.switchToSearch)
 
         # Browser toolbar
         # ---------------
         self.__mBrowserToolbar = QToolBar(self)
-        self.connect(self.actionBack, SIGNAL("triggered()"), self.vfkBrowser.goBack)
-        self.connect(self.actionForward, SIGNAL("triggered()"), self.vfkBrowser.goForth)
+        self.connect(self.actionBack, SIGNAL(
+            "triggered()"), self.vfkBrowser.goBack)
+        self.connect(self.actionForward, SIGNAL(
+            "triggered()"), self.vfkBrowser.goForth)
 
-        self.connect(self.actionSelectBudInMap, SIGNAL("triggered()"), self.selectBudInMap)
-        self.connect(self.actionSelectParInMap, SIGNAL("triggered()"), self.selectParInMap)
-        self.connect(self.actionCuzkPage, SIGNAL("triggered()"), self.showOnCuzk)
+        self.connect(self.actionSelectBudInMap,
+                     SIGNAL("triggered()"), self.selectBudInMap)
+        self.connect(self.actionSelectParInMap,
+                     SIGNAL("triggered()"), self.selectParInMap)
+        self.connect(self.actionCuzkPage,
+                     SIGNAL("triggered()"), self.showOnCuzk)
 
-        self.connect(self.actionExportLatex, SIGNAL("triggered()"), self.latexExport)
-        self.connect(self.actionExportHtml, SIGNAL("triggered()"), self.htmlExport)
+        self.connect(self.actionExportLatex,
+                     SIGNAL("triggered()"), self.latexExport)
+        self.connect(self.actionExportHtml,
+                     SIGNAL("triggered()"), self.htmlExport)
 
-        self.connect(self.actionShowInfoaboutSelection, SIGNAL("toggled(bool)"), self.setSelectionChangedConnected)
-        self.connect(self.actionShowHelpPage, SIGNAL("triggered()"), self.vfkBrowser.showHelpPage)
+        self.connect(self.actionShowInfoaboutSelection, SIGNAL(
+            "toggled(bool)"), self.setSelectionChangedConnected)
+        self.connect(self.actionShowHelpPage, SIGNAL(
+            "triggered()"), self.vfkBrowser.showHelpPage)
 
         self.browseButton.clicked.connect(self.browseButton_clicked)
         self.loadVfkButton.clicked.connect(self.loadVfkButton_clicked)
@@ -572,8 +623,13 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.rightWidgetLayout.insertWidget(0, self.__mBrowserToolbar)
 
         # connect signals from vfkbrowser when changing history
-        self.connect(self.vfkBrowser, SIGNAL("currentParIdsChanged"), self.actionSelectParInMap.setEnabled)
-        self.connect(self.vfkBrowser, SIGNAL("currentBudIdsChanged"), self.actionSelectBudInMap.setEnabled)
-        self.connect(self.vfkBrowser, SIGNAL("historyBefore"), self.actionBack.setEnabled)
-        self.connect(self.vfkBrowser, SIGNAL("historyAfter"), self.actionForward.setEnabled)
-        self.connect(self.vfkBrowser, SIGNAL("definitionPointAvailable"), self.actionCuzkPage.setEnabled)
+        self.connect(self.vfkBrowser, SIGNAL(
+            "currentParIdsChanged"), self.actionSelectParInMap.setEnabled)
+        self.connect(self.vfkBrowser, SIGNAL("currentBudIdsChanged"),
+                     self.actionSelectBudInMap.setEnabled)
+        self.connect(self.vfkBrowser, SIGNAL(
+            "historyBefore"), self.actionBack.setEnabled)
+        self.connect(self.vfkBrowser, SIGNAL(
+            "historyAfter"), self.actionForward.setEnabled)
+        self.connect(self.vfkBrowser, SIGNAL(
+            "definitionPointAvailable"), self.actionCuzkPage.setEnabled)

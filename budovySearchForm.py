@@ -29,6 +29,7 @@ from ui_budovysearchform import *
 
 
 class BudovySearchForm(QWidget):
+
     def __init__(self, parent=None):
         super(BudovySearchForm, self).__init__(parent)
 

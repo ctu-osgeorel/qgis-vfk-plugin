@@ -9,12 +9,14 @@ from domains import *
 
 
 class Coordinates(object):
+
     def __init__(self):
         self.first = u''
         self.second = u''
 
 
 class DocumentBuilder:
+
     def __init__(self, connectionName=''):
         """
         :type connectionName: str
@@ -83,16 +85,22 @@ class DocumentBuilder:
                         self.pageSeznamOsob(taskMap['opsub'].split(","))
             elif taskMap["page"] == "search":
                 if taskMap["type"] == "vlastnici":
-                    self.pageSearchVlastnici(taskMap["jmeno"], taskMap["rcIco"],
+                    self.pageSearchVlastnici(
+                        taskMap["jmeno"], taskMap["rcIco"],
                                              taskMap["sjm"], taskMap["opo"],
                                              taskMap["ofo"], taskMap["lv"])
                 elif taskMap["type"] == "parcely":
-                    self.pageSearchParcely(taskMap["parcelniCislo"], taskMap["typ"], taskMap["druh"], taskMap["lv"])
+                    self.pageSearchParcely(
+                        taskMap["parcelniCislo"], taskMap["typ"], taskMap["druh"], taskMap["lv"])
                 elif taskMap["type"] == "budovy":
-                    self.pageSearchBudovy(taskMap["domovniCislo"], taskMap["naParcele"],taskMap["zpusobVyuziti"],
+                    self.pageSearchBudovy(
+                        taskMap["domovniCislo"], taskMap[
+                            "naParcele"], taskMap["zpusobVyuziti"],
                                           taskMap["lv"])
                 elif taskMap["type"] == "jednotky":
-                    self.pageSearchJednotky(taskMap["cisloJednotky"], taskMap["domovniCislo"], taskMap["naParcele"],
+                    self.pageSearchJednotky(
+                        taskMap["cisloJednotky"], taskMap[
+                            "domovniCislo"], taskMap["naParcele"],
                                             taskMap["zpusobVyuziti"], taskMap["lv"])
         self.__mDocument.footer()
         return
@@ -113,7 +121,8 @@ class DocumentBuilder:
         for i in xrange(model.rowCount()):
             tel_id = model.value(i, u"tel_id")
             cislo_tel = model.value(i, u"tel_cislo_tel")
-            link = self.__mDocument.link(u"showText?page=tel&id={}".format(tel_id), cislo_tel+u"<br/>")
+            link = self.__mDocument.link(
+                u"showText?page=tel&id={}".format(tel_id), cislo_tel + u"<br/>")
             self.__mDocument.text(link)
 
     def pageTeleso(self, id):
@@ -150,21 +159,25 @@ class DocumentBuilder:
             return
 
         self.__mDocument.heading1(u"List vlastnictví")
-        content = [TPair(u"List vlastnictví:", self.makeLVCislo(hlavickaModel, 0)),
-                   TPair(u"Kat. území:", self.makeKatastrUzemi(hlavickaModel, 0)),
+        content = [TPair(
+            u"List vlastnictví:", self.makeLVCislo(hlavickaModel, 0)),
+            TPair(
+            u"Kat. území:", self.makeKatastrUzemi(hlavickaModel, 0)),
                    TPair(u"Obec:", self.makeObec(hlavickaModel, 0)),
-                   TPair(u"Okres:", u"{} {}".format(hlavickaModel.value(0, u"okresy_nazev"),
+                   TPair(
+                       u"Okres:", u"{} {}".format(hlavickaModel.value(0, u"okresy_nazev"),
                                                   hlavickaModel.value(0, u"okresy_nuts4")))]
 
         self.__mDocument.keyValueTable(content)
 
         if hlavickaModel.dveRadyCislovani():
-            self.__mDocument.paragraph(u"V kat. území jsou pozemky vedeny ve dvou číselných řadách.")
+            self.__mDocument.paragraph(
+                u"V kat. území jsou pozemky vedeny ve dvou číselných řadách.")
         else:
-            self.__mDocument.paragraph(u"V kat. území jsou pozemky vedeny v jedné číselné řadě.")
+            self.__mDocument.paragraph(
+                u"V kat. území jsou pozemky vedeny v jedné číselné řadě.")
 
     def partTelesoNemovitosti(self, id, parIds, budIds, jedIds):
-
         """
 
         :type id: str
@@ -228,7 +241,10 @@ class DocumentBuilder:
         """
         self.__mDocument.heading3(u"Pozemky")
         self.__mDocument.beginTable()
-        header = [u"Parcela", u"Výměra [m{}]".format(self.__mDocument.superScript(u"2")), u"Druh pozemku", u"Způsob využití",
+        header = [
+            u"Parcela", u"Výměra [m{}]".format(
+                self.__mDocument.superScript(
+                    u"2")), u"Druh pozemku", u"Způsob využití",
                   u"Způsob ochrany"]
         if LVColumn:
             header.append(u"LV")
@@ -236,13 +252,15 @@ class DocumentBuilder:
         self.__mDocument.tableHeader(header)
 
         for i in xrange(model.rowCount()):
-            row = [self.makeParcelniCislo(model, i), model.value(i, u"par_vymera_parcely"),
-                   model.value(i, u"drupoz_nazev"), model.value(i, u"zpvypo_nazev")]
+            row = [self.makeParcelniCislo(
+                model, i), model.value(i, u"par_vymera_parcely"),
+                model.value(i, u"drupoz_nazev"), model.value(i, u"zpvypo_nazev")]
 
             parcelaId = model.value(i, u"par_id")
             ochranaModel = VfkTableModel(self.__mConnectionName)
 
-            ok = ochranaModel.nemovitostOchrana(parcelaId, VfkTableModel.Nemovitost.NParcela)
+            ok = ochranaModel.nemovitostOchrana(
+                parcelaId, VfkTableModel.Nemovitost.NParcela)
             if ok is False:
                 break
 
@@ -300,7 +318,8 @@ class DocumentBuilder:
         """
         self.__mDocument.heading3(u"Stavby")
         self.__mDocument.beginTable()
-        header = [u"Typ stavby", u"Část obce", u"Č. budovy", u"Způsob využití", u"Způsob ochrany", u"Na parcele"]
+        header = [u"Typ stavby", u"Část obce", u"Č. budovy",
+                  u"Způsob využití", u"Způsob ochrany", u"Na parcele"]
 
         if LVColumn:
             header.append(u"LV")
@@ -311,22 +330,29 @@ class DocumentBuilder:
             row = []
 
             if Domains.anoNe(model.value(i, u"typbud_zadani_cd")) is False:
-                row.append(self.__mDocument.link(u"showText?page=bud&id={}".format(model.value(i, u"bud_id")),
+                row.append(
+                    self.__mDocument.link(
+                        u"showText?page=bud&id={}".format(
+                            model.value(i, u"bud_id")),
                                                  model.value(i, u"typbud_zkratka")))
                 row.append(model.value(i, u"casobc_nazev"))
                 row.append(u'')
             else:
                 row.append(u'')
                 row.append(model.value(i, u"casobc_nazev"))
-                row.append(self.__mDocument.link(u"showText?page=bud&id={}".format(model.value(i, u"bud_id")),
+                row.append(
+                    self.__mDocument.link(
+                        u"showText?page=bud&id={}".format(
+                            model.value(i, u"bud_id")),
                                                  u"{} {}".format(model.value(i, u"typbud_zkratka"),
-                                                                model.value(i, u"bud_cislo_domovni"))))
+                                                                 model.value(i, u"bud_cislo_domovni"))))
             row.append(model.value(i, u"zpvybu_nazev"))
 
             budId = model.value(i, u"bud_id")
             ochranaModel = VfkTableModel(self.__mConnectionName)
 
-            ok = ochranaModel.nemovitostOchrana(budId, VfkTableModel.Nemovitost.NBudova)
+            ok = ochranaModel.nemovitostOchrana(
+                budId, VfkTableModel.Nemovitost.NBudova)
             if ok is False:
                 break
 
@@ -400,7 +426,8 @@ class DocumentBuilder:
             row.append(model.value(i, u"zpvyje_nazev"))
             ochranaModel = VfkTableModel(self.__mConnectionName)
 
-            ok = ochranaModel.nemovitostOchrana(jedId, VfkTableModel.Nemovitost.NJednotka)
+            ok = ochranaModel.nemovitostOchrana(
+                jedId, VfkTableModel.Nemovitost.NJednotka)
             if ok is False:
                 break
 
@@ -450,17 +477,20 @@ class DocumentBuilder:
         budova += budModel.value(0, u"typbud_zkratka")
         if Domains.anoNe(budModel.value(0, u"typbud_zadani_cd")):
             budova += u" " + budModel.value(0, u"bud_cislo_domovni")
-        budInfo += self.__mDocument.link(u"showText?page=bud&id={}".format(budId), budova)
+        budInfo += self.__mDocument.link(
+            u"showText?page=bud&id={}".format(budId), budova)
 
         lv = budModel.value(0, u"tel_cislo_tel")
         lvId = budModel.value(0, u"tel_id")
         if lv:
-            budInfo += self.__mDocument.link(u"showText?page=tel&id={}".format(lvId), u"LV {}".format(lv))
+            budInfo += self.__mDocument.link(
+                u"showText?page=tel&id={}".format(lvId), u"LV {}".format(lv))
 
         zpvybu = budModel.value(0, u"zpvybu_nazev")
         budInfo += u", {}".format(zpvybu) if zpvybu else u''
 
-        budInfo + u", na parcele {}".format(self.makeParcelniCislo(budModel, 0))
+        budInfo + u", na parcele {}".format(
+            self.makeParcelniCislo(budModel, 0))
 
         self.__mDocument.tableRowOneColumnSpan(budInfo)
 
@@ -474,11 +504,13 @@ class DocumentBuilder:
         lv = parModel.value(0, u"tel_cislo_tel")
         lvId = parModel.value(0, u"tel_id")
         if lv:
-            parInfo += self.__mDocument.link(u"showText?page=tel&id={}".format(lvId), u"LV {}".format(lv))
+            parInfo += self.__mDocument.link(
+                u"showText?page=tel&id={}".format(lvId), u"LV {}".format(lv))
 
         zpvypo = parModel.value(0, u"zpvypo_nazev")
         parInfo += u'' if not zpvypo else u", {}".format(zpvypo)
-        parInfo += u", {} m{}".format(parModel.value(0, u"par_vymera_parcely"), self.__mDocument.superScript(u"2"))
+        parInfo += u", {} m{}".format(
+            parModel.value(0, u"par_vymera_parcely"), self.__mDocument.superScript(u"2"))
 
         self.__mDocument.tableRowOneColumnSpan(parInfo)
 
@@ -604,7 +636,8 @@ class DocumentBuilder:
         :type budIds: list
         :type jedIds: list
         """
-        self.__mDocument.heading2(u"E – Nabývací tituly a jiné podklady k zápisu")
+        self.__mDocument.heading2(
+            u"E – Nabývací tituly a jiné podklady k zápisu")
 
         model = VfkTableModel(self.__mConnectionName)
         ok = model.nabyvaciListiny(parIds, budIds, jedIds)
@@ -619,7 +652,9 @@ class DocumentBuilder:
             for i in xrange(model.rowCount()):
                 currentListinaId = model.value(i, u"rl_listin_id")
                 if currentListinaId == lastListinaId:
-                    self.__mDocument.item(self.makeShortDescription(model.value(i, u"rl_opsub_id"),
+                    self.__mDocument.item(
+                        self.makeShortDescription(
+                            model.value(i, u"rl_opsub_id"),
                                                                     VfkTableModel.OpravnenyPovinny.OPOsoba))
                 else:
                     if lastListinaId:
@@ -629,7 +664,9 @@ class DocumentBuilder:
                     self.__mDocument.beginItem()
                     self.__mDocument.text(self.makeListina(model, i))
                     self.__mDocument.beginItemize()
-                    self.__mDocument.item(self.makeShortDescription(model.value(i, u"rl_opsub_id"),
+                    self.__mDocument.item(
+                        self.makeShortDescription(
+                            model.value(i, u"rl_opsub_id"),
                                                                     VfkTableModel.OpravnenyPovinny.OPOsoba))
 
             if lastListinaId:
@@ -645,11 +682,13 @@ class DocumentBuilder:
         :type forLV: bool
         """
         if forLV:
-            self.__mDocument.heading2(u"F – Vztah bonitovaných půdně ekologických jednotek (BPEJ) k parcelám")
+            self.__mDocument.heading2(
+                u"F – Vztah bonitovaných půdně ekologických jednotek (BPEJ) k parcelám")
         else:
             self.__mDocument.heading2(u"BPEJ")
 
-        header = [u"Parcela", u"BPEJ", u"Výměra [m{}]".format(self.__mDocument.superScript(u"2"))]
+        header = [u"Parcela", u"BPEJ", u"Výměra [m{}]".format(
+            self.__mDocument.superScript(u"2"))]
         self.__mDocument.beginTable()
         self.__mDocument.tableHeader(header)
 
@@ -720,8 +759,10 @@ class DocumentBuilder:
         :type povinny: VfkTableModel.OpravnenyPovinny
         :return: bool
         """
-        test1 = self.partTelesoB1CDSubjekt(ids, povinny, VfkTableModel.Pravo.Opravneni, True, False)
-        test2 = self.partTelesoB1CDSubjekt(ids, povinny, VfkTableModel.Pravo.Povinnost, True, False)
+        test1 = self.partTelesoB1CDSubjekt(
+            ids, povinny, VfkTableModel.Pravo.Opravneni, True, False)
+        test2 = self.partTelesoB1CDSubjekt(
+            ids, povinny, VfkTableModel.Pravo.Povinnost, True, False)
         return test1 or test2
 
     def partTelesoJineZapisy(self, ids, povinny):
@@ -731,8 +772,10 @@ class DocumentBuilder:
         :type povinny: VfkTableModel.OpravnenyPovinny
         :return: bool
         """
-        test1 = self.partTelesoB1CDSubjekt(ids, povinny, VfkTableModel.Pravo.Opravneni, True, True)
-        test2 = self.partTelesoB1CDSubjekt(ids, povinny, VfkTableModel.Pravo.Povinnost, True, True)
+        test1 = self.partTelesoB1CDSubjekt(
+            ids, povinny, VfkTableModel.Pravo.Opravneni, True, True)
+        test2 = self.partTelesoB1CDSubjekt(
+            ids, povinny, VfkTableModel.Pravo.Povinnost, True, True)
         return test1 or test2
 
     def partTelesoB1CDSubjekt(self, ids, pravniSubjekt, pravo, sekceD, showListiny):
@@ -746,8 +789,10 @@ class DocumentBuilder:
         :return: bool
         """
         isRecord = False
-        povinni = [u"jpv_par_id_k", u"jpv_bud_id_k", u"jpv_jed_id_k", u"jpv_opsub_id_k"]
-        opravneni = [u"jpv_par_id_pro", u"jpv_bud_id_pro", u"jpv_jed_id_pro", u"jpv_opsub_id_pro"]
+        povinni = [u"jpv_par_id_k", u"jpv_bud_id_k",
+                   u"jpv_jed_id_k", u"jpv_opsub_id_k"]
+        opravneni = [u"jpv_par_id_pro", u"jpv_bud_id_pro",
+                     u"jpv_jed_id_pro", u"jpv_opsub_id_pro"]
 
         for id in ids:
             model = VfkTableModel(self.__mConnectionName)
@@ -765,18 +810,22 @@ class DocumentBuilder:
                 opravneniList = []
                 for column1 in opravneni:
                     if model.value(i, column1):
-                        opravneny = VfkTableModel().tableName2OpravnenyPovinny(column1)
+                        opravneny = VfkTableModel().tableName2OpravnenyPovinny(
+                            column1)
                         opravnenyId = model.value(i, column1)
-                        opravneniList.append(self.makeShortDescription(opravnenyId, opravneny))
+                        opravneniList.append(
+                            self.makeShortDescription(opravnenyId, opravneny))
 
                 row.append(str(self.__mDocument.newLine()).join(opravneniList))
 
                 povinniList = []
                 for column2 in povinni:
                     if model.value(i, column2):
-                        povinny = VfkTableModel().tableName2OpravnenyPovinny(column2)
+                        povinny = VfkTableModel().tableName2OpravnenyPovinny(
+                            column2)
                         povinnyId = model.value(i, column2)
-                        povinniList.append(self.makeShortDescription(povinnyId, povinny))
+                        povinniList.append(
+                            self.makeShortDescription(povinnyId, povinny))
 
                 row.append(str(self.__mDocument.newLine()).join(povinniList))
 
@@ -819,24 +868,33 @@ class DocumentBuilder:
 
         telesoModel = VfkTableModel(self.__mConnectionName)
         telesoModel.nemovitostTeleso(id, VfkTableModel.Nemovitost.NParcela)
-        content.append(TPair(u"List vlastnictví:", self.makeLVCislo(telesoModel, 0)))
-        content.append(TPair(u"Výměra [m{}]:".format(self.__mDocument.superScript(u"2")),
-                             model.value(0, u"par_vymera_parcely")))
-        content.append(TPair(u"Určení výměry:", model.value(0, u"zpurvy_nazev")))
+        content.append(
+            TPair(u"List vlastnictví:", self.makeLVCislo(telesoModel, 0)))
+        content.append(
+            TPair(u"Výměra [m{}]:".format(self.__mDocument.superScript(u"2")),
+                  model.value(0, u"par_vymera_parcely")))
+        content.append(
+            TPair(u"Určení výměry:", model.value(0, u"zpurvy_nazev")))
 
         if model.value(0, u"par_cena_nemovitosti"):
-            content.append(TPair(u"Cena nemovitosti:", model.value(0, u"par_cena_nemovitosti")))
+            content.append(
+                TPair(u"Cena nemovitosti:", model.value(0, u"par_cena_nemovitosti")))
 
         content.append(TPair(u"Typ parcely:", model.value(0, u"par_par_type")))
-        content.append(TPair(u"Mapový list:", model.value(0, u"maplis_oznaceni_mapoveho_listu")))
-        content.append(TPair(u"Katastrální území:", self.makeKatastrUzemi(model, 0)))
-        content.append(TPair(u"Druh pozemku:", model.value(0, u"drupoz_nazev")))
+        content.append(
+            TPair(u"Mapový list:", model.value(0, u"maplis_oznaceni_mapoveho_listu")))
+        content.append(
+            TPair(u"Katastrální území:", self.makeKatastrUzemi(model, 0)))
+        content.append(
+            TPair(u"Druh pozemku:", model.value(0, u"drupoz_nazev")))
 
         if model.value(0, u"zpvypo_nazev"):
-            content.append(TPair(u"Způsob využití pozemku:", model.value(0, u"zpvypo_nazev")))
+            content.append(
+                TPair(u"Způsob využití pozemku:", model.value(0, u"zpvypo_nazev")))
 
         if Domains.anoNe(model.value(0, u"drupoz_stavebni_parcela")):
-            content.append(TPair(u"Stavba na parcele:", self.makeDomovniCislo(model, 0)))
+            content.append(
+                TPair(u"Stavba na parcele:", self.makeDomovniCislo(model, 0)))
             self.__mCurrentPageBudIds.append(model.value(0, u"bud_id"))
 
         self.__mDocument.heading1(u"Informace o parcele")
@@ -853,12 +911,14 @@ class DocumentBuilder:
         ids = list(set(ids))
         ids.remove(id)
 
-        link = self.__mDocument.link(u"showText?page=seznam&type=id&parcely={}".format(u",".join(ids)),
+        link = self.__mDocument.link(
+            u"showText?page=seznam&type=id&parcely={}".format(u",".join(ids)),
                                      u"Sousední parcely")
 
         self.__mDocument.paragraph(link)
         opsubIds = []
-        self.partTelesoVlastnici(telesoModel.value(0, u"tel_id"), opsubIds, False)
+        self.partTelesoVlastnici(
+            telesoModel.value(0, u"tel_id"), opsubIds, False)
         self.partNemovitostOchrana(id, VfkTableModel.Nemovitost.NParcela)
 
         parIds = [id]
@@ -903,7 +963,8 @@ class DocumentBuilder:
             typravNazev = vlastniciModel.value(i, u"typrav_nazev")
             opsubId = vlastniciModel.value(i, u"vla_opsub_id")
             vlaPodilCitatel = vlastniciModel.value(i, u"vla_podil_citatel")
-            vlaPodilJmenovatel = vlastniciModel.value(i, u"vla_podil_jmenovatel")
+            vlaPodilJmenovatel = vlastniciModel.value(
+                i, u"vla_podil_jmenovatel")
             podil = u''
 
             if vlaPodilCitatel and vlaPodilJmenovatel and vlaPodilJmenovatel != u'1':
@@ -927,12 +988,14 @@ class DocumentBuilder:
                 content.append(podil)
                 tables[typravNazev].append(content)
             else:
-                nazev += u" ({})".format(vlastnikModel.value(0, u"charos_zkratka"))
+                nazev += u" ({})".format(
+                    vlastnikModel.value(0, u"charos_zkratka"))
                 rowContent = [nazev, u'', u'', podil]
                 tables[typravNazev].append(rowContent)
 
-                manzeleId = [vlastnikModel.value(0, u"opsub_id_je_1_partner_bsm"),
-                             vlastnikModel.value(0, u"opsub_id_je_2_partner_bsm")]
+                manzeleId = [vlastnikModel.value(
+                    0, u"opsub_id_je_1_partner_bsm"),
+                    vlastnikModel.value(0, u"opsub_id_je_2_partner_bsm")]
 
                 sjmModel = VfkTableModel(self.__mConnectionName)
                 for j in xrange(len(manzeleId)):
@@ -941,7 +1004,8 @@ class DocumentBuilder:
                         break
 
                     identifikatorSJM = sjmModel.value(0, u"opsub_rodne_cislo")
-                    rowContent = [self.makeJmeno(sjmModel, 0), self.makeAdresa(sjmModel, 0), identifikatorSJM, u'']
+                    rowContent = [self.makeJmeno(sjmModel, 0), self.makeAdresa(
+                        sjmModel, 0), identifikatorSJM, u'']
                     tables[typravNazev].append(rowContent)
 
             opsubIds.append(opsubId)
@@ -1000,13 +1064,15 @@ class DocumentBuilder:
 
         telesoModel = VfkTableModel(self.__mConnectionName)
         telesoModel.nemovitostTeleso(id, VfkTableModel.Nemovitost.NBudova)
-        content.append(TPair(u"List vlastnictví:", self.makeLVCislo(telesoModel, 0)))
+        content.append(
+            TPair(u"List vlastnictví:", self.makeLVCislo(telesoModel, 0)))
 
         cena = model.value(0, u"bud_cena_nemovitosti")
         if cena:
             content.append(TPair(u"Cena nemovitosti:", cena))
         content.append(TPair(u"Typ stavby:", model.value(0, u"typbud_nazev")))
-        content.append(TPair(u"Způsob využití:", model.value(0, u"zpvybu_nazev")))
+        content.append(
+            TPair(u"Způsob využití:", model.value(0, u"zpvybu_nazev")))
 
         jednotkyModel = VfkTableModel(self.__mConnectionName)
         jednotkyModel.budovaJednotky(id)
@@ -1017,13 +1083,15 @@ class DocumentBuilder:
 
             content.append(TPair(u"Jednotky v budově:", u", ".join(jednotky)))
 
-        content.append(TPair(u"Katastrální území:", self.makeKatastrUzemi(model, 0)))
+        content.append(
+            TPair(u"Katastrální území:", self.makeKatastrUzemi(model, 0)))
 
         self.__mDocument.heading1(u"Informace o stavbě")
         self.__mDocument.keyValueTable(content)
 
         opsubIds = []
-        self.partTelesoVlastnici(telesoModel.value(0, u"tel_id"), opsubIds, False)
+        self.partTelesoVlastnici(
+            telesoModel.value(0, u"tel_id"), opsubIds, False)
         self.partNemovitostOchrana(id, VfkTableModel.Nemovitost.NBudova)
 
         budIds = [id]
@@ -1051,23 +1119,28 @@ class DocumentBuilder:
 
         telesoModel = VfkTableModel(self.__mConnectionName)
         telesoModel.nemovitostTeleso(id, VfkTableModel.Nemovitost.NJednotka)
-        content.append(TPair(u"List vlastnictví:", self.makeLVCislo(telesoModel, 0)))
+        content.append(
+            TPair(u"List vlastnictví:", self.makeLVCislo(telesoModel, 0)))
 
         cena = model.value(0, u"jed_cena_nemovitosti")
         if cena:
             content.append(TPair(u"Cena nemovitosti:", cena))
 
-        content.append(TPair(u"Typ jednotky:", model.value(0, u"typjed_nazev")))
-        content.append(TPair(u"Způsob využití:", model.value(0, u"zpvyje_nazev")))
+        content.append(
+            TPair(u"Typ jednotky:", model.value(0, u"typjed_nazev")))
+        content.append(
+            TPair(u"Způsob využití:", model.value(0, u"zpvyje_nazev")))
         content.append(TPair(u"Podíl jednotky na společných částech domu:", u"{}/{}"
                              .format(model.value(0, u"jed_podil_citatel"), model.value(0, u"jed_podil_jmenovatel"))))
-        content.append(TPair(u"Katastrální území:", self.makeKatastrUzemi(model, 0)))
+        content.append(
+            TPair(u"Katastrální území:", self.makeKatastrUzemi(model, 0)))
 
         self.__mDocument.heading1(u"Informace o jednotce")
         self.__mDocument.keyValueTable(content)
 
         opsubIds = []
-        self.partTelesoVlastnici(telesoModel.value(0, u"tel_id"), opsubIds, False)
+        self.partTelesoVlastnici(
+            telesoModel.value(0, u"tel_id"), opsubIds, False)
         self.partNemovitostOchrana(id, VfkTableModel.Nemovitost.NJednotka)
 
         jedIds = [id]
@@ -1092,17 +1165,21 @@ class DocumentBuilder:
         if opsubModel.value(0, u"opsub_opsub_type") == u"OPO":
             content.append(TPair(u"Název:", name))
             content.append(TPair(u"Adresa:", self.makeAdresa(opsubModel, 0)))
-            content.append(TPair(u"IČO:", self.makeIdentifikator(opsubModel, 0)))
+            content.append(
+                TPair(u"IČO:", self.makeIdentifikator(opsubModel, 0)))
         elif opsubModel.value(0, u"opsub_opsub_type") == u"OFO":
             content.append(TPair(u"Jméno:", name))
             content.append(TPair(u"Adresa:", self.makeAdresa(opsubModel, 0)))
-            content.append(TPair(u"Rodné číslo:", self.makeIdentifikator(opsubModel, 0)))
+            content.append(
+                TPair(u"Rodné číslo:", self.makeIdentifikator(opsubModel, 0)))
         else:
             content.append(TPair(u"Jméno:", name))
 
             for i in xrange(1, 3):
-                manzelId = opsubModel.value(0, u"opsub_id_je_{}_partner_bsm".format(i))
-                desc = self.makeShortDescription(manzelId, VfkTableModel.OpravnenyPovinny.OPOsoba)
+                manzelId = opsubModel.value(
+                    0, u"opsub_id_je_{}_partner_bsm".format(i))
+                desc = self.makeShortDescription(
+                    manzelId, VfkTableModel.OpravnenyPovinny.OPOsoba)
                 content.append(TPair(u'', desc))
 
         content.append(TPair(u"Typ:", opsubModel.value(0, u"charos_nazev")))
@@ -1118,8 +1195,9 @@ class DocumentBuilder:
             telesaDesc.append(self.makeLVCislo(nemovitostiModel, i))
 
             for column in idColumns:
-                nemovitostDesc.append(self.makeLongDescription(nemovitostiModel.value(i, column),
-                                                               VfkTableModel().tableName2OpravnenyPovinny(column)))
+                nemovitostDesc.append(
+                    self.makeLongDescription(nemovitostiModel.value(i, column),
+                                             VfkTableModel().tableName2OpravnenyPovinny(column)))
 
         content.append(TPair(u"Listy vlastnictví:", u", ".join(telesaDesc)))
         self.__mDocument.heading1(u"Informace o oprávněné osobě")
@@ -1148,7 +1226,8 @@ class DocumentBuilder:
             if ok is False:
                 continue
 
-            self.__mDocument.item(self.makeLongDescription(id, VfkTableModel.OpravnenyPovinny.OPParcela))
+            self.__mDocument.item(self.makeLongDescription(
+                id, VfkTableModel.OpravnenyPovinny.OPParcela))
 
         self.__mDocument.endItemize()
 
@@ -1168,7 +1247,8 @@ class DocumentBuilder:
             if ok is False:
                 continue
 
-            self.__mDocument.item(self.makeLongDescription(id, VfkTableModel.OpravnenyPovinny.OPOsoba))
+            self.__mDocument.item(self.makeLongDescription(
+                id, VfkTableModel.OpravnenyPovinny.OPOsoba))
 
         self.__mDocument.endItemize()
 
@@ -1182,10 +1262,10 @@ class DocumentBuilder:
         self.__mCurrentPageBudIds = ids
 
         for id in ids:
-            self.__mDocument.item(self.makeLongDescription(id,VfkTableModel.OpravnenyPovinny.OPBudova))
+            self.__mDocument.item(self.makeLongDescription(
+                id, VfkTableModel.OpravnenyPovinny.OPBudova))
 
         self.__mDocument.endItemize()
-
 
     def pageSeznamJednotek(self, ids):
         """
@@ -1197,7 +1277,8 @@ class DocumentBuilder:
         self.__mCurrentPageBudIds = ids
 
         for id in ids:
-            self.__mDocument.item(self.makeLongDescription(id,VfkTableModel.OpravnenyPovinny.OPJednotka))
+            self.__mDocument.item(self.makeLongDescription(
+                id, VfkTableModel.OpravnenyPovinny.OPJednotka))
 
         self.__mDocument.endItemize()
 
@@ -1274,7 +1355,8 @@ class DocumentBuilder:
         :return:
         """
         model = VfkTableModel(self.__mConnectionName)
-        ok = model.searchJed(cisloJednotky, domovniCislo, naParcele, zpusobVyuziti, lv)
+        ok = model.searchJed(
+            cisloJednotky, domovniCislo, naParcele, zpusobVyuziti, lv)
         if not ok:
             qDebug("Nemohu najit danne jednotky, nekde se stala nejaka chyba")
             return
@@ -1287,34 +1369,41 @@ class DocumentBuilder:
 
     def pageHelp(self):
         self.__mDocument.heading1(u"VFK plugin")
-        self.__mDocument.paragraph(u"VFK plugin slouží pro usnadnění práce s českými katastrálními daty ve formátu VFK.")
+        self.__mDocument.paragraph(
+            u"VFK plugin slouží pro usnadnění práce s českými katastrálními daty ve formátu VFK.")
         self.__mDocument.heading2(u"Kde začít?")
 
-        link = self.__mDocument.link(u"switchPanel?panel=import", u"Importujte")
-        text = u"{} data ve formátu VFK. Během importu se vytváří databáze, tato operace může chvíli trvat. ".format(link)
+        link = self.__mDocument.link(
+            u"switchPanel?panel=import", u"Importujte")
+        text = u"{} data ve formátu VFK. Během importu se vytváří databáze, tato operace může chvíli trvat. ".format(
+            link)
         text += u"Následně lze vyhledávat:"
         self.__mDocument.paragraph(text)
 
         self.__mDocument.beginItemize()
-        link = self.__mDocument.link(u"switchPanel?panel=search&type=0", u"oprávněné osoby")
+        link = self.__mDocument.link(
+            u"switchPanel?panel=search&type=0", u"oprávněné osoby")
         self.__mDocument.item(link)
-        link = self.__mDocument.link(u"switchPanel?panel=search&type=1", u"parcely")
+        link = self.__mDocument.link(
+            u"switchPanel?panel=search&type=1", u"parcely")
         self.__mDocument.item(link)
-        link = self.__mDocument.link(u"switchPanel?panel=search&type=2", u"budovy")
+        link = self.__mDocument.link(
+            u"switchPanel?panel=search&type=2", u"budovy")
         self.__mDocument.item(link)
-        link = self.__mDocument.link(u"switchPanel?panel=search&type=3", u"jednotky")
+        link = self.__mDocument.link(
+            u"switchPanel?panel=search&type=3", u"jednotky")
         self.__mDocument.item(link)
         self.__mDocument.endItemize()
 
         text = u"Vyhledávat lze na základě různých kritérií. " \
-                u"Není-li kritérium zadáno, vyhledány jsou všechny nemovitosti či osoby obsažené v databázi. " \
-                u"Výsledky hledání jsou pak vždy zobrazeny v tomto okně."
+            u"Není-li kritérium zadáno, vyhledány jsou všechny nemovitosti či osoby obsažené v databázi. " \
+            u"Výsledky hledání jsou pak vždy zobrazeny v tomto okně."
         self.__mDocument.paragraph(text)
 
         text = u"Výsledky hledání obsahují odkazy na další informace, " \
-                u"kliknutím na odkaz si tyto informace zobrazíte, " \
-                u"stejně jako je tomu u webového prohlížeče. " \
-                u"Pro procházení historie použijte tlačítka Zpět a Vpřed v panelu nástrojů nad tímto oknem."
+            u"kliknutím na odkaz si tyto informace zobrazíte, " \
+            u"stejně jako je tomu u webového prohlížeče. " \
+            u"Pro procházení historie použijte tlačítka Zpět a Vpřed v panelu nástrojů nad tímto oknem."
         self.__mDocument.paragraph(text)
 
     def makeShortDescription(self, id, nemovitost):
@@ -1345,7 +1434,7 @@ class DocumentBuilder:
                 text = u"{}".format(self.makeJmeno(model, 0))
             else:
                 text = u"{}, {}, RČ/IČO: {}".format(self.makeJmeno(model, 0), self.makeAdresa(model, 0),
-                                                   self.makeIdentifikator(model, 0))
+                                                    self.makeIdentifikator(model, 0))
         else:
             pass
 
@@ -1481,7 +1570,8 @@ class DocumentBuilder:
         if self.__mDveRadyCislovani and Domains.anoNe(model.value(row, u"drupoz_stavebni_parcela")):
             st = u"st."
 
-        link = self.__mDocument.link(u"showText?page=par&id={}".format(model.value(row, u"par_id")), cislo)
+        link = self.__mDocument.link(
+            u"showText?page=par&id={}".format(model.value(row, u"par_id")), cislo)
         return u"{} {}".format(st, link)
 
     def makeDomovniCislo(self, model, row):
@@ -1491,9 +1581,10 @@ class DocumentBuilder:
         :type row: int
         :return: str
         """
-        return self.__mDocument.link(u"showText?page=bud&id={}".format(model.value(row, u"bud_id")),
+        return self.__mDocument.link(
+            u"showText?page=bud&id={}".format(model.value(row, u"bud_id")),
                                      u"{} {}".format(model.value(row, u"typbud_zkratka"),
-                                                    model.value(row, u"bud_cislo_domovni")))
+                                                     model.value(row, u"bud_cislo_domovni")))
 
     def makeJednotka(self, model, row):
         """
@@ -1502,9 +1593,10 @@ class DocumentBuilder:
         :type row: int
         :return: str
         """
-        return self.__mDocument.link(u"showText?page=jed&id={}".format(model.value(row, u"jed_id")),
+        return self.__mDocument.link(
+            u"showText?page=jed&id={}".format(model.value(row, u"jed_id")),
                                      u"{}/{}".format(model.value(row, u"bud_cislo_domovni"),
-                                                    model.value(row, u"jed_cislo_jednotky")))
+                                                     model.value(row, u"jed_cislo_jednotky")))
 
     def makeListina(self, model, row):
         """
@@ -1522,7 +1614,8 @@ class DocumentBuilder:
         :type row: int
         :return: str
         """
-        return self.__mDocument.link(u"showText?page=tel&id={}".format(model.value(row, u"tel_id")),
+        return self.__mDocument.link(
+            u"showText?page=tel&id={}".format(model.value(row, u"tel_id")),
                                      model.value(row, u"tel_cislo_tel"))
 
     def makeKatastrUzemi(self, model, row):
@@ -1562,5 +1655,7 @@ class DocumentBuilder:
         ok = model.definicniBod(id, nemovitost)
         if ok is False:
             return
-        self.__mCurrentDefinitionPoint.first = model.value(0, u"obdebo_souradnice_x")
-        self.__mCurrentDefinitionPoint.second = model.value(0, u"obdebo_souradnice_y")
+        self.__mCurrentDefinitionPoint.first = model.value(
+            0, u"obdebo_souradnice_x")
+        self.__mCurrentDefinitionPoint.second = model.value(
+            0, u"obdebo_souradnice_y")

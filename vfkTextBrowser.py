@@ -34,12 +34,14 @@ from richTextDocument import *
 
 
 class TPair:
+
     def __init__(self, first=u'', second=u''):
         self.first = first
         self.second = second
 
 
 class HistoryRecord(QObject):
+
     def __init__(self):
         QObject.__init__(self)
         self.html = u''
@@ -146,17 +148,18 @@ class VfkTextBrowser(QTextBrowser):
 
         return taskMap
 
-
     def goBack(self):
         if len(self.__mUrlHistory) > 1 and len(self.__mUrlHistory) - self.__mHistoryOrder > 0 and self.__mHistoryOrder > 0:
-            self.__mCurrentRecord = self.__mUrlHistory[self.__mHistoryOrder - 1]
+            self.__mCurrentRecord = self.__mUrlHistory[
+                self.__mHistoryOrder - 1]
             self.__mHistoryOrder -= 1 if self.__mHistoryOrder > 0 else self.__mHistoryOrder == 0
             self.setHtml(self.__mCurrentRecord.html)
             self.updateButtonEnabledState()
 
     def goForth(self):
         if len(self.__mUrlHistory) > 1 and len(self.__mUrlHistory) - self.__mHistoryOrder > 1 and self.__mHistoryOrder >= 0:
-            self.__mCurrentRecord = self.__mUrlHistory[self.__mHistoryOrder + 1]
+            self.__mCurrentRecord = self.__mUrlHistory[
+                self.__mHistoryOrder + 1]
             self.__mHistoryOrder += 1
             self.setHtml(self.__mCurrentRecord.html)
             self.updateButtonEnabledState()
@@ -230,14 +233,17 @@ class VfkTextBrowser(QTextBrowser):
             qDebug("Nejsou podporovany jine formaty pro export")
 
     def updateButtonEnabledState(self):
-        self.emit(SIGNAL("currentParIdsChanged"), True if self.__mCurrentRecord.parIds else False)
-        self.emit(SIGNAL("currentBudIdsChanged"), True if self.__mCurrentRecord.budIds else False)
+        self.emit(SIGNAL("currentParIdsChanged"),
+                  True if self.__mCurrentRecord.parIds else False)
+        self.emit(SIGNAL("currentBudIdsChanged"),
+                  True if self.__mCurrentRecord.budIds else False)
 
         self.emit(SIGNAL("historyBefore"), self.__mHistoryOrder > 0)
-        self.emit(SIGNAL("historyAfter"), len(self.__mUrlHistory) - self.__mHistoryOrder > 1)
+        self.emit(SIGNAL("historyAfter"), len(
+            self.__mUrlHistory) - self.__mHistoryOrder > 1)
 
         self.emit(SIGNAL("definitionPointAvailable"), True if (self.__mCurrentRecord.definitionPoint.first
-                                                    and self.__mCurrentRecord.definitionPoint.second) else False)
+                                                               and self.__mCurrentRecord.definitionPoint.second) else False)
 
     def onLinkClicked(self, task):
         """
@@ -268,7 +274,8 @@ class VfkTextBrowser(QTextBrowser):
             record.html = html
             record.parIds = self.__mDocumentBuilder.currentParIds()
             record.budIds = self.__mDocumentBuilder.currentBudIds()
-            record.definitionPoint = self.__mDocumentBuilder.currentDefinitionPoint()
+            record.definitionPoint = self.__mDocumentBuilder.currentDefinitionPoint(
+            )
 
             self.emit(SIGNAL("updateHistory"), record)
 
