@@ -31,8 +31,7 @@ from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIG
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import *
 from qgis.gui import *
-import osgeo
-from osgeo import ogr
+from osgeo import ogr, gdal
 import time
 
 from ui_MainApp import Ui_MainApp
@@ -65,10 +64,6 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.setupUi(self)
         self.iface = iface
 
-        # check GDAL version
-        print(osgeo.gdal.VersionInfo())
-        # TODO: dopsat check verze
-
         # variables
         self.__mLastVfkFile = []
         self.__mOgrDataSource = None
@@ -85,6 +80,13 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         # Connect ui with functions
         self.__createToolbarsAndConnect()
+
+        # check GDAL version
+        gdal_version = int(gdal.VersionInfo())
+
+        if gdal_version < 2010000:
+            self.pb_nextFile.setEnabled(False)
+            self.pb_nextFile.setToolTip(u'Není možné načíst více souborů, verze GDAL je nižší než 2.1.0.')
 
         # settings
         self.loadVfkButton.setDisabled(True)
@@ -200,11 +202,10 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             id = self.__mLoadedLayers[layerName]
             vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
             searchString = "ID IN ({})".format(", ".join(ids))
-            qDebug('\n (VFK) searchString in showInMap: {}'.format(searchString))
             error = ''
             fIds = self.__search(vectorLayer, searchString, error)
             if error:
-                qDebug(error)
+                qDebug('\n (VFK) ERROR in showInMap: {}'.format(error))
                 return
             else:
                 vectorLayer.setSelectedFeatures(fIds)
@@ -231,10 +232,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         layer.select(rect, False)
         fit = QgsFeatureIterator(layer.getFeatures())
         f = QgsFeature()
-        qDebug('\n (VFK) searchString in search: {}'.format(searchString))
 
         while fit.nextFeature(f):
-            qDebug('\n (VFK) evaluate: {}'.format(search.evaluate(f)))
 
             if search.evaluate(f):
                 fIds.append(f.id())
@@ -268,8 +267,6 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         """
         if fileName not in self.__mLastVfkFile:
 
-            qDebug('\n(VFK) runLoadingLayer: {}'.format(fileName))
-
             try:
                 self.loadVfkFile(fileName)
             except VFKError as e:
@@ -288,7 +285,6 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         :return:
         """
-        qDebug('\n(VFK) Uz je konec')
         try:
             self.__openDatabase(os.environ['OGR_VFK_DB_NAME']) # self.__mDataSourceName)
         except VFKError as e:
@@ -428,8 +424,6 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.progressBar.setValue(0)
 
         QgsApplication.processEvents()
-
-        qDebug("(VFK) Open VFK file: {}".format(fileName))
 
         self.__mOgrDataSource = ogr.Open(fileName, 0)   # 0 - datasource is open in read-only mode
 

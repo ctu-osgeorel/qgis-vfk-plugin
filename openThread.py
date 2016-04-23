@@ -44,8 +44,6 @@ class OpenThread(QThread):
 
     def run(self):
         for i, vfkFile in enumerate(self.vfk_files):
-            qDebug('\n(VFK) pracuju se souborem: {}'.format(vfkFile))
-            qDebug('(VFK) threadID: {}'.format(self.currentThreadId()))
             self.working.emit(vfkFile)
             self.nextLayer = True
 
