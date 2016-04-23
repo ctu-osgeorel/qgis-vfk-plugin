@@ -31,6 +31,7 @@ from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIG
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import *
 from qgis.gui import *
+import osgeo
 from osgeo import ogr
 import time
 
@@ -63,6 +64,10 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         QDockWidget.__init__(self, iface.mainWindow())
         self.setupUi(self)
         self.iface = iface
+
+        # check GDAL version
+        print(osgeo.gdal.VersionInfo())
+        # TODO: dopsat check verze
 
         # variables
         self.__mLastVfkFile = []
@@ -238,7 +243,6 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                 qDebug('\n (VFK) Evaluate error: {}'.format(error))
                 break
 
-        qDebug('\n (VFK) Feature Ids: {}'.format(str(fIds)))
         return fIds
 
     def loadVfkButton_clicked(self):
@@ -247,7 +251,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :return:
         """
         os.environ['OGR_VFK_DB_NAME'] = os.path.join(os.path.dirname(os.path.dirname(self.__fileName[0])), 'vfkDB.db')
-        self.__mDataSourceName = self.__fileName[0] # os.environ['OGR_VFK_DB_NAME']
+        self.__mDataSourceName = self.__fileName[0]     # os.environ['OGR_VFK_DB_NAME']
 
         self.labelLoading.setText(u'Otevírám VFK soubory...')
         QgsApplication.processEvents()
@@ -255,7 +259,6 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.importThread = OpenThread(self.__fileName)
         self.importThread.working.connect(self.runLoadingLayer)
         if not self.importThread.isRunning():
-            qDebug('\n(VFK) loadVfkButton_clicked')
             self.importThread.start()
 
     def runLoadingLayer(self, fileName):
@@ -426,7 +429,6 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         QgsApplication.processEvents()
 
-        #qDebug("(VFK) Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
         qDebug("(VFK) Open VFK file: {}".format(fileName))
 
         self.__mOgrDataSource = ogr.Open(fileName, 0)   # 0 - datasource is open in read-only mode

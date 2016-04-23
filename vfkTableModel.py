@@ -929,7 +929,7 @@ class VfkTableModel(QSqlQueryModel):
     def __evaluate(self, query):
         """
 
-        :type query: unicode
+        :type query: str
         :return: bool
         """
         t = QTime()
