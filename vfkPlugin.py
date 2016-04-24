@@ -31,6 +31,7 @@ import os.path
 
 
 class vfkPlugin(object):
+
     """QGIS Plugin Implementation."""
 
     def __init__(self, iface):
@@ -84,7 +85,8 @@ class vfkPlugin(object):
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('vfk', message)
 
-    def add_action(self, icon_path, text, callback, enabled_flag=True, add_to_menu=True, add_to_toolbar=True,
+    def add_action(
+        self, icon_path, text, callback, enabled_flag=True, add_to_menu=True, add_to_toolbar=True,
                    status_tip=None, whats_this=None, parent=None):
         """Add a toolbar icon to the toolbar.
 

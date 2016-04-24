@@ -24,6 +24,7 @@ from abc import ABCMeta, abstractmethod
 
 
 class TPair(object):
+
     def __init__(self, first=u'', second=u''):
         self.first = first
         self.second = second

@@ -74,9 +74,12 @@ class SearchFormController(QObject):
         self.__controls.formCombobox.addItem(u"budovy", self.Form.Budovy)
         self.__controls.formCombobox.addItem(u"jednotky", self.Form.Jednotky)
 
-        self.connect(self.__controls.formCombobox, SIGNAL("activated(int)"), self.__controls.searchForms,
+        self.connect(
+            self.__controls.formCombobox, SIGNAL(
+                "activated(int)"), self.__controls.searchForms,
                      SLOT("setCurrentIndex(int)"))
-        self.connect(self.__controls.searchButton, SIGNAL("clicked()"), self.search)
+        self.connect(self.__controls.searchButton,
+                     SIGNAL("clicked()"), self.search)
 
         self.__controls.searchForms.setCurrentIndex(0)
         self.__controls.searchButton.setEnabled(False)
@@ -172,27 +175,36 @@ class SearchFormController(QObject):
         self.__mDruhParcely = VfkTableModel(self.__mConnectionName, self)
         self.__mDruhParcely.druhyPozemku(True, True)
 
-        self.__mDruhPozemkoveParcely = VfkTableModel(self.__mConnectionName, self)
+        self.__mDruhPozemkoveParcely = VfkTableModel(
+            self.__mConnectionName, self)
         self.__mDruhPozemkoveParcely.druhyPozemku(True, False)
 
-        self.__mDruhStavebniParcely = VfkTableModel(self.__mConnectionName, self)
+        self.__mDruhStavebniParcely = VfkTableModel(
+            self.__mConnectionName, self)
         self.__mDruhStavebniParcely.druhyPozemku(False, True)
 
-        self.__mZpusobVyuzitiBudovy = VfkTableModel(self.__mConnectionName, self)
+        self.__mZpusobVyuzitiBudovy = VfkTableModel(
+            self.__mConnectionName, self)
         self.__mZpusobVyuzitiBudovy.zpusobVyuzitiBudov()
 
-        self.__mZpusobVyuzitiJednotek = VfkTableModel(self.__mConnectionName, self)
+        self.__mZpusobVyuzitiJednotek = VfkTableModel(
+            self.__mConnectionName, self)
         self.__mZpusobVyuzitiJednotek.zpusobVyuzitiJednotek()
 
         falseKodForDefaultDruh = ''
         text = u'libovolný'
         fakeRow = [falseKodForDefaultDruh, text]
 
-        self.__forms.parcely.setDruhPozemkuModel(self.__addFirstRowToModel(self.__mDruhParcely, fakeRow))
-        self.__forms.parcely.setDruhPozemkuPozemkovaModel(self.__addFirstRowToModel(self.__mDruhPozemkoveParcely, fakeRow))
-        self.__forms.parcely.setDruhPozemkuStavebniModel(self.__mDruhStavebniParcely)
-        self.__forms.budovy.setZpusobVyuzitiModel(self.__addFirstRowToModel(self.__mZpusobVyuzitiBudovy, fakeRow))
-        self.__forms.jednotky.setZpusobVyuzitiModel(self.__addFirstRowToModel(self.__mZpusobVyuzitiJednotek, fakeRow))
+        self.__forms.parcely.setDruhPozemkuModel(
+            self.__addFirstRowToModel(self.__mDruhParcely, fakeRow))
+        self.__forms.parcely.setDruhPozemkuPozemkovaModel(
+            self.__addFirstRowToModel(self.__mDruhPozemkoveParcely, fakeRow))
+        self.__forms.parcely.setDruhPozemkuStavebniModel(
+            self.__mDruhStavebniParcely)
+        self.__forms.budovy.setZpusobVyuzitiModel(
+            self.__addFirstRowToModel(self.__mZpusobVyuzitiBudovy, fakeRow))
+        self.__forms.jednotky.setZpusobVyuzitiModel(
+            self.__addFirstRowToModel(self.__mZpusobVyuzitiJednotek, fakeRow))
 
     def __addFirstRowToModel(self, oldModel, newRow):
         """

@@ -111,7 +111,8 @@ class RichTextDocument(VfkDocument):
         self.__mPage += u"<tr>"
 
         for column in columns:
-            self.__mPage += u"<td class=\"{}\">{}</td>".format(self.__currentTableRowCssClass(), column)
+            self.__mPage += u"<td class=\"{}\">{}</td>".format(
+                self.__currentTableRowCssClass(), column)
 
         self.__mPage += u"</tr>"
         self.__mLastColumnNumber = len(columns)
@@ -120,7 +121,7 @@ class RichTextDocument(VfkDocument):
     def tableRowOneColumnSpan(self, text):
         self.__mPage += u"<tr>"
         self.__mPage += u"<td colspan=\"{}\" class=\"{}\">{}</td>".format(self.__mLastColumnNumber,
-                                                                         self.__currentTableRowCssClass(), text)
+                                                                          self.__currentTableRowCssClass(), text)
         self.__mPage += u"</tr>"
         self.__mCurrentTableRowNumber += 1
 

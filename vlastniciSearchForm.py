@@ -39,12 +39,17 @@ class VlastniciSearchForm(QWidget):
         self.ui = Ui_VlastniciSearchForm()
         self.ui.setupUi(self)
 
-        self.connect(self.ui.ofoCheckBox, SIGNAL("clicked()"), self.__vlastniciSetRcIcoEnabled)
-        self.connect(self.ui.opoCheckBox, SIGNAL("clicked()"), self.__vlastniciSetRcIcoEnabled)
+        self.connect(self.ui.ofoCheckBox, SIGNAL(
+            "clicked()"), self.__vlastniciSetRcIcoEnabled)
+        self.connect(self.ui.opoCheckBox, SIGNAL(
+            "clicked()"), self.__vlastniciSetRcIcoEnabled)
 
-        self.connect(self.ui.ofoCheckBox, SIGNAL("clicked()"), self.__vlastniciSearchEnabled)
-        self.connect(self.ui.opoCheckBox, SIGNAL("clicked()"), self.__vlastniciSearchEnabled)
-        self.connect(self.ui.sjmCheckBox, SIGNAL("clicked()"), self.__vlastniciSearchEnabled)
+        self.connect(self.ui.ofoCheckBox, SIGNAL(
+            "clicked()"), self.__vlastniciSearchEnabled)
+        self.connect(self.ui.opoCheckBox, SIGNAL(
+            "clicked()"), self.__vlastniciSearchEnabled)
+        self.connect(self.ui.sjmCheckBox, SIGNAL(
+            "clicked()"), self.__vlastniciSearchEnabled)
 
     def jmeno(self):
         return unicode(self.ui.jmenoLineEdit.text().strip())

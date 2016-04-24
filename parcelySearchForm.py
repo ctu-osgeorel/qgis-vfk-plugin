@@ -29,6 +29,7 @@ from ui_parcelysearchform import *
 
 
 class ParcelySearchForm(QWidget):
+
     def __init__(self, parent=None):
         super(ParcelySearchForm, self).__init__(parent)
         # Set up the user interface from Designer.
@@ -39,7 +40,8 @@ class ParcelySearchForm(QWidget):
         self.__stavebniModel = QAbstractItemModel
         self.__pozemkovaModel = QAbstractItemModel
 
-        self.connect(self.ui.typParcelyCombo, SIGNAL("currentIndexChanged(int)"), self.__setDruhModel)
+        self.connect(self.ui.typParcelyCombo, SIGNAL(
+            "currentIndexChanged(int)"), self.__setDruhModel)
         self.rx = QRegExp("[0-9]*/?[0-9]*")
         self.validator = QRegExpValidator(self.rx)
         self.ui.parCisloLineEdit.setValidator(self.validator)
