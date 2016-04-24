@@ -484,17 +484,16 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             return
 
         # load all layers
-        if not self.__mOgrDataSource.GetLayer().TestCapability('IsPreProcessed'):
-            self.progressBar.setRange(0, layerCount - 1)
-            for i in xrange(layerCount):
-                self.progressBar.setValue(i)
-                theLayerName = self.__mOgrDataSource.GetLayer(
-                    i).GetLayerDefn().GetName()
-                self.labelLoading.setText(
-                    u"VFK data {}/{}: {}".format(i + 1, layerCount, theLayerName))
-                QgsApplication.processEvents()
-                self.__mOgrDataSource.GetLayer(i).GetFeatureCount(True)
-                time.sleep(0.02)
+        self.progressBar.setRange(0, layerCount - 1)
+        for i in xrange(layerCount):
+            self.progressBar.setValue(i)
+            theLayerName = self.__mOgrDataSource.GetLayer(
+                i).GetLayerDefn().GetName()
+            self.labelLoading.setText(
+                u"VFK data {}/{}: {}".format(i + 1, layerCount, theLayerName))
+            QgsApplication.processEvents()
+            self.__mOgrDataSource.GetLayer(i).GetFeatureCount(True)
+            time.sleep(0.02)
 
         self.labelLoading.setText(
             u'Soubor {} úspěšně načten.'.format(fileName))
