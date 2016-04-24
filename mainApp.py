@@ -493,7 +493,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                 self.labelLoading.setText(
                     u"VFK data {}/{}: {}".format(i + 1, layerCount, theLayerName))
                 QgsApplication.processEvents()
-                self.__mOgrDataSource.GetLayer(i).GetFeatureCount(1)
+                self.__mOgrDataSource.GetLayer(i).GetFeatureCount(True)
                 time.sleep(0.02)
 
         self.labelLoading.setText(
