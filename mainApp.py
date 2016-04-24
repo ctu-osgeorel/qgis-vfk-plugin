@@ -458,7 +458,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         QgsApplication.processEvents()
 
-        os.environ['OGR_VFK_DB_READ_ALL_BLOCKS'] = 'NO'
+        #os.environ['OGR_VFK_DB_READ_ALL_BLOCKS'] = 'NO'
         self.labelLoading.setText(
             u'Načítám data do SQLite databáze (může nějaký čas trvat...)')
         self.__mOgrDataSource = ogr.Open(
