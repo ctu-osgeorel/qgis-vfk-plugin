@@ -458,6 +458,9 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         QgsApplication.processEvents()
 
+        os.environ['OGR_VFK_DB_READ_ALL_BLOCKS'] = 'NO'
+        self.labelLoading.setText(
+            u'Načítám data do SQLite databáze (může nějaký čas trvat...)')
         self.__mOgrDataSource = ogr.Open(
             fileName, 0)   # 0 - datasource is open in read-only mode
 
@@ -476,14 +479,12 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         if ('PAR' not in layers_names or 'BUD' not in layers_names) and len(self.__vfkLineEdits) == 1:
             self.__dataWithoutParBud()
             self.labelLoading.setText(
-                u'Data nemohla být načtena. Vstupní soubor neobsahuje bloky PAR a BUD')
+                u'Data nemohla být načtena. Vstupní soubor neobsahuje bloky PAR a BUD.')
             QgsApplication.processEvents()
             return
 
         # load all layers
         if not self.__mOgrDataSource.GetLayer().TestCapability('IsPreProcessed'):
-            self.labelLoading.setText(
-                u'Načítám data do SQLite databáze (může nějaký čas trvat...)')
             self.progressBar.setRange(0, layerCount - 1)
             for i in xrange(layerCount):
                 self.progressBar.setValue(i)
