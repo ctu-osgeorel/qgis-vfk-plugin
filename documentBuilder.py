@@ -1410,6 +1410,16 @@ class DocumentBuilder:
             u"Pro procházení historie použijte tlačítka Zpět a Vpřed v panelu nástrojů nad tímto oknem."
         self.__mDocument.paragraph(text)
 
+        self.__mDocument.heading2(u"Aplikace změn")
+
+        link = self.__mDocument.link(
+            u"switchPanel?panel=changes", u"aplikaci změn")
+
+        text = u"Změny je možné aplikovat v panelu pro {}. Pro aplikování změn na stavová data je potřeba zadat " \
+               u"cestu k databázi se stavovými daty, k databázi se změnovými daty a nakonec cestu/jméno " \
+               u"pro výstupní databázi.".format(link)
+        self.__mDocument.paragraph(text)
+
     def makeShortDescription(self, id, nemovitost):
         """
 

@@ -68,6 +68,7 @@ class VfkTextBrowser(QTextBrowser):
     definitionPointAvailable = pyqtSignal(bool)
     switchToPanelImport = pyqtSignal()
     switchToPanelSearch = pyqtSignal(int)
+    switchToPanelChanges = pyqtSignal()
 
     def __init__(self, parent=None):
         """
@@ -286,6 +287,8 @@ class VfkTextBrowser(QTextBrowser):
                 self.emit(SIGNAL("switchToPanelImport"))
             elif taskMap[u"panel"] == u"search":
                 self.emit(SIGNAL("switchToPanelSearch"), int(taskMap[u'type']))
+            elif taskMap[u"panel"] == u"changes":
+                self.emit(SIGNAL("switchToPanelChanges"))
             self.setHtml(self.__mCurrentRecord.html)
         else:
             qDebug("..Jina akce")

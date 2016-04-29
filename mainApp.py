@@ -688,6 +688,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             "switchToPanelImport"), self.switchToImport)
         self.connect(self.vfkBrowser, SIGNAL(
             "switchToPanelSearch"), self.switchToSearch)
+        self.connect(self.vfkBrowser, SIGNAL(
+            "switchToPanelChanges"), self.switchToChanges)
 
         # Browser toolbar
         # ---------------
