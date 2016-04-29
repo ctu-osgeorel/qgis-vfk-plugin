@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>918</width>
-    <height>408</height>
+    <height>274</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -48,8 +48,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>383</width>
-              <height>370</height>
+              <width>409</width>
+              <height>236</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_11">
@@ -199,6 +199,128 @@
          </item>
         </layout>
        </widget>
+       <widget class="QWidget" name="changesPage">
+        <layout class="QGridLayout" name="gridLayout_15">
+         <item row="0" column="0">
+          <widget class="QScrollArea" name="scrollArea_6">
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="QWidget" name="scrollAreaWidgetContents_6">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>409</width>
+              <height>236</height>
+             </rect>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_16">
+             <item row="0" column="0">
+              <widget class="QWidget" name="widget_3" native="true">
+               <layout class="QGridLayout" name="gridLayout_14">
+                <item row="0" column="0">
+                 <layout class="QGridLayout" name="gridLayout_13">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_4">
+                    <property name="text">
+                     <string>Hlavní databáze:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QLineEdit" name="lineEdit"/>
+                  </item>
+                  <item row="0" column="2">
+                   <widget class="QPushButton" name="pushButton">
+                    <property name="text">
+                     <string>Procházet</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="label_5">
+                    <property name="text">
+                     <string>Změnová databáze:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLineEdit" name="lineEdit_2"/>
+                  </item>
+                  <item row="1" column="2">
+                   <widget class="QPushButton" name="pushButton_2">
+                    <property name="text">
+                     <string>Procházet</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="label_6">
+                    <property name="text">
+                     <string>Výstupní databáze:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLineEdit" name="lineEdit_3"/>
+                  </item>
+                  <item row="2" column="2">
+                   <widget class="QPushButton" name="pushButton_3">
+                    <property name="text">
+                     <string>Procházet</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item row="1" column="0">
+                 <spacer name="verticalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>38</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="l_status">
+                  <property name="text">
+                   <string></string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0">
+                 <layout class="QHBoxLayout" name="horizontalLayout_5">
+                  <item>
+                   <widget class="QProgressBar" name="pb_processChanges">
+                    <property name="value">
+                     <number>0</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_4">
+                    <property name="text">
+                     <string>Zpracovat změny</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
        <widget class="QWidget" name="searchPage">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -251,8 +373,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>353</width>
-                  <height>276</height>
+                  <width>391</width>
+                  <height>142</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_5">
@@ -277,7 +399,7 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>66</width>
+                  <width>98</width>
                   <height>28</height>
                  </rect>
                 </property>
@@ -303,7 +425,7 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>66</width>
+                  <width>98</width>
                   <height>28</height>
                  </rect>
                 </property>
@@ -329,7 +451,7 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>66</width>
+                  <width>98</width>
                   <height>28</height>
                  </rect>
                 </property>
@@ -485,6 +607,9 @@
    <property name="toolTip">
     <string>Označit aktuální parcely v mapě</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
   </action>
   <action name="actionSelectBudInMap">
    <property name="icon">
@@ -496,6 +621,9 @@
    </property>
    <property name="toolTip">
     <string>Označit aktuální budovy v mapě</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
    </property>
   </action>
   <action name="actionCuzkPage">
@@ -535,6 +663,27 @@
    </property>
    <property name="toolTip">
     <string>Zobrazit nápovědu</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+H</string>
+   </property>
+  </action>
+  <action name="actionZpracujZmeny">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/applyChanges.png</normaloff>:/applyChanges.png</iconset>
+   </property>
+   <property name="text">
+    <string>ZpracujZmeny</string>
+   </property>
+   <property name="toolTip">
+    <string>Aplikuj změny na stavová data</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
  </widget>

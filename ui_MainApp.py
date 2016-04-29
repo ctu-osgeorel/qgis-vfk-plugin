@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_MainApp.ui'
 #
-# Created: Thu Apr  7 20:36:41 2016
+# Created: Fri Apr 29 14:57:12 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -17,19 +17,16 @@ except AttributeError:
 
 try:
     _encoding = QtGui.QApplication.UnicodeUTF8
-
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-
 class Ui_MainApp(object):
-
     def setupUi(self, MainApp):
         MainApp.setObjectName(_fromUtf8("MainApp"))
-        MainApp.resize(918, 408)
+        MainApp.resize(918, 274)
         MainApp.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.centralWidget = QtGui.QWidget(MainApp)
         self.centralWidget.setObjectName(_fromUtf8("centralWidget"))
@@ -39,12 +36,10 @@ class Ui_MainApp(object):
         self.splitter.setOrientation(QtCore.Qt.Horizontal)
         self.splitter.setObjectName(_fromUtf8("splitter"))
         self.stackedWidget = QtGui.QStackedWidget(self.splitter)
-        sizePolicy = QtGui.QSizePolicy(
-            QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Preferred)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(2)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.stackedWidget.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(self.stackedWidget.sizePolicy().hasHeightForWidth())
         self.stackedWidget.setSizePolicy(sizePolicy)
         self.stackedWidget.setObjectName(_fromUtf8("stackedWidget"))
         self.importPage = QtGui.QWidget()
@@ -55,10 +50,8 @@ class Ui_MainApp(object):
         self.scrollArea_5.setWidgetResizable(True)
         self.scrollArea_5.setObjectName(_fromUtf8("scrollArea_5"))
         self.scrollAreaWidgetContents_5 = QtGui.QWidget()
-        self.scrollAreaWidgetContents_5.setGeometry(
-            QtCore.QRect(0, 0, 383, 370))
-        self.scrollAreaWidgetContents_5.setObjectName(
-            _fromUtf8("scrollAreaWidgetContents_5"))
+        self.scrollAreaWidgetContents_5.setGeometry(QtCore.QRect(0, 0, 409, 236))
+        self.scrollAreaWidgetContents_5.setObjectName(_fromUtf8("scrollAreaWidgetContents_5"))
         self.gridLayout_11 = QtGui.QGridLayout(self.scrollAreaWidgetContents_5)
         self.gridLayout_11.setObjectName(_fromUtf8("gridLayout_11"))
         self.widget = QtGui.QWidget(self.scrollAreaWidgetContents_5)
@@ -110,8 +103,7 @@ class Ui_MainApp(object):
         self.parCheckBox.setObjectName(_fromUtf8("parCheckBox"))
         self.gridLayout_12.addWidget(self.parCheckBox, 1, 1, 1, 1)
         self.verticalLayout_2.addLayout(self.gridLayout_12)
-        spacerItem = QtGui.QSpacerItem(
-            20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout_2.addItem(spacerItem)
         self.labelLoading = QtGui.QLabel(self.widget)
         self.labelLoading.setText(_fromUtf8(""))
@@ -131,13 +123,77 @@ class Ui_MainApp(object):
         self.scrollArea_5.setWidget(self.scrollAreaWidgetContents_5)
         self.gridLayout_10.addWidget(self.scrollArea_5, 0, 0, 1, 1)
         self.stackedWidget.addWidget(self.importPage)
+        self.changesPage = QtGui.QWidget()
+        self.changesPage.setObjectName(_fromUtf8("changesPage"))
+        self.gridLayout_15 = QtGui.QGridLayout(self.changesPage)
+        self.gridLayout_15.setObjectName(_fromUtf8("gridLayout_15"))
+        self.scrollArea_6 = QtGui.QScrollArea(self.changesPage)
+        self.scrollArea_6.setWidgetResizable(True)
+        self.scrollArea_6.setObjectName(_fromUtf8("scrollArea_6"))
+        self.scrollAreaWidgetContents_6 = QtGui.QWidget()
+        self.scrollAreaWidgetContents_6.setGeometry(QtCore.QRect(0, 0, 409, 236))
+        self.scrollAreaWidgetContents_6.setObjectName(_fromUtf8("scrollAreaWidgetContents_6"))
+        self.gridLayout_16 = QtGui.QGridLayout(self.scrollAreaWidgetContents_6)
+        self.gridLayout_16.setObjectName(_fromUtf8("gridLayout_16"))
+        self.widget_3 = QtGui.QWidget(self.scrollAreaWidgetContents_6)
+        self.widget_3.setObjectName(_fromUtf8("widget_3"))
+        self.gridLayout_14 = QtGui.QGridLayout(self.widget_3)
+        self.gridLayout_14.setMargin(0)
+        self.gridLayout_14.setObjectName(_fromUtf8("gridLayout_14"))
+        self.gridLayout_13 = QtGui.QGridLayout()
+        self.gridLayout_13.setObjectName(_fromUtf8("gridLayout_13"))
+        self.label_4 = QtGui.QLabel(self.widget_3)
+        self.label_4.setObjectName(_fromUtf8("label_4"))
+        self.gridLayout_13.addWidget(self.label_4, 0, 0, 1, 1)
+        self.lineEdit = QtGui.QLineEdit(self.widget_3)
+        self.lineEdit.setObjectName(_fromUtf8("lineEdit"))
+        self.gridLayout_13.addWidget(self.lineEdit, 0, 1, 1, 1)
+        self.pushButton = QtGui.QPushButton(self.widget_3)
+        self.pushButton.setObjectName(_fromUtf8("pushButton"))
+        self.gridLayout_13.addWidget(self.pushButton, 0, 2, 1, 1)
+        self.label_5 = QtGui.QLabel(self.widget_3)
+        self.label_5.setObjectName(_fromUtf8("label_5"))
+        self.gridLayout_13.addWidget(self.label_5, 1, 0, 1, 1)
+        self.lineEdit_2 = QtGui.QLineEdit(self.widget_3)
+        self.lineEdit_2.setObjectName(_fromUtf8("lineEdit_2"))
+        self.gridLayout_13.addWidget(self.lineEdit_2, 1, 1, 1, 1)
+        self.pushButton_2 = QtGui.QPushButton(self.widget_3)
+        self.pushButton_2.setObjectName(_fromUtf8("pushButton_2"))
+        self.gridLayout_13.addWidget(self.pushButton_2, 1, 2, 1, 1)
+        self.label_6 = QtGui.QLabel(self.widget_3)
+        self.label_6.setObjectName(_fromUtf8("label_6"))
+        self.gridLayout_13.addWidget(self.label_6, 2, 0, 1, 1)
+        self.lineEdit_3 = QtGui.QLineEdit(self.widget_3)
+        self.lineEdit_3.setObjectName(_fromUtf8("lineEdit_3"))
+        self.gridLayout_13.addWidget(self.lineEdit_3, 2, 1, 1, 1)
+        self.pushButton_3 = QtGui.QPushButton(self.widget_3)
+        self.pushButton_3.setObjectName(_fromUtf8("pushButton_3"))
+        self.gridLayout_13.addWidget(self.pushButton_3, 2, 2, 1, 1)
+        self.gridLayout_14.addLayout(self.gridLayout_13, 0, 0, 1, 1)
+        spacerItem1 = QtGui.QSpacerItem(20, 38, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.gridLayout_14.addItem(spacerItem1, 1, 0, 1, 1)
+        self.l_status = QtGui.QLabel(self.widget_3)
+        self.l_status.setObjectName(_fromUtf8("l_status"))
+        self.gridLayout_14.addWidget(self.l_status, 2, 0, 1, 1)
+        self.horizontalLayout_5 = QtGui.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(_fromUtf8("horizontalLayout_5"))
+        self.pb_processChanges = QtGui.QProgressBar(self.widget_3)
+        self.pb_processChanges.setProperty("value", 0)
+        self.pb_processChanges.setObjectName(_fromUtf8("pb_processChanges"))
+        self.horizontalLayout_5.addWidget(self.pb_processChanges)
+        self.pushButton_4 = QtGui.QPushButton(self.widget_3)
+        self.pushButton_4.setObjectName(_fromUtf8("pushButton_4"))
+        self.horizontalLayout_5.addWidget(self.pushButton_4)
+        self.gridLayout_14.addLayout(self.horizontalLayout_5, 3, 0, 1, 1)
+        self.gridLayout_16.addWidget(self.widget_3, 0, 0, 1, 1)
+        self.scrollArea_6.setWidget(self.scrollAreaWidgetContents_6)
+        self.gridLayout_15.addWidget(self.scrollArea_6, 0, 0, 1, 1)
+        self.stackedWidget.addWidget(self.changesPage)
         self.searchPage = QtGui.QWidget()
-        sizePolicy = QtGui.QSizePolicy(
-            QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.searchPage.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(self.searchPage.sizePolicy().hasHeightForWidth())
         self.searchPage.setSizePolicy(sizePolicy)
         self.searchPage.setObjectName(_fromUtf8("searchPage"))
         self.verticalLayout_3 = QtGui.QVBoxLayout(self.searchPage)
@@ -145,22 +201,18 @@ class Ui_MainApp(object):
         self.horizontalLayout_4 = QtGui.QHBoxLayout()
         self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
         self.label_3 = QtGui.QLabel(self.searchPage)
-        sizePolicy = QtGui.QSizePolicy(
-            QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Preferred)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.label_3.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(self.label_3.sizePolicy().hasHeightForWidth())
         self.label_3.setSizePolicy(sizePolicy)
         self.label_3.setObjectName(_fromUtf8("label_3"))
         self.horizontalLayout_4.addWidget(self.label_3)
         self.searchCombo = QtGui.QComboBox(self.searchPage)
-        sizePolicy = QtGui.QSizePolicy(
-            QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.searchCombo.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(self.searchCombo.sizePolicy().hasHeightForWidth())
         self.searchCombo.setSizePolicy(sizePolicy)
         self.searchCombo.setObjectName(_fromUtf8("searchCombo"))
         self.horizontalLayout_4.addWidget(self.searchCombo)
@@ -175,15 +227,12 @@ class Ui_MainApp(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName(_fromUtf8("scrollArea"))
         self.scrollAreaWidgetContents = QtGui.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 353, 276))
-        self.scrollAreaWidgetContents.setObjectName(
-            _fromUtf8("scrollAreaWidgetContents"))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 391, 142))
+        self.scrollAreaWidgetContents.setObjectName(_fromUtf8("scrollAreaWidgetContents"))
         self.gridLayout_5 = QtGui.QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_5.setObjectName(_fromUtf8("gridLayout_5"))
-        self.vlastniciSearchForm = VlastniciSearchForm(
-            self.scrollAreaWidgetContents)
-        self.vlastniciSearchForm.setObjectName(
-            _fromUtf8("vlastniciSearchForm"))
+        self.vlastniciSearchForm = VlastniciSearchForm(self.scrollAreaWidgetContents)
+        self.vlastniciSearchForm.setObjectName(_fromUtf8("vlastniciSearchForm"))
         self.gridLayout_5.addWidget(self.vlastniciSearchForm, 0, 0, 1, 1)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.gridLayout.addWidget(self.scrollArea, 0, 0, 1, 1)
@@ -196,13 +245,11 @@ class Ui_MainApp(object):
         self.scrollArea_3.setWidgetResizable(True)
         self.scrollArea_3.setObjectName(_fromUtf8("scrollArea_3"))
         self.scrollAreaWidgetContents_2 = QtGui.QWidget()
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 66, 28))
-        self.scrollAreaWidgetContents_2.setObjectName(
-            _fromUtf8("scrollAreaWidgetContents_2"))
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents_2.setObjectName(_fromUtf8("scrollAreaWidgetContents_2"))
         self.gridLayout_7 = QtGui.QGridLayout(self.scrollAreaWidgetContents_2)
         self.gridLayout_7.setObjectName(_fromUtf8("gridLayout_7"))
-        self.parcelySearchForm = ParcelySearchForm(
-            self.scrollAreaWidgetContents_2)
+        self.parcelySearchForm = ParcelySearchForm(self.scrollAreaWidgetContents_2)
         self.parcelySearchForm.setObjectName(_fromUtf8("parcelySearchForm"))
         self.gridLayout_7.addWidget(self.parcelySearchForm, 0, 0, 1, 1)
         self.scrollArea_3.setWidget(self.scrollAreaWidgetContents_2)
@@ -216,13 +263,11 @@ class Ui_MainApp(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollArea_2.setObjectName(_fromUtf8("scrollArea_2"))
         self.scrollAreaWidgetContents_3 = QtGui.QWidget()
-        self.scrollAreaWidgetContents_3.setGeometry(QtCore.QRect(0, 0, 66, 28))
-        self.scrollAreaWidgetContents_3.setObjectName(
-            _fromUtf8("scrollAreaWidgetContents_3"))
+        self.scrollAreaWidgetContents_3.setGeometry(QtCore.QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents_3.setObjectName(_fromUtf8("scrollAreaWidgetContents_3"))
         self.gridLayout_3 = QtGui.QGridLayout(self.scrollAreaWidgetContents_3)
         self.gridLayout_3.setObjectName(_fromUtf8("gridLayout_3"))
-        self.budovySearchForm = BudovySearchForm(
-            self.scrollAreaWidgetContents_3)
+        self.budovySearchForm = BudovySearchForm(self.scrollAreaWidgetContents_3)
         self.budovySearchForm.setObjectName(_fromUtf8("budovySearchForm"))
         self.gridLayout_3.addWidget(self.budovySearchForm, 0, 0, 1, 1)
         self.scrollArea_2.setWidget(self.scrollAreaWidgetContents_3)
@@ -236,13 +281,11 @@ class Ui_MainApp(object):
         self.scrollArea_4.setWidgetResizable(True)
         self.scrollArea_4.setObjectName(_fromUtf8("scrollArea_4"))
         self.scrollAreaWidgetContents_4 = QtGui.QWidget()
-        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, 0, 66, 28))
-        self.scrollAreaWidgetContents_4.setObjectName(
-            _fromUtf8("scrollAreaWidgetContents_4"))
+        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, 0, 98, 28))
+        self.scrollAreaWidgetContents_4.setObjectName(_fromUtf8("scrollAreaWidgetContents_4"))
         self.gridLayout_9 = QtGui.QGridLayout(self.scrollAreaWidgetContents_4)
         self.gridLayout_9.setObjectName(_fromUtf8("gridLayout_9"))
-        self.jednotkySearchForm = JednotkySearchForm(
-            self.scrollAreaWidgetContents_4)
+        self.jednotkySearchForm = JednotkySearchForm(self.scrollAreaWidgetContents_4)
         self.jednotkySearchForm.setObjectName(_fromUtf8("jednotkySearchForm"))
         self.gridLayout_9.addWidget(self.jednotkySearchForm, 0, 0, 1, 1)
         self.scrollArea_4.setWidget(self.scrollAreaWidgetContents_4)
@@ -251,21 +294,18 @@ class Ui_MainApp(object):
         self.verticalLayout_3.addWidget(self.searchForms)
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
-        spacerItem1 = QtGui.QSpacerItem(
-            40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout.addItem(spacerItem1)
+        spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem2)
         self.searchButton = QtGui.QPushButton(self.searchPage)
         self.searchButton.setObjectName(_fromUtf8("searchButton"))
         self.horizontalLayout.addWidget(self.searchButton)
         self.verticalLayout_3.addLayout(self.horizontalLayout)
         self.stackedWidget.addWidget(self.searchPage)
         self.widget_2 = QtGui.QWidget(self.splitter)
-        sizePolicy = QtGui.QSizePolicy(
-            QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(3)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.widget_2.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(self.widget_2.sizePolicy().hasHeightForWidth())
         self.widget_2.setSizePolicy(sizePolicy)
         self.widget_2.setObjectName(_fromUtf8("widget_2"))
         self.rightWidgetLayout = QtGui.QVBoxLayout(self.widget_2)
@@ -279,28 +319,24 @@ class Ui_MainApp(object):
         self.actionVyhledavani = QtGui.QAction(MainApp)
         self.actionVyhledavani.setCheckable(True)
         icon = QtGui.QIcon()
-        icon.addPixmap(
-            QtGui.QPixmap(_fromUtf8(":/search.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/search.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionVyhledavani.setIcon(icon)
         self.actionVyhledavani.setObjectName(_fromUtf8("actionVyhledavani"))
         self.actionImport = QtGui.QAction(MainApp)
         self.actionImport.setCheckable(True)
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(
-            QtGui.QPixmap(_fromUtf8(":/db-add.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap(_fromUtf8(":/db-add.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionImport.setIcon(icon1)
         self.actionImport.setObjectName(_fromUtf8("actionImport"))
         self.actionBack = QtGui.QAction(MainApp)
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(
-            QtGui.QPixmap(_fromUtf8(":/arrowBack.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap(_fromUtf8(":/arrowBack.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionBack.setIcon(icon2)
         self.actionBack.setObjectName(_fromUtf8("actionBack"))
         self.actionForward = QtGui.QAction(MainApp)
         self.actionForward.setEnabled(True)
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(
-            QtGui.QPixmap(_fromUtf8(":/arrowForward.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap(_fromUtf8(":/arrowForward.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionForward.setIcon(icon3)
         self.actionForward.setObjectName(_fromUtf8("actionForward"))
         self.actionExportLatex = QtGui.QAction(MainApp)
@@ -309,38 +345,36 @@ class Ui_MainApp(object):
         self.actionExportHtml.setObjectName(_fromUtf8("actionExportHtml"))
         self.actionSelectParInMap = QtGui.QAction(MainApp)
         icon4 = QtGui.QIcon()
-        icon4.addPixmap(
-            QtGui.QPixmap(_fromUtf8(":/selectPar.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon4.addPixmap(QtGui.QPixmap(_fromUtf8(":/selectPar.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionSelectParInMap.setIcon(icon4)
-        self.actionSelectParInMap.setObjectName(
-            _fromUtf8("actionSelectParInMap"))
+        self.actionSelectParInMap.setObjectName(_fromUtf8("actionSelectParInMap"))
         self.actionSelectBudInMap = QtGui.QAction(MainApp)
         icon5 = QtGui.QIcon()
-        icon5.addPixmap(
-            QtGui.QPixmap(_fromUtf8(":/selectBud.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon5.addPixmap(QtGui.QPixmap(_fromUtf8(":/selectBud.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionSelectBudInMap.setIcon(icon5)
-        self.actionSelectBudInMap.setObjectName(
-            _fromUtf8("actionSelectBudInMap"))
+        self.actionSelectBudInMap.setObjectName(_fromUtf8("actionSelectBudInMap"))
         self.actionCuzkPage = QtGui.QAction(MainApp)
         icon6 = QtGui.QIcon()
-        icon6.addPixmap(
-            QtGui.QPixmap(_fromUtf8(":/cuzk.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon6.addPixmap(QtGui.QPixmap(_fromUtf8(":/cuzk.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionCuzkPage.setIcon(icon6)
         self.actionCuzkPage.setObjectName(_fromUtf8("actionCuzkPage"))
         self.actionShowInfoaboutSelection = QtGui.QAction(MainApp)
         self.actionShowInfoaboutSelection.setCheckable(True)
         icon7 = QtGui.QIcon()
-        icon7.addPixmap(
-            QtGui.QPixmap(_fromUtf8(":/showInfo.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon7.addPixmap(QtGui.QPixmap(_fromUtf8(":/showInfo.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionShowInfoaboutSelection.setIcon(icon7)
-        self.actionShowInfoaboutSelection.setObjectName(
-            _fromUtf8("actionShowInfoaboutSelection"))
+        self.actionShowInfoaboutSelection.setObjectName(_fromUtf8("actionShowInfoaboutSelection"))
         self.actionShowHelpPage = QtGui.QAction(MainApp)
         icon8 = QtGui.QIcon()
-        icon8.addPixmap(
-            QtGui.QPixmap(_fromUtf8(":/vfkPlugin.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon8.addPixmap(QtGui.QPixmap(_fromUtf8(":/vfkPlugin.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionShowHelpPage.setIcon(icon8)
         self.actionShowHelpPage.setObjectName(_fromUtf8("actionShowHelpPage"))
+        self.actionZpracujZmeny = QtGui.QAction(MainApp)
+        self.actionZpracujZmeny.setCheckable(True)
+        icon9 = QtGui.QIcon()
+        icon9.addPixmap(QtGui.QPixmap(_fromUtf8(":/applyChanges.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionZpracujZmeny.setIcon(icon9)
+        self.actionZpracujZmeny.setObjectName(_fromUtf8("actionZpracujZmeny"))
 
         self.retranslateUi(MainApp)
         self.stackedWidget.setCurrentIndex(0)
@@ -356,14 +390,19 @@ class Ui_MainApp(object):
         self.label.setText(_translate("MainApp", "VFK soubor:", None))
         self.parCheckBox.setText(_translate("MainApp", "Parcely (PAR)", None))
         self.loadVfkButton.setText(_translate("MainApp", "Načíst", None))
+        self.label_4.setText(_translate("MainApp", "Hlavní databáze:", None))
+        self.pushButton.setText(_translate("MainApp", "Procházet", None))
+        self.label_5.setText(_translate("MainApp", "Změnová databáze:", None))
+        self.pushButton_2.setText(_translate("MainApp", "Procházet", None))
+        self.label_6.setText(_translate("MainApp", "Výstupní databáze:", None))
+        self.pushButton_3.setText(_translate("MainApp", "Procházet", None))
+        self.l_status.setText(_translate("MainApp", "", None))
+        self.pushButton_4.setText(_translate("MainApp", "Zpracovat změny", None))
         self.label_3.setText(_translate("MainApp", "Vyhledat:", None))
         self.searchButton.setText(_translate("MainApp", "Hledej", None))
-        self.actionVyhledavani.setText(
-            _translate("MainApp", "Vyhledávání", None))
-        self.actionVyhledavani.setToolTip(
-            _translate("MainApp", "Vyhledávání", None))
-        self.actionVyhledavani.setShortcut(
-            _translate("MainApp", "Ctrl+F", None))
+        self.actionVyhledavani.setText(_translate("MainApp", "Vyhledávání", None))
+        self.actionVyhledavani.setToolTip(_translate("MainApp", "Vyhledávání", None))
+        self.actionVyhledavani.setShortcut(_translate("MainApp", "Ctrl+F", None))
         self.actionImport.setText(_translate("MainApp", "Import", None))
         self.actionImport.setToolTip(_translate("MainApp", "Import VFK", None))
         self.actionImport.setShortcut(_translate("MainApp", "Ctrl+I", None))
@@ -372,33 +411,27 @@ class Ui_MainApp(object):
         self.actionBack.setShortcut(_translate("MainApp", "Ctrl+Z", None))
         self.actionForward.setText(_translate("MainApp", "forward", None))
         self.actionForward.setToolTip(_translate("MainApp", "Vpřed", None))
-        self.actionForward.setShortcut(
-            _translate("MainApp", "Ctrl+Shift+Z", None))
+        self.actionForward.setShortcut(_translate("MainApp", "Ctrl+Shift+Z", None))
         self.actionExportLatex.setText(_translate("MainApp", "LaTeX", None))
-        self.actionExportLatex.setToolTip(
-            _translate("MainApp", "Export do LaTeXu", None))
+        self.actionExportLatex.setToolTip(_translate("MainApp", "Export do LaTeXu", None))
         self.actionExportHtml.setText(_translate("MainApp", "HTML", None))
-        self.actionExportHtml.setToolTip(
-            _translate("MainApp", "Export do HTML", None))
-        self.actionSelectParInMap.setText(
-            _translate("MainApp", "selectParInMap", None))
-        self.actionSelectParInMap.setToolTip(
-            _translate("MainApp", "Označit aktuální parcely v mapě", None))
-        self.actionSelectBudInMap.setText(
-            _translate("MainApp", "selectBudInMap", None))
-        self.actionSelectBudInMap.setToolTip(
-            _translate("MainApp", "Označit aktuální budovy v mapě", None))
+        self.actionExportHtml.setToolTip(_translate("MainApp", "Export do HTML", None))
+        self.actionSelectParInMap.setText(_translate("MainApp", "selectParInMap", None))
+        self.actionSelectParInMap.setToolTip(_translate("MainApp", "Označit aktuální parcely v mapě", None))
+        self.actionSelectParInMap.setShortcut(_translate("MainApp", "Ctrl+P", None))
+        self.actionSelectBudInMap.setText(_translate("MainApp", "selectBudInMap", None))
+        self.actionSelectBudInMap.setToolTip(_translate("MainApp", "Označit aktuální budovy v mapě", None))
+        self.actionSelectBudInMap.setShortcut(_translate("MainApp", "Ctrl+B", None))
         self.actionCuzkPage.setText(_translate("MainApp", "cuzkPage", None))
-        self.actionCuzkPage.setToolTip(
-            _translate("MainApp", "Otevřít v prohlížeči aplikaci Nahlížení do KN pro aktuální nemovitost", None))
-        self.actionShowInfoaboutSelection.setText(
-            _translate("MainApp", "showInfoaboutSelection", None))
-        self.actionShowInfoaboutSelection.setToolTip(
-            _translate("MainApp", "Aktivovat/deaktivovat zobrazení informací o vybraných nemovitostech", None))
-        self.actionShowHelpPage.setText(
-            _translate("MainApp", "showHelpPage", None))
-        self.actionShowHelpPage.setToolTip(
-            _translate("MainApp", "Zobrazit nápovědu", None))
+        self.actionCuzkPage.setToolTip(_translate("MainApp", "Otevřít v prohlížeči aplikaci Nahlížení do KN pro aktuální nemovitost", None))
+        self.actionShowInfoaboutSelection.setText(_translate("MainApp", "showInfoaboutSelection", None))
+        self.actionShowInfoaboutSelection.setToolTip(_translate("MainApp", "Aktivovat/deaktivovat zobrazení informací o vybraných nemovitostech", None))
+        self.actionShowHelpPage.setText(_translate("MainApp", "showHelpPage", None))
+        self.actionShowHelpPage.setToolTip(_translate("MainApp", "Zobrazit nápovědu", None))
+        self.actionShowHelpPage.setShortcut(_translate("MainApp", "Ctrl+H", None))
+        self.actionZpracujZmeny.setText(_translate("MainApp", "ZpracujZmeny", None))
+        self.actionZpracujZmeny.setToolTip(_translate("MainApp", "Aplikuj změny na stavová data", None))
+        self.actionZpracujZmeny.setShortcut(_translate("MainApp", "Ctrl+A", None))
 
 from vlastniciSearchForm import VlastniciSearchForm
 from vfkTextBrowser import VfkTextBrowser
@@ -406,3 +439,4 @@ from jednotkySearchForm import JednotkySearchForm
 from budovySearchForm import BudovySearchForm
 from parcelySearchForm import ParcelySearchForm
 import resources_rc
+

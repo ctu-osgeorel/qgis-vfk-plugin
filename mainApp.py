@@ -446,6 +446,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type fileName: str
         :return:
         """
+        label_text = fileName.split('/')
+        label_text = label_text[-2] + label_text[-1]
 
         if self.__mOgrDataSource:
             self.__mOgrDataSource.Destroy()
@@ -460,7 +462,10 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         #os.environ['OGR_VFK_DB_READ_ALL_BLOCKS'] = 'NO'
         self.labelLoading.setText(
-            u'Načítám data do SQLite databáze (může nějaký čas trvat...)')
+            u'Načítám soubor {} (může nějaký čas trvat...)'.format(label_text))
+
+        QgsApplication.processEvents()
+
         self.__mOgrDataSource = ogr.Open(
             fileName, 0)   # 0 - datasource is open in read-only mode
 
@@ -496,7 +501,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             time.sleep(0.02)
 
         self.labelLoading.setText(
-            u'Soubor {} úspěšně načten.'.format(fileName))
+            u'Soubor {} úspěšně načten.'.format(label_text))
 
     def __selectedIds(self, layer):
         """
@@ -568,6 +573,12 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.actionVyhledavani.trigger()
         self.searchCombo.setCurrentIndex(searchType)
         self.searchFormMainControls.searchForms.setCurrentIndex(searchType)
+
+    def switchToChanges(self):
+        """
+
+        """
+        self.actionZpracujZmeny.trigger()
 
     def succesfullExport(self, export_format):
         """
@@ -649,6 +660,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         actionGroup = QActionGroup(self)
         actionGroup.addAction(self.actionImport)
         actionGroup.addAction(self.actionVyhledavani)
+        actionGroup.addAction(self.actionZpracujZmeny)
 
         # QSignalMapper
         self.signalMapper = QSignalMapper(self)
@@ -658,11 +670,14 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             "triggered()"), self.signalMapper, SLOT("map()"))
         self.connect(self.actionVyhledavani, SIGNAL(
             "triggered()"), self.signalMapper, SLOT("map()"))
+        self.connect(self.actionZpracujZmeny, SIGNAL(
+            "triggered()"), self.signalMapper, SLOT("map()"))
 
         # setMapping on each button to the QStackedWidget index we'd like to
         # switch to
         self.signalMapper.setMapping(self.actionImport, 0)
-        self.signalMapper.setMapping(self.actionVyhledavani, 1)
+        self.signalMapper.setMapping(self.actionVyhledavani, 2)
+        self.signalMapper.setMapping(self.actionZpracujZmeny, 1)
 
         # connect mapper to stackedWidget
         self.connect(self.signalMapper, SIGNAL("mapped(int)"),
@@ -720,6 +735,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         # add actions to toolbar icons
         self.__mBrowserToolbar.addAction(self.actionImport)
         self.__mBrowserToolbar.addAction(self.actionVyhledavani)
+        self.__mBrowserToolbar.addAction(self.actionZpracujZmeny)
         self.__mBrowserToolbar.addSeparator()
         self.__mBrowserToolbar.addAction(self.actionBack)
         self.__mBrowserToolbar.addAction(self.actionForward)

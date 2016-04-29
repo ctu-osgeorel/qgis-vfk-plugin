@@ -2,6 +2,7 @@
   <qresource>
     <file alias="vfkPluginIcon.png">data/vfkPluginIcon.png</file>
     <file alias="arrowBack.png">data/arrowBack.png</file>
+    <file alias="applyChanges.png">data/applyChanges.png</file>
     <file alias="arrowForward.png">data/arrowForward.png</file>
     <file alias="budStyle.qml">data/budStyle.qml</file>
     <file alias="cuzk.png">data/cuzk.png</file>

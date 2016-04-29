@@ -299,7 +299,7 @@ class VfkTextBrowser(QTextBrowser):
         """
         doc = self.documentFactory(format)
         if not doc:
-            return ''
+            return u''
 
         self.__mDocumentBuilder.buildHtml(doc, taskMap)
         text = doc.toString()
