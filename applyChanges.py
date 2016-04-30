@@ -241,4 +241,4 @@ if __name__ == '__main__':
     changes.run(args.main, args.changes, args.export)
 
     print('--------------------------------')
-    print('All changes successfully aplied.')
+    print('All changes successfully applied.')
