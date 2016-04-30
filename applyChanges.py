@@ -26,9 +26,9 @@ import sqlite3
 import sys
 import os
 import shutil
-import time
+import argparse
 
-from PyQt4.QtGui import QWidget
+from PyQt4.QtGui import QWidget, QApplication
 from PyQt4.QtCore import qDebug, pyqtSignal, SIGNAL
 
 
@@ -224,8 +224,21 @@ class ApplyChanges(QWidget):
         return ids
 
 if __name__ == '__main__':
+    app = QApplication(sys.argv)
+
+    # load arguments from command line
+    parser = argparse.ArgumentParser(description='Script applies changes from amendment VFK database to '
+                                                 'main VFK database. In this process new database is created.')
+    parser.add_argument('-v', '--version', action='version', version='%(prog)s 2.1')
+    parser.add_argument('-m', '--main', help='Path to the main database.', required=True)
+    parser.add_argument('-c', '--changes', help='Path to the database with changes.', required=True)
+    parser.add_argument('-e', '--export', help='Path to the new database which will be created.', required=True)
+
+    args = parser.parse_args()
+
+    print('Applying changes..')
     changes = ApplyChanges()
-    changes.run('/home/stepan/GoogleDrive/CVUT/Diplomka/zmenova_data/stav/stavova.db',
-                 #'/home/stepan/vfkDB.db',
-                 '/home/stepan/GoogleDrive/CVUT/Diplomka/zmenova_data/zmena/zmenova.db',
-                 '/home/stepan/Desktop/novaDB.db')
+    changes.run(args.main, args.changes, args.export)
+
+    print('--------------------------------')
+    print('All changes successfully aplied.')
