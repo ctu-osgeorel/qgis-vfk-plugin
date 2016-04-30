@@ -26,48 +26,74 @@ import sqlite3
 import sys
 import os
 import shutil
+import time
 
-from PyQt4.QtCore import qDebug
+from PyQt4.QtGui import QWidget
+from PyQt4.QtCore import qDebug, pyqtSignal, SIGNAL
 
 
-class ApplyChanges:
-    def __init__(self, db_full, db_amendment, db_updated):
+class ApplyChanges(QWidget):
+    # signals
+    maxRangeProgressBar = pyqtSignal(int)
+    updateStatus = pyqtSignal(int, str)
+    finishedStatus = pyqtSignal()
+    preprocessingDatabase = pyqtSignal()
+
+    def __init__(self):
+        QWidget.__init__(self)
+
+        self.__conn = None
+        self.__cur = None
+
+    def run(self, db_full, db_amendment, db_updated):
         """
 
+        :param db_full: Path to the main database.
+        :param db_amendment: Path to the database with changes to process.
+        :param db_updated: Path to the database for export.
+        :type db_full: str
+        :type db_amendment: str
+        :type db_updated: str
         """
+        self.emit(SIGNAL('preprocessingDatabase'))
+
         db_full = os.path.abspath(db_full)
         db_amendment = os.path.abspath(db_amendment)
         db_updated = os.path.abspath(db_updated)
 
-        #shutil.copy2(db_full, db_updated)
+        shutil.copy2(db_full, db_updated)
 
         # create connection to main database
-        self.conn = sqlite3.connect(db_updated)
+        self.__conn = sqlite3.connect(db_updated)
 
-        with self.conn:
-
-            self.cur = self.conn.cursor()
+        with self.__conn:
+            self.__cur = self.__conn.cursor()
             # attach database with amendment data
-            self.cur.execute('ATTACH DATABASE "{}" as db2'.format(db_amendment))
+            self.__cur.execute('ATTACH DATABASE "{}" as db2'.format(db_amendment))
 
-            self.applyChanges()
+            self.__applyChanges()
 
-    def applyChanges(self):
+        self.emit(SIGNAL('finishedStatus'))
+
+    def __applyChanges(self):
         """
         Method updates rows in main database by rows from databse with amendment data.
         """
         table_names = self.__findTablesWithChanges()
+        self.emit(SIGNAL("maxRangeProgressBar"), len(table_names))
 
         # process all relevant tables
-        for table in table_names:
+        for i, table in enumerate(table_names):
+            self.emit(SIGNAL("updateStatus"), i+1, table)
+
             # delete old data --> not actual rows
             query = 'DELETE FROM main.{table} ' \
                     'WHERE {column} IN (' \
                     'SELECT DISTINCT t1.{column} FROM main.{table} t1 ' \
                     'JOIN db2.{table} t2 ON t1.{column} = t2.{column})'.format(table=table, column='id')
 
-            qDebug('(VFK) Changes query: {}'.format(query))
-            self.cur.execute(query)
+            #qDebug('(VFK) Changes query: {}'.format(query))
+            self.__cur.execute(query)
 
             # delete deleted rows
             if table in ['SPOL', 'SOBR']:   # this tables always have actual data
@@ -81,8 +107,8 @@ class ApplyChanges:
                         'SELECT DISTINCT t2.{column} FROM db2.{table} t2 ' \
                         'WHERE stav_dat = 3 AND priznak_kontextu = 1);'.format(table=table, column='id')
 
-            qDebug('(VFK) Changes query: {}'.format(query))
-            self.cur.execute(query)
+            #qDebug('(VFK) Changes query: {}'.format(query))
+            self.__cur.execute(query)
 
             self.__doInsertOperation(table)
 
@@ -103,6 +129,8 @@ class ApplyChanges:
 
         cols = ", ".join(columns)    # create string from list
 
+        qDebug('(VFK) Processing table {}...'.format(table))
+
         for id in ids:
             query = 'INSERT INTO main.{table} ' \
                     'SELECT {columns} FROM db2.{table} ' \
@@ -112,8 +140,8 @@ class ApplyChanges:
                                                 columns=cols.replace('ogr_fid', '\'{ogr_fid}\''.format(ogr_fid=max_fid + 1)),
                                                 id=id)
 
-            qDebug('(VFK) Changes query: {}'.format(query))
-            self.cur.execute(query)
+            #qDebug('(VFK) Changes query: {}'.format(query))
+            self.__cur.execute(query)
 
             max_fid += 1
 
@@ -126,9 +154,9 @@ class ApplyChanges:
         tables = set()
         query = 'SELECT table_name FROM db2.vfk_tables ' \
                 'WHERE num_records > 0 OR num_features > 0;'
-        self.cur.execute(query)
+        self.__cur.execute(query)
 
-        result = self.cur.fetchall()
+        result = self.__cur.fetchall()
         for table in result:
             table = str(table[0])
 
@@ -150,8 +178,8 @@ class ApplyChanges:
         columns = []
 
         query = 'PRAGMA table_info(\'{table}\')'.format(table=table)
-        self.cur.execute(query)
-        result = self.cur.fetchall()
+        self.__cur.execute(query)
+        result = self.__cur.fetchall()
 
         for row in result:
             columns.append(str(row[1]))
@@ -169,8 +197,8 @@ class ApplyChanges:
         :rtype: int
         """
         query = 'SELECT max(ogr_fid) FROM {schema}.{table};'.format(table=table, schema=schema)
-        self.cur.execute(query)
-        result = self.cur.fetchone()
+        self.__cur.execute(query)
+        result = self.__cur.fetchone()
 
         return 0 if result[0] is None else result[0]
 
@@ -187,8 +215,8 @@ class ApplyChanges:
         ids = []
 
         query = 'SELECT DISTINCT id FROM {schema}.{table}'.format(table=table, schema=schema)
-        self.cur.execute(query)
-        result = self.cur.fetchall()
+        self.__cur.execute(query)
+        result = self.__cur.fetchall()
 
         for id in result:
             ids.append(id[0])
@@ -196,7 +224,8 @@ class ApplyChanges:
         return ids
 
 if __name__ == '__main__':
-    ApplyChanges('/home/stepan/GoogleDrive/CVUT/Diplomka/zmenova_data/stav/stavova.db',
+    changes = ApplyChanges()
+    changes.run('/home/stepan/GoogleDrive/CVUT/Diplomka/zmenova_data/stav/stavova.db',
                  #'/home/stepan/vfkDB.db',
                  '/home/stepan/GoogleDrive/CVUT/Diplomka/zmenova_data/zmena/zmenova.db',
                  '/home/stepan/Desktop/novaDB.db')

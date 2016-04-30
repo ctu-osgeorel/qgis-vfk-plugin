@@ -37,6 +37,7 @@ import time
 from ui_MainApp import Ui_MainApp
 from searchFormController import *
 from openThread import *
+from applyChanges import *
 
 
 class VFKError(StandardError):
@@ -77,6 +78,11 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         self.__browseButtons = {}
         self.__vfkLineEdits = {}
+
+        # apply changes into main database
+        self.__databases = {}
+        # self.pb_applyChanges.setEnabled(False)
+        self.changes_instance = ApplyChanges()
 
         # Connect ui with functions
         self.__createToolbarsAndConnect()
@@ -655,6 +661,76 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                                                      u"\nNačítání dalších souborů není povoleno!".
                                 format(self.lineEditsCount), QMessageBox.Ok)
 
+    def browseDb_clicked(self, database_type):
+        """
+        Method run dialog for select database in widget with changes.
+        According to pushButton name will fill in relevant lineEdit.
+        :type database_type: str
+        """
+        title = u'Vyber databázi'
+        lastUsedDir = ''
+
+        if database_type == 'mainDb':
+            self.__databases[database_type] = QFileDialog.getOpenFileName(self, title, lastUsedDir, u'Datábaze (*.db)')
+            if not self.__databases[database_type]:
+                return
+            self.le_mainDb.setText(self.__databases[database_type])
+
+        elif database_type == 'amendmentDb':
+            self.__databases[database_type] = QFileDialog.getOpenFileName(self, title, lastUsedDir, u'Datábaze (*.db)')
+            if not self.__databases[database_type]:
+                return
+            self.le_amendmentDb.setText(self.__databases[database_type])
+
+        elif database_type == 'exportDb':
+            title = u'Zadej jméno výstupní databáze'
+            self.__databases[database_type] = QFileDialog.getSaveFileName(self, u"Jméno výstupní databáze",
+                                                                          ".db", u"Databáze (*.db)")
+            if not self.__databases[database_type]:
+                return
+            self.le_exportDb.setText(self.__databases[database_type])
+
+        if len(self.__databases) == 3:
+            self.pb_applyChanges.setEnabled(True)
+
+    def applyChanges(self):
+        """
+        Method
+        :return:
+        """
+        self.changes_instance.run(self.__databases['mainDb'],
+                                  self.__databases['amendmentDb'],
+                                  self.__databases['exportDb'])
+
+    def __updateProgressBarChanges(self, iteration, table_name):
+        """
+        :type iteration: int
+        :type table_name: str
+        """
+        self.progressBar_changes.setValue(iteration)
+        self.l_status.setText(u'Aplikuji změny na tabulku {}...'.format(table_name))
+        QgsApplication.processEvents()
+
+    def __setRangeProgressBarChanges(self, max_range):
+        """
+        :type max_range: int
+        """
+        self.progressBar_changes.setRange(0, max_range)
+        self.progressBar_changes.setValue(0)
+
+    def __changesApplied(self):
+        """
+        """
+        time.sleep(1)
+        self.l_status.setText(u'Změny byly úspěšně aplikovány.')
+        QgsApplication.processEvents()
+
+    def __changesPreprocessingDatabase(self):
+        """
+        """
+        self.l_status.setText(u'Připravuji výstupní databázi...')
+        QgsApplication.processEvents()
+
     def __createToolbarsAndConnect(self):
 
         actionGroup = QActionGroup(self)
@@ -716,7 +792,6 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.connect(self.actionShowHelpPage, SIGNAL(
             "triggered()"), self.vfkBrowser.showHelpPage)
 
-        # self.browseButton.clicked.connect(self.browseButton_clicked)
         self.loadVfkButton.clicked.connect(self.loadVfkButton_clicked)
 
         self.__browseButtons['browseButton_1'] = self.browseButton
@@ -772,3 +847,18 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         # add new VFK file
         self.pb_nextFile.clicked.connect(self.__addRowToGridLayout)
+
+        # widget apply changes
+        self.pb_mainDb.clicked.connect(
+            lambda: self.browseDb_clicked('mainDb'))
+        self.pb_amendmentDb.clicked.connect(
+            lambda: self.browseDb_clicked('amendmentDb'))
+        self.pb_exportDb.clicked.connect(
+            lambda: self.browseDb_clicked('exportDb'))
+
+        self.pb_applyChanges.clicked.connect(self.applyChanges)
+
+        self.connect(self.changes_instance, SIGNAL("maxRangeProgressBar"), self.__setRangeProgressBarChanges)
+        self.connect(self.changes_instance, SIGNAL("updateStatus"), self.__updateProgressBarChanges)
+        self.connect(self.changes_instance, SIGNAL("finishedStatus"), self.__changesApplied)
+        self.connect(self.changes_instance, SIGNAL("preprocessingDatabase"), self.__changesPreprocessingDatabase)
