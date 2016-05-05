@@ -90,10 +90,10 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         # check GDAL version
         gdal_version = int(gdal.VersionInfo())
 
-        if gdal_version < 2010000:
+        if gdal_version < 2020000:
             self.pb_nextFile.setEnabled(False)
             self.pb_nextFile.setToolTip(
-                u'Není možné načíst více souborů, verze GDAL je nižší než 2.1.0.')
+                u'Není možné načíst více souborů, verze GDAL je nižší než 2.2.0.')
 
         # settings
         self.loadVfkButton.setDisabled(True)
