@@ -87,6 +87,9 @@ class ApplyChanges(QWidget):
             self.emit(SIGNAL("updateStatus"), i+1, table)
 
             # delete old data --> not actual rows
+            ### ML: is this really neeed? we could probably implement
+            ### also update statements, currently we are performing
+            ### only delete and insert statements
             query = 'DELETE FROM main.{table} ' \
                     'WHERE {column} IN (' \
                     'SELECT DISTINCT t1.{column} FROM main.{table} t1 ' \
@@ -97,6 +100,8 @@ class ApplyChanges(QWidget):
 
             # delete deleted rows
             if table in ['SPOL', 'SOBR']:   # this tables always have actual data
+                ### ML: we are not sure about stav_data = 0 (update vs
+                ### delete)
                 query = 'DELETE FROM main.{table} ' \
                         'WHERE {column} IN (' \
                         'SELECT DISTINCT t2.{column} FROM db2.{table} t2 ' \
@@ -132,6 +137,8 @@ class ApplyChanges(QWidget):
         qDebug('(VFK) Processing table {}...'.format(table))
 
         for id in ids:
+            ### ML: this operation must be performed on all ids
+            ### (currently only the first one is processed)
             query = 'INSERT INTO main.{table} ' \
                     'SELECT {columns} FROM db2.{table} ' \
                     'WHERE stav_dat = 0 ' \
