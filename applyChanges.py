@@ -44,13 +44,15 @@ class ApplyChanges(QWidget):
 
         self.__conn = None
         self.__cur = None
+        self.__use_debug = False
 
-    def run(self, db_full, db_amendment, db_updated):
+    def run(self, db_full, db_amendment, db_updated, use_debug=False):
         """
 
         :param db_full: Path to the main database.
         :param db_amendment: Path to the database with changes to process.
         :param db_updated: Path to the database for export.
+        :param use_debug: True if queries will be debugged.
         :type db_full: str
         :type db_amendment: str
         :type db_updated: str
@@ -61,6 +63,9 @@ class ApplyChanges(QWidget):
         db_amendment = os.path.abspath(db_amendment)
         db_updated = os.path.abspath(db_updated)
 
+        self.__use_debug = use_debug
+
+        # copy main database
         shutil.copy2(db_full, db_updated)
 
         # create connection to main database
@@ -69,7 +74,8 @@ class ApplyChanges(QWidget):
         with self.__conn:
             self.__cur = self.__conn.cursor()
             # attach database with amendment data
-            self.__cur.execute('ATTACH DATABASE "{}" as db2'.format(db_amendment))
+            query = 'ATTACH DATABASE "{}" as db2'.format(db_amendment)
+            self.__doQuery(query)
 
             self.__applyChanges()
 
@@ -95,8 +101,7 @@ class ApplyChanges(QWidget):
                     'SELECT DISTINCT t1.{column} FROM main.{table} t1 ' \
                     'JOIN db2.{table} t2 ON t1.{column} = t2.{column})'.format(table=table, column='id')
 
-            #qDebug('(VFK) Changes query: {}'.format(query))
-            self.__cur.execute(query)
+            self.__doQuery(query)
 
             # delete deleted rows
             if table in ['SPOL', 'SOBR']:   # this tables always have actual data
@@ -112,8 +117,7 @@ class ApplyChanges(QWidget):
                         'SELECT DISTINCT t2.{column} FROM db2.{table} t2 ' \
                         'WHERE stav_dat = 3 AND priznak_kontextu = 1);'.format(table=table, column='id')
 
-            #qDebug('(VFK) Changes query: {}'.format(query))
-            self.__cur.execute(query)
+            self.__doQuery(query)
 
             self.__doInsertOperation(table)
 
@@ -146,9 +150,7 @@ class ApplyChanges(QWidget):
                     'LIMIT 1;'.format(table=table,
                                                 columns=cols.replace('ogr_fid', '\'{ogr_fid}\''.format(ogr_fid=max_fid + 1)),
                                                 id=id)
-
-            #qDebug('(VFK) Changes query: {}'.format(query))
-            self.__cur.execute(query)
+            self.__doQuery(query)
 
             max_fid += 1
 
@@ -161,7 +163,7 @@ class ApplyChanges(QWidget):
         tables = set()
         query = 'SELECT table_name FROM db2.vfk_tables ' \
                 'WHERE num_records > 0 OR num_features > 0;'
-        self.__cur.execute(query)
+        self.__doQuery(query)
 
         result = self.__cur.fetchall()
         for table in result:
@@ -185,7 +187,7 @@ class ApplyChanges(QWidget):
         columns = []
 
         query = 'PRAGMA table_info(\'{table}\')'.format(table=table)
-        self.__cur.execute(query)
+        self.__doQuery(query)
         result = self.__cur.fetchall()
 
         for row in result:
@@ -204,7 +206,7 @@ class ApplyChanges(QWidget):
         :rtype: int
         """
         query = 'SELECT max(ogr_fid) FROM {schema}.{table};'.format(table=table, schema=schema)
-        self.__cur.execute(query)
+        self.__doQuery(query)
         result = self.__cur.fetchone()
 
         return 0 if result[0] is None else result[0]
@@ -222,13 +224,24 @@ class ApplyChanges(QWidget):
         ids = []
 
         query = 'SELECT DISTINCT id FROM {schema}.{table}'.format(table=table, schema=schema)
-        self.__cur.execute(query)
+        self.__doQuery(query)
         result = self.__cur.fetchall()
 
         for id in result:
             ids.append(id[0])
 
         return ids
+
+    def __doQuery(self, query):
+        """
+        Method will execute given query in opened database.
+        :param query: Query
+        """
+        if self.__use_debug:
+            qDebug('(VFK) Apply changes query: {}'.format(query))
+
+        self.__cur.execute(query)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
@@ -240,12 +253,18 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--main', help='Path to the main database.', required=True)
     parser.add_argument('-c', '--changes', help='Path to the database with changes.', required=True)
     parser.add_argument('-e', '--export', help='Path to the new database which will be created.', required=True)
+    parser.add_argument('-d', '--debug', help='Enables debug mod.', action='store_true')
 
     args = parser.parse_args()
 
+    if args.debug:
+        use_debug = args.debug
+    else:
+        use_debug = False
+
     print('Applying changes..')
     changes = ApplyChanges()
-    changes.run(args.main, args.changes, args.export)
+    changes.run(args.main, args.changes, args.export, use_debug)
 
     print('--------------------------------')
     print('All changes successfully applied.')
