@@ -253,7 +253,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--main', help='Path to the main database.', required=True)
     parser.add_argument('-c', '--changes', help='Path to the database with changes.', required=True)
     parser.add_argument('-e', '--export', help='Path to the new database which will be created.', required=True)
-    parser.add_argument('-d', '--debug', help='Enables debug mod.', action='store_true')
+    parser.add_argument('-d', '--debug', help='Enables debug mode.', action='store_true')
 
     args = parser.parse_args()
 
