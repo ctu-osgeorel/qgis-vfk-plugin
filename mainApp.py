@@ -162,7 +162,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         title = u'Načti soubor VFK'
         lastUsedDir = ''
         self.__fileName.append(QFileDialog.getOpenFileName(
-            self, title, lastUsedDir, 'Soubor VFK (*.vfk)'))
+            self, title, lastUsedDir, 'Soubor VFK (*.vfk *.db)'))
         if not self.__fileName:
             return
         else:
