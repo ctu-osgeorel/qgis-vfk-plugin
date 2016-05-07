@@ -65,6 +65,7 @@ class ApplyChanges(QWidget):
 
         self.__use_debug = use_debug
 
+        qDebug('(VFK) Preparing databases..')
         # copy main database
         shutil.copy2(db_full, db_updated)
 
@@ -92,30 +93,15 @@ class ApplyChanges(QWidget):
         for i, table in enumerate(table_names):
             self.emit(SIGNAL("updateStatus"), i+1, table)
 
-            # delete old data --> not actual rows
             ### ML: is this really neeed? we could probably implement
             ### also update statements, currently we are performing
             ### only delete and insert statements
+
+            # Delete data which are in both databases --> there are updates in amendment database
             query = 'DELETE FROM main.{table} ' \
                     'WHERE {column} IN (' \
                     'SELECT DISTINCT t1.{column} FROM main.{table} t1 ' \
                     'JOIN db2.{table} t2 ON t1.{column} = t2.{column})'.format(table=table, column='id')
-
-            self.__doQuery(query)
-
-            # delete deleted rows
-            if table in ['SPOL', 'SOBR']:   # this tables always have actual data
-                ### ML: we are not sure about stav_data = 0 (update vs
-                ### delete)
-                query = 'DELETE FROM main.{table} ' \
-                        'WHERE {column} IN (' \
-                        'SELECT DISTINCT t2.{column} FROM db2.{table} t2 ' \
-                        'WHERE stav_dat = 0);'.format(table=table, column='id')
-            else:
-                query = 'DELETE FROM main.{table} ' \
-                        'WHERE {column} IN (' \
-                        'SELECT DISTINCT t2.{column} FROM db2.{table} t2 ' \
-                        'WHERE stav_dat = 3 AND priznak_kontextu = 1);'.format(table=table, column='id')
 
             self.__doQuery(query)
 
@@ -138,18 +124,22 @@ class ApplyChanges(QWidget):
 
         cols = ", ".join(columns)    # create string from list
 
-        qDebug('(VFK) Processing table {}...'.format(table))
+        qDebug('(VFK) Processing table {}..'.format(table))
 
         for id in ids:
             ### ML: this operation must be performed on all ids
             ### (currently only the first one is processed)
+
+            ## LIMIT 1: protoze v tabulce muze byt pouze jeden zaznam o danem id, ktery je aktualni, v pripade, ze tomu tak neni
+            ## tak jsou v tabulce nepovolene duplicity a je proto zpracovam pouze jeden z techto prvku
+
             query = 'INSERT INTO main.{table} ' \
                     'SELECT {columns} FROM db2.{table} ' \
                     'WHERE stav_dat = 0 ' \
                         'AND id = {id} ' \
                     'LIMIT 1;'.format(table=table,
-                                                columns=cols.replace('ogr_fid', '\'{ogr_fid}\''.format(ogr_fid=max_fid + 1)),
-                                                id=id)
+                                      columns=cols.replace('ogr_fid', '\'{ogr_fid}\''.format(ogr_fid=max_fid + 1)),
+                                      id=id)
             self.__doQuery(query)
 
             max_fid += 1
@@ -174,7 +164,7 @@ class ApplyChanges(QWidget):
             if 'STAV_DAT' in columns or 'PRIZNAK_KONTEXTU' in columns:
                 tables.add(table)
 
-        qDebug('(VFK) Tables with changes: {}'.format(tables))
+        qDebug('(VFK) Tables with changes: {}'.format(', '.join(x for x in tables)))
         return tables
 
     def __getColumnNames(self, table):
@@ -263,6 +253,7 @@ if __name__ == '__main__':
         use_debug = False
 
     print('Applying changes..')
+    print('------------------')
     changes = ApplyChanges()
     changes.run(args.main, args.changes, args.export, use_debug)
 
