@@ -25,9 +25,10 @@
 from PyQt4 import QtCore, QtGui
 from re import search
 import os
+import csv
 
 from PyQt4.QtGui import QMainWindow, QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup, QDockWidget, QToolButton, QMenu, QPalette, QDesktopServices
-from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, qDebug, QThread
+from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, qDebug, QThread, QSettings
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import *
 from qgis.gui import *
@@ -91,9 +92,11 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         gdal_version = int(gdal.VersionInfo())
 
         if gdal_version < 2020000:
+            self.actionZpracujZmeny.setEnabled(False)
             self.pb_nextFile.setEnabled(False)
             self.pb_nextFile.setToolTip(
                 u'Není možné načíst více souborů, verze GDAL je nižší než 2.2.0.')
+            self.actionZpracujZmeny.setToolTip(u'Zpracování změn není povoleno, verze GDAL je nižší než 2.2.0.')
 
         # settings
         self.loadVfkButton.setDisabled(True)
@@ -160,12 +163,16 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :return:
         """
         title = u'Načti soubor VFK'
-        lastUsedDir = ''
-        self.__fileName.append(QFileDialog.getOpenFileName(
-            self, title, lastUsedDir, 'Soubor VFK (*.vfk *.db)'))
-        if not self.__fileName:
+        settings = QSettings()
+        lastUsedDir = str(settings.value('/UI/' + "lastVectorFileFilter" + "Dir", "."))
+
+        loaded_file = QFileDialog.getOpenFileName(
+            self, title, lastUsedDir, u'Soubory podporované ovladačem VFK GDAL (*.vfk *.db)')
+
+        if not loaded_file:
             return
         else:
+            self.__fileName.append(loaded_file)
             if browseButton_id == 1:
                 self.vfkFileLineEdit.setText(self.__fileName[0])
             else:
@@ -277,12 +284,18 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
     def loadVfkButton_clicked(self):
         """
 
-        :return:
         """
+        amendment_file = self.__checkIfAmendmentFile(self.__fileName[0])
+        print amendment_file
+
+        if amendment_file:
+            new_database_name = '{}_zmeny.db'.format(os.path.basename(self.__fileName[0]).split('.')[0])
+        else:
+            new_database_name = '{}_stav.db'.format(os.path.basename(self.__fileName[0]).split('.')[0])
+
         os.environ['OGR_VFK_DB_NAME'] = os.path.join(
-            os.path.dirname(os.path.dirname(self.__fileName[0])), 'vfkDB.db')
-        self.__mDataSourceName = self.__fileName[
-            0]     # os.environ['OGR_VFK_DB_NAME']
+            os.path.dirname(os.path.dirname(self.__fileName[0])), new_database_name)
+        self.__mDataSourceName = self.__fileName[0]     # os.environ['OGR_VFK_DB_NAME']
 
         self.labelLoading.setText(u'Otevírám VFK soubory...')
         QgsApplication.processEvents()
@@ -453,7 +466,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :return:
         """
         label_text = fileName.split('/')
-        label_text = label_text[-2] + label_text[-1]
+        label_text = '...' + label_text[-2] + '/' + label_text[-1]
 
         if self.__mOgrDataSource:
             self.__mOgrDataSource.Destroy()
@@ -508,6 +521,9 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         self.labelLoading.setText(
             u'Soubor {} úspěšně načten.'.format(label_text))
+
+        self.__mOgrDataSource.Destroy()
+        self.__mOgrDataSource = None
 
     def __selectedIds(self, layer):
         """
@@ -668,7 +684,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type database_type: str
         """
         title = u'Vyber databázi'
-        lastUsedDir = ''
+        settings = QSettings()
+        lastUsedDir = str(settings.value('/UI/' + "lastVectorFileFilter" + "Dir", "."))
 
         if database_type == 'mainDb':
             self.__databases[database_type] = QFileDialog.getOpenFileName(self, title, lastUsedDir, u'Datábaze (*.db)')
@@ -730,6 +747,29 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         """
         self.l_status.setText(u'Připravuji výstupní databázi...')
         QgsApplication.processEvents()
+
+    def __checkIfAmendmentFile(self, file_name):
+        """
+
+        :param file_name: Name of the input file
+        :type file_name: str
+        :return: bool
+        """
+        if file_name.endswith(".vfk"):
+            with open(file_name, 'r') as f:
+                vfk = csv.reader(f, delimiter=";")
+
+                for i, row in enumerate(vfk):
+                    if row[0] == '&HZMENY':
+                        if int(row[1]) == 1:
+                            return True
+                        else:
+                            return False
+        else:
+            print 'database'
+            # TODO: dopsat kontrolu, zda se jedna o stavovou, nebo zmenovou databazi
+
+
 
     def __createToolbarsAndConnect(self):
 
@@ -857,6 +897,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             lambda: self.browseDb_clicked('exportDb'))
 
         self.pb_applyChanges.clicked.connect(self.applyChanges)
+        self.pb_applyChanges.setEnabled(False)
 
         self.connect(self.changes_instance, SIGNAL("maxRangeProgressBar"), self.__setRangeProgressBarChanges)
         self.connect(self.changes_instance, SIGNAL("updateStatus"), self.__updateProgressBarChanges)
