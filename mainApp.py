@@ -234,7 +234,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         fileName = self.vfkFileLineEdit.text()
 
         self.labelLoading.setText(
-            u'Otevírám datasource {}...'.format(fileName))
+            u"Otevírám datasource {}...".format(fileName))
         QgsApplication.processEvents()
 
         self.vlakno = OpenThread(fileName)
@@ -308,9 +308,9 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type vfkLayerName: str
         :return:
         """
-        qDebug("Loading vfk layer {}".format(vfkLayerName))
+        qDebug(u"Loading vfk layer {}".format(vfkLayerName))
         if vfkLayerName in self.__mLoadedLayers:
-            qDebug("Vfk layer {} is already loaded".format(vfkLayerName))
+            qDebug(u"Vfk layer {} is already loaded".format(vfkLayerName))
             return
 
         composedURI = self.__mLastVfkFile + "|layername=" + vfkLayerName
@@ -329,10 +329,10 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type vfkLayerName: str
         :return:
         """
-        qDebug("Unloading vfk layer {}".format(vfkLayerName))
+        qDebug(u"Unloading vfk layer {}".format(vfkLayerName))
 
         if vfkLayerName not in self.__mLoadedLayers:
-            qDebug("Vfk layer {} is already unloaded".format(vfkLayerName))
+            qDebug(u"Vfk layer {} is already unloaded".format(vfkLayerName))
             return
 
         QgsMapLayerRegistry.instance().removeMapLayer(
@@ -399,7 +399,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         QgsApplication.processEvents()
 
         qDebug(
-            "Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
+            u"Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
 
         self.__mOgrDataSource = ogr.Open(fileName, 0)
 
