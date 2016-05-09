@@ -234,7 +234,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         fileName = self.vfkFileLineEdit.text()
 
         self.labelLoading.setText(
-            u"Otevírám datasource {}...".format(fileName))
+            u'Načítám data do SQLite databáze (může nějaký čas trvat...)'
+        )
         QgsApplication.processEvents()
 
         self.vlakno = OpenThread(fileName)
@@ -418,14 +419,10 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             return True
 
         if not self.__mOgrDataSource:
-            errorMsg = u'Nemohu otevřít datový zdroj OGR!'
+            errorMsg = u'Nemohu otevřít datový zdroj {}!'.format(fileName)
             return False
         else:
             self.progressBar.setRange(0, layerCount - 1)
-
-            extraMsg = u''
-            if not self.__mOgrDataSource.GetLayer().TestCapability('IsPreProcessed'):
-                extraMsg = u'Načítám data do SQLite databáze (může nějaký čas trvat...)'
 
             for i in xrange(layerCount):
 
@@ -435,7 +432,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                     i).GetLayerDefn().GetName()
 
                 self.labelLoading.setText(
-                    u"VFK data {}/{}: {}\n{}".format(i + 1, layerCount, theLayerName, extraMsg))
+                    u"VFK data {}/{}: {}".format(i + 1, layerCount, theLayerName))
                 QgsApplication.processEvents()
                 self.__mOgrDataSource.GetLayer(i).GetFeatureCount(1)
 
