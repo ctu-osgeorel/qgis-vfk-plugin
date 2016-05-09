@@ -242,7 +242,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             error = ''
             fIds = self.__search(vectorLayer, searchString, error)
             if error:
-                qDebug('\n (VFK) ERROR in showInMap: {}'.format(error))
+                qDebug(u'\n (VFK) ERROR in showInMap: {}'.format(error))
                 return
             else:
                 vectorLayer.setSelectedFeatures(fIds)
@@ -276,7 +276,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                 fIds.append(f.id())
             # check if there were errors during evaluating
             if search.hasEvalError():
-                qDebug('\n (VFK) Evaluate error: {}'.format(error))
+                qDebug(u'\n (VFK) Evaluate error: {}'.format(error))
                 break
 
         return fIds
@@ -385,10 +385,10 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type vfkLayerName: str
         :return:
         """
-        qDebug("\n(VFK) Loading vfk layer {}".format(vfkLayerName))
+        qDebug(u"\n(VFK) Loading vfk layer {}".format(vfkLayerName))
         if vfkLayerName in self.__mLoadedLayers:
             qDebug(
-                "\n(VFK) Vfk layer {} is already loaded".format(vfkLayerName))
+                u"\n(VFK) Vfk layer {} is already loaded".format(vfkLayerName))
             return
 
         composedURI = self.__mDataSourceName + "|layername=" + vfkLayerName
@@ -411,11 +411,11 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type vfkLayerName: str
         :return:
         """
-        qDebug("\n(VFK) Unloading vfk layer {}".format(vfkLayerName))
+        qDebug(u"\n(VFK) Unloading vfk layer {}".format(vfkLayerName))
 
         if vfkLayerName not in self.__mLoadedLayers:
             qDebug(
-                "\n(VFK) Vfk layer {} is already unloaded".format(vfkLayerName))
+                u"\n(VFK) Vfk layer {} is already unloaded".format(vfkLayerName))
             return
 
         QgsMapLayerRegistry.instance().removeMapLayer(
@@ -450,7 +450,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type dbPath: str
         :return:
         """
-        qDebug("\n(VFK) Open DB: {}".format(dbPath))
+        qDebug(u"\n(VFK) Open DB: {}".format(dbPath))
         connectionName = QUuid.createUuid().toString()
         db = QSqlDatabase.addDatabase("QSQLITE", connectionName)
         db.setDatabaseName(dbPath)
