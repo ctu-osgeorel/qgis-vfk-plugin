@@ -309,9 +309,9 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type vfkLayerName: str
         :return:
         """
-        qDebug(u"Loading vfk layer {}".format(vfkLayerName))
+        qDebug("Loading vfk layer {}".format(vfkLayerName))
         if vfkLayerName in self.__mLoadedLayers:
-            qDebug(u"Vfk layer {} is already loaded".format(vfkLayerName))
+            qDebug("Vfk layer {} is already loaded".format(vfkLayerName))
             return
 
         composedURI = self.__mLastVfkFile + "|layername=" + vfkLayerName
@@ -330,10 +330,10 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type vfkLayerName: str
         :return:
         """
-        qDebug(u"Unloading vfk layer {}".format(vfkLayerName))
+        qDebug("Unloading vfk layer {}".format(vfkLayerName))
 
         if vfkLayerName not in self.__mLoadedLayers:
-            qDebug(u"Vfk layer {} is already unloaded".format(vfkLayerName))
+            qDebug("Vfk layer {} is already unloaded".format(vfkLayerName))
             return
 
         QgsMapLayerRegistry.instance().removeMapLayer(
@@ -399,8 +399,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         QgsApplication.processEvents()
 
-        qDebug(
-            u"Open OGR datasource (using DB: {})".format(self.__mDataSourceName))
+        qDebug("Open OGR datasource")
 
         self.__mOgrDataSource = ogr.Open(fileName, 0)
 
