@@ -1379,7 +1379,8 @@ class DocumentBuilder:
 
         link = self.__mDocument.link(
             u"switchPanel?panel=import", u"Importujte")
-        text = u"{} data ve formátu VFK. Během importu se vytváří databáze, tato operace může chvíli trvat. ".format(
+        text = u"{} data ve formátu VFK, nebo již připravenou databázi SQLite s daty katastru nemovitostí. " \
+               u"Během importu se vytváří databáze, tato operace může chvíli trvat. ".format(
             link)
         text += u"Následně lze vyhledávat:"
         self.__mDocument.paragraph(text)
