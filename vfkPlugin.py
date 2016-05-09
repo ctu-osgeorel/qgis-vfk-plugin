@@ -21,7 +21,7 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
+from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt, qDebug
 from PyQt4.QtGui import QAction, QIcon, QToolButton, QMenu
 # Initialize Qt resources from file resources.py
 import resources_rc
@@ -95,7 +95,7 @@ class vfkPlugin(object):
         :type icon_path: str
 
         :param text: Text that should be shown in menu items for this action.
-        :type text: str
+        :type text: unicode
 
         :param callback: Function to be called when the action is triggered.
         :type callback: function
@@ -179,10 +179,15 @@ class vfkPlugin(object):
         self.myDockWidget = None
 
     def run(self):
-        """Run method that performs all the real work"""
+        """
+        Run method that performs all the real work
+        """
         # show the dialog
         if self.myDockWidget.isVisible():
             self.myDockWidget.hide()
         else:
+            self.myDockWidget.close()
+            self.myDockWidget = None
+            self.myDockWidget = MainApp(self.iface)
             self.iface.addDockWidget(Qt.TopDockWidgetArea, self.myDockWidget)
             self.myDockWidget.show()
