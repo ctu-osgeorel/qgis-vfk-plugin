@@ -403,11 +403,11 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         self.__mOgrDataSource = ogr.Open(fileName, 0)
 
-        layerCount = self.__mOgrDataSource.GetLayerCount()
         if not self.__mOgrDataSource:
             errorMsg = u'Nemohu otevřít datový zdroj {}!'.format(fileName)
             return False
 
+        layerCount = self.__mOgrDataSource.GetLayerCount()
         layers_names = []
 
         for i in xrange(layerCount):
