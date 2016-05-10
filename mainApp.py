@@ -263,6 +263,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             try:
                 self.loadVfkFile(fileName, errorMsg)
             except VFKError as e:
+                self.labelLoading.setText('')
                 QMessageBox.critical(
                     self, u'Chyba', u'{}'.format(e), QMessageBox.Ok)
                 self.emit(SIGNAL("enableSearch"), False)
