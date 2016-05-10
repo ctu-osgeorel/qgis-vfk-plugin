@@ -404,6 +404,9 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.__mOgrDataSource = ogr.Open(fileName, 0)
 
         layerCount = self.__mOgrDataSource.GetLayerCount()
+        if not self.__mOgrDataSource:
+            errorMsg = u'Nemohu otevřít datový zdroj {}!'.format(fileName)
+            return False
 
         layers_names = []
 
@@ -417,29 +420,25 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             QgsApplication.processEvents()
             return True
 
-        if not self.__mOgrDataSource:
-            errorMsg = u'Nemohu otevřít datový zdroj {}!'.format(fileName)
-            return False
-        else:
-            self.progressBar.setRange(0, layerCount - 1)
+        self.progressBar.setRange(0, layerCount - 1)
 
-            for i in xrange(layerCount):
+        for i in xrange(layerCount):
 
-                self.progressBar.setValue(i)
+            self.progressBar.setValue(i)
 
-                theLayerName = self.__mOgrDataSource.GetLayer(
-                    i).GetLayerDefn().GetName()
+            theLayerName = self.__mOgrDataSource.GetLayer(
+                i).GetLayerDefn().GetName()
 
-                self.labelLoading.setText(
-                    u"VFK data {}/{}: {}".format(i + 1, layerCount, theLayerName))
-                QgsApplication.processEvents()
-                self.__mOgrDataSource.GetLayer(i).GetFeatureCount(1)
+            self.labelLoading.setText(
+                u"VFK data {}/{}: {}".format(i + 1, layerCount, theLayerName))
+            QgsApplication.processEvents()
+            self.__mOgrDataSource.GetLayer(i).GetFeatureCount(1)
 
-                time.sleep(0.02)
+            time.sleep(0.02)
 
-            self.labelLoading.setText(u'Data byla úspěšně načtena.')
+        self.labelLoading.setText(u'Data byla úspěšně načtena.')
 
-            return True
+        return True
 
     def __selectedIds(self, layer):
         """
