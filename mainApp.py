@@ -35,6 +35,13 @@ from ui_MainApp import Ui_MainApp
 from searchFormController import *
 from openThread import *
 
+class VFKError(StandardError):
+    pass
+
+
+class VFKWarning(Warning):
+    pass
+
 
 class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
     # signals
@@ -253,9 +260,11 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             self.__mDataSourceName = QDir(
                 fInfo.absolutePath()).filePath(fInfo.baseName() + '.db')
 
-            if not self.loadVfkFile(fileName, errorMsg):
+            try:
+                self.loadVfkFile(fileName, errorMsg)
+            except VFKError as e:
                 QMessageBox.critical(
-                    self, u'Chyba načtení dat', errorMsg)
+                    self, u'Chyba', u'{}'.format(e), QMessageBox.Ok)
                 self.emit(SIGNAL("enableSearch"), False)
                 return
 
@@ -401,10 +410,9 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         qDebug("Open OGR datasource")
 
         self.__mOgrDataSource = ogr.Open(fileName, 0)
-
         if not self.__mOgrDataSource:
-            errorMsg = u'Nemohu otevřít datový zdroj {}!'.format(fileName)
-            return False
+            raise VFKError(
+                u"Nelze otevřít VFK soubor '{}' jako platný OGR datasource.".format(fileName))
 
         layerCount = self.__mOgrDataSource.GetLayerCount()
         layers_names = []
@@ -417,7 +425,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             self.__dataWithoutParBud()
             self.labelLoading.setText(u'Data nemohla být načtena.')
             QgsApplication.processEvents()
-            return True
+            return
 
         self.progressBar.setRange(0, layerCount - 1)
 
@@ -436,8 +444,6 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             time.sleep(0.02)
 
         self.labelLoading.setText(u'Data byla úspěšně načtena.')
-
-        return True
 
     def __selectedIds(self, layer):
         """
