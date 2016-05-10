@@ -254,9 +254,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                 fInfo.absolutePath()).filePath(fInfo.baseName() + '.db')
 
             if not self.loadVfkFile(fileName, errorMsg):
-                msg2 = u'Nepodařilo se získat OGR provider'
                 QMessageBox.critical(
-                    self, u'Nepodařilo se získat data provider', msg2)
+                    self, u'Chyba načtení dat', errorMsg)
                 self.emit(SIGNAL("enableSearch"), False)
                 return
 
