@@ -255,13 +255,12 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :return:
         """
         if self.__mLastVfkFile != fileName:
-            errorMsg = ''
             fInfo = QFileInfo(fileName)
             self.__mDataSourceName = QDir(
                 fInfo.absolutePath()).filePath(fInfo.baseName() + '.db')
 
             try:
-                self.loadVfkFile(fileName, errorMsg)
+                self.loadVfkFile(fileName)
             except VFKError as e:
                 self.labelLoading.setText('')
                 QMessageBox.critical(
@@ -269,11 +268,10 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                 self.emit(SIGNAL("enableSearch"), False)
                 return
 
-            if not self.__openDatabase(self.__mDataSourceName):
-                msg1 = u'Nepodařilo se otevřít databázi.'
-                if not QSqlDatabase.isDriverAvailable('QSQLITE'):
-                    msg1 += u'\nDatabázový ovladač QSQLITE není dostupný.'
-                QMessageBox.critical(self, u'Chyba', msg1)
+            try:
+                self.__openDatabase(self.__mDataSourceName):
+            except VFKError as e:
+                QMessageBox.critical(self, u'Chyba', "{}".format(e))
                 self.emit(SIGNAL("enableSearch"), False)
                 return
 
@@ -379,21 +377,22 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type dbPath: str
         :return:
         """
+        if not QSqlDatabase.isDriverAvailable('QSQLITE'):
+            raise VFKError("Databázový ovladač QSQLITE není dostupný.")
+
         connectionName = QUuid.createUuid().toString()
         db = QSqlDatabase.addDatabase("QSQLITE", connectionName)
         qDebug(dbPath)
         db.setDatabaseName(dbPath)
         if not db.open():
-            return False
-        else:
-            self.setProperty("connectionName", connectionName)
-            return True
+            raise VFKError(u"Nepodařilo se otevřít databázi {}".format(dbPath))
 
-    def loadVfkFile(self, fileName, errorMsg):
+        self.setProperty("connectionName", connectionName)
+
+    def loadVfkFile(self, fileName):
         """
 
         :type fileName: str
-        :type errorMsg: str
         :return:
         """
 
