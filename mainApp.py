@@ -89,9 +89,9 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.__createToolbarsAndConnect()
 
         # check GDAL version
-        gdal_version = int(gdal.VersionInfo())
+        self.__gdal_version = int(gdal.VersionInfo())
 
-        if gdal_version < 2020000:
+        if self.__gdal_version < 2020000:
             self.actionZpracujZmeny.setEnabled(False)
             self.pb_nextFile.setEnabled(False)
             self.pb_nextFile.setToolTip(
@@ -166,8 +166,11 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         settings = QSettings()
         lastUsedDir = str(settings.value('/UI/' + "lastVectorFileFilter" + "Dir", "."))
 
+        ext = '*.vfk'
+        if self.__gdal_version >= 2020000:
+            ext += ' *.db'
         loaded_file = QFileDialog.getOpenFileName(
-            self, title, lastUsedDir, u'Soubory podporované ovladačem VFK GDAL (*.vfk *.db)')
+            self, title, lastUsedDir, u'Soubory podporované ovladačem VFK GDAL ({})'.format(ext))
 
         if not loaded_file:
             return
