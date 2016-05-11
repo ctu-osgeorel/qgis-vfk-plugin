@@ -335,11 +335,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             self.__openDatabase(
                 os.environ['OGR_VFK_DB_NAME'])  # self.__mDataSourceName)
         except VFKError as e:
-            err_msg = u''
-            if not QSqlDatabase.isDriverAvailable('QSQLITE'):
-                err_msg = u'\nDatabázový ovladač QSQLITE není dostupný.'
             QMessageBox.critical(
-                self, u'Chyba', u'{}{}'.format(e, err_msg), QMessageBox.Ok)
+                self, u'Chyba', u'{}'.format(e), QMessageBox.Ok)
             self.emit(SIGNAL("enableSearch"), False)
             return
 
@@ -451,6 +448,9 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :return:
         """
         qDebug("\n(VFK) Open DB: {}".format(dbPath))
+        if not QSqlDatabase.isDriverAvailable('QSQLITE'):
+            raise VFKError(u'Databázový ovladač QSQLITE není dostupný.')
+
         connectionName = QUuid.createUuid().toString()
         db = QSqlDatabase.addDatabase("QSQLITE", connectionName)
         db.setDatabaseName(dbPath)
