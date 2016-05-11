@@ -286,7 +286,6 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         """
         amendment_file = self.__checkIfAmendmentFile(self.__fileName[0])
-        print amendment_file
 
         if amendment_file:
             new_database_name = '{}_zmeny.db'.format(os.path.basename(self.__fileName[0]).split('.')[0])
@@ -297,7 +296,6 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             os.path.dirname(os.path.dirname(self.__fileName[0])), new_database_name)
         self.__mDataSourceName = self.__fileName[0]     # os.environ['OGR_VFK_DB_NAME']
 
-        self.labelLoading.setText(u'Otevírám VFK soubory...')
         QgsApplication.processEvents()
 
         self.importThread = OpenThread(self.__fileName)
@@ -311,6 +309,9 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :return:
         """
         if fileName not in self.__mLastVfkFile:
+
+            self.labelLoading.setText(
+                u'Načítám data do SQLite databáze (může nějaký čas trvat...)')
 
             try:
                 self.loadVfkFile(fileName)
