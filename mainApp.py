@@ -413,8 +413,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         if not self.__mOgrDataSource:
             raise VFKError(
                 u"Nelze otevřít VFK soubor '{}' jako platný "
-                "OGR datasource. Zkuste smazat soubor '{}' pokud existuje a "
-                "načíst data znovu".format(fileName, self.__mDataSourceName))
+                u"OGR datasource. Zkuste smazat soubor '{}' pokud existuje a "
+                u"načíst data znovu".format(fileName, self.__mDataSourceName))
 
         layerCount = self.__mOgrDataSource.GetLayerCount()
         layers_names = []
