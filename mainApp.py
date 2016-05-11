@@ -240,9 +240,6 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
     def loadVfkButton_clicked(self):
         fileName = self.vfkFileLineEdit.text()
 
-        self.labelLoading.setText(
-            u'Načítám data do SQLite databáze (může nějaký čas trvat...)'
-        )
         QgsApplication.processEvents()
 
         self.vlakno = OpenThread(fileName)
@@ -255,6 +252,11 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :return:
         """
         if self.__mLastVfkFile != fileName:
+
+            self.labelLoading.setText(
+                u'Načítám data do SQLite databáze (může nějaký čas trvat...)'
+            )
+
             fInfo = QFileInfo(fileName)
             self.__mDataSourceName = QDir(
                 fInfo.absolutePath()).filePath(fInfo.baseName() + '.db')
