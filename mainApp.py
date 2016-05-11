@@ -269,7 +269,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                 return
 
             try:
-                self.__openDatabase(self.__mDataSourceName):
+                self.__openDatabase(self.__mDataSourceName)
             except VFKError as e:
                 QMessageBox.critical(self, u'Chyba', "{}".format(e))
                 self.emit(SIGNAL("enableSearch"), False)
