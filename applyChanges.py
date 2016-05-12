@@ -27,6 +27,7 @@ import sys
 import os
 import shutil
 import argparse
+from datetime import datetime
 
 from PyQt4.QtGui import QWidget, QApplication
 from PyQt4.QtCore import qDebug, pyqtSignal, SIGNAL
@@ -74,6 +75,7 @@ class ApplyChanges(QWidget):
 
         with self.__conn:
             self.__cur = self.__conn.cursor()
+
             # attach database with amendment data
             query = 'ATTACH DATABASE "{}" as db2'.format(db_amendment)
             self.__doQuery(query)
@@ -93,15 +95,11 @@ class ApplyChanges(QWidget):
         for i, table in enumerate(table_names):
             self.emit(SIGNAL("updateStatus"), i+1, table)
 
-            ### ML: is this really neeed? we could probably implement
-            ### also update statements, currently we are performing
-            ### only delete and insert statements
-
             # Delete data which are in both databases --> there are updates in amendment database
             query = 'DELETE FROM main.{table} ' \
-                    'WHERE {column} IN (' \
-                    'SELECT DISTINCT t1.{column} FROM main.{table} t1 ' \
-                    'JOIN db2.{table} t2 ON t1.{column} = t2.{column})'.format(table=table, column='id')
+                    'WHERE id IN (' \
+                    'SELECT DISTINCT t1.id FROM main.{table} t1 ' \
+                    'JOIN db2.{table} t2 ON t1.id = t2.id)'.format(table=table)
 
             self.__doQuery(query)
 
@@ -127,22 +125,39 @@ class ApplyChanges(QWidget):
         qDebug('(VFK) Processing table {}..'.format(table))
 
         for id in ids:
-            ### ML: this operation must be performed on all ids
-            ### (currently only the first one is processed)
-
-            ## LIMIT 1: protoze v tabulce muze byt pouze jeden zaznam o danem id, ktery je aktualni, v pripade, ze tomu tak neni
-            ## tak jsou v tabulce nepovolene duplicity a je proto zpracovam pouze jeden z techto prvku
-
-            query = 'INSERT INTO main.{table} ' \
-                    'SELECT {columns} FROM db2.{table} ' \
-                    'WHERE stav_dat = 0 ' \
-                        'AND id = {id} ' \
-                    'LIMIT 1;'.format(table=table,
-                                      columns=cols.replace('ogr_fid', '\'{ogr_fid}\''.format(ogr_fid=max_fid + 1)),
-                                      id=id)
+            # get all rows for given ID
+            query = 'SELECT * FROM db2.{table} WHERE stav_dat=0 AND id={id}'.format(table=table, id=id)
             self.__doQuery(query)
+            result = self.__cur.fetchall()
 
-            max_fid += 1
+            if len(result) > 0:
+                # create list of dictionaries from returned rows
+                data_rows = []
+                for row in result:
+                    tmp = []
+                    for item in row:
+                        tmp.append(item)
+
+                    data_rows.append(dict(zip(columns, tmp)))
+
+                # sort data according to the date 'DATUM_VZNIKU'
+                if 'DATUM_VZNIKU' in data_rows[0]:
+                    data_rows.sort(key=lambda x: datetime.strptime(x['DATUM_VZNIKU'], '%d.%m.%Y %H:%M:%S'), reverse=True)
+
+                # insert new data into main table
+                selected_ogr_fid = data_rows[0]['ogr_fid']
+
+                query = 'INSERT INTO main.{table} ' \
+                        'SELECT {columns} FROM db2.{table} ' \
+                        'WHERE ogr_fid={selected_ogr_fid} ' \
+                        'AND stav_dat=0 ' \
+                        'AND id = {id};'.format(table=table,
+                                          columns=cols.replace('ogr_fid', '\'{ogr_fid}\''.format(ogr_fid=max_fid + 1)),
+                                          selected_ogr_fid=selected_ogr_fid,
+                                          id=id)
+
+                self.__doQuery(query)
+                max_fid += 1
 
     def __findTablesWithChanges(self):
         """
