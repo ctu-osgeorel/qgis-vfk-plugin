@@ -252,12 +252,14 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     # load arguments from command line
-    parser = argparse.ArgumentParser(description='Script applies changes from amendment VFK database to '
-                                                 'main VFK database. In this process new database is created.')
+    description = 'Script applies changes from amendment VFK database to ' \
+                  'main VFK database. In this process new database is created.'
+
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument('-v', '--version', action='version', version='%(prog)s 2.1')
-    parser.add_argument('-m', '--main', help='Path to the main database.', required=True)
+    parser.add_argument('-i', '--input', help='Path to the main database.', required=True)
     parser.add_argument('-c', '--changes', help='Path to the database with changes.', required=True)
-    parser.add_argument('-e', '--export', help='Path to the new database which will be created.', required=True)
+    parser.add_argument('-o', '--output', help='Path to the new database which will be created.', required=True)
     parser.add_argument('-d', '--debug', help='Enables debug mode.', action='store_true')
 
     args = parser.parse_args()
@@ -270,7 +272,7 @@ if __name__ == '__main__':
     print('Applying changes..')
     print('------------------')
     changes = ApplyChanges()
-    changes.run(args.main, args.changes, args.export, use_debug)
+    changes.run(args.input, args.changes, args.output, use_debug)
 
     print('--------------------------------')
     print('All changes successfully applied.')
