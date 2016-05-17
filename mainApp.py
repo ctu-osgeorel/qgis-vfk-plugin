@@ -300,10 +300,6 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             os.path.dirname(os.path.dirname(self.__fileName[0])), new_database_name)
         self.__mDataSourceName = self.__fileName[0]     # os.environ['OGR_VFK_DB_NAME']
 
-        # overwrite database
-        if self.overwriteCheckBox.isChecked():
-            os.environ['OGR_VFK_DB_OVERWRITE'] = '1'
-
         QgsApplication.processEvents()
 
         self.importThread = OpenThread(self.__fileName)
@@ -477,6 +473,12 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         label_text = fileName.split('/')
         label_text = '...' + label_text[-2] + '/' + label_text[-1]
 
+        # overwrite database
+        if fileName == self.__fileName[0]:
+            if self.overwriteCheckBox.isChecked():
+                qDebug('\n (VFK) Database will be overwritten')
+                os.environ['OGR_VFK_DB_OVERWRITE'] = '1'
+
         if self.__mOgrDataSource:
             self.__mOgrDataSource.Destroy()
             self.__mOgrDataSource = None
@@ -531,6 +533,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.labelLoading.setText(
             u'Soubor {} úspěšně načten.'.format(label_text))
 
+        os.environ['OGR_VFK_DB_OVERWRITE'] = '0'
         self.__mOgrDataSource.Destroy()
         self.__mOgrDataSource = None
 
