@@ -25,7 +25,6 @@
 from PyQt4 import QtCore, QtGui
 from re import search
 import os
-import csv
 
 from PyQt4.QtGui import QMainWindow, QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup, QDockWidget, QToolButton, QMenu, QPalette, QDesktopServices
 from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, qDebug, QThread, QSettings
@@ -164,7 +163,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         """
         title = u'Načti soubor VFK'
         settings = QSettings()
-        lastUsedDir = str(settings.value('/UI/' + "lastVectorFileFilter" + "Dir", "."))
+        lastUsedDir = ''
 
         ext = '*.vfk'
         if self.__gdal_version >= 2020000:
@@ -286,10 +285,12 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
     def loadVfkButton_clicked(self):
         """
-
+        After click method starts loading all inserted files
         """
+        # check if first file is amendment
         amendment_file = self.__checkIfAmendmentFile(self.__fileName[0])
 
+        # prepare name for database
         if amendment_file:
             new_database_name = '{}_zmeny.db'.format(os.path.basename(self.__fileName[0]).split('.')[0])
         else:
@@ -298,6 +299,10 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         os.environ['OGR_VFK_DB_NAME'] = os.path.join(
             os.path.dirname(os.path.dirname(self.__fileName[0])), new_database_name)
         self.__mDataSourceName = self.__fileName[0]     # os.environ['OGR_VFK_DB_NAME']
+
+        # overwrite database
+        if self.overwriteCheckBox.isChecked():
+            os.environ['OGR_VFK_DB_OVERWRITE'] = '1'
 
         QgsApplication.processEvents()
 
@@ -761,19 +766,18 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         """
         if file_name.endswith(".vfk"):
             with open(file_name, 'r') as f:
-                vfk = csv.reader(f, delimiter=";")
+                for line in f:
 
-                for i, row in enumerate(vfk):
-                    if row[0] == '&HZMENY':
-                        if int(row[1]) == 1:
+                    line_splited = str(line).split(';')
+
+                    if line_splited[0] == '&HZMENY':
+                        if line_splited[1] == '1':
                             return True
                         else:
                             return False
         else:
             print 'database'
             # TODO: dopsat kontrolu, zda se jedna o stavovou, nebo zmenovou databazi
-
-
 
     def __createToolbarsAndConnect(self):
 
