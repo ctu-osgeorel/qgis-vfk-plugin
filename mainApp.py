@@ -79,6 +79,9 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.__browseButtons = {}
         self.__vfkLineEdits = {}
 
+        # data will be load from source according to checked radiobox
+        self.__source_for_data = 'file'
+
         # apply changes into main database
         self.__databases = {}
         # self.pb_applyChanges.setEnabled(False)
@@ -782,6 +785,19 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             print 'database'
             # TODO: dopsat kontrolu, zda se jedna o stavovou, nebo zmenovou databazi
 
+    def radioButtonValue(self):
+        """
+        Check which radio button is checked
+        """
+        if self.rb_file.isChecked():
+            self.__source_for_data = 'file'
+            self.pb_nextFile.show()
+        elif self.rb_directory.isChecked():
+            self.__source_for_data = 'directory'
+            self.pb_nextFile.hide()
+
+        print self.__source_for_data
+
     def __createToolbarsAndConnect(self):
 
         actionGroup = QActionGroup(self)
@@ -914,3 +930,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.connect(self.changes_instance, SIGNAL("updateStatus"), self.__updateProgressBarChanges)
         self.connect(self.changes_instance, SIGNAL("finishedStatus"), self.__changesApplied)
         self.connect(self.changes_instance, SIGNAL("preprocessingDatabase"), self.__changesPreprocessingDatabase)
+
+        # connect radio boxes
+        self.rb_file.clicked.connect(self.radioButtonValue)
+        self.rb_directory.clicked.connect(self.radioButtonValue)
