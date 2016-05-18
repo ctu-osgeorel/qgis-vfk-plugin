@@ -168,21 +168,31 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         settings = QSettings()
         lastUsedDir = ''
 
-        ext = '*.vfk'
-        if self.__gdal_version >= 2020000:
-            ext += ' *.db'
-        loaded_file = QFileDialog.getOpenFileName(
-            self, title, lastUsedDir, u'Soubory podporované ovladačem VFK GDAL ({})'.format(ext))
+        if self.__source_for_data == 'file':
+            ext = '*.vfk'
+            if self.__gdal_version >= 2020000:
+                ext += ' *.db'
+            loaded_file = QFileDialog.getOpenFileName(
+                self, title, lastUsedDir, u'Soubory podporované ovladačem VFK GDAL ({})'.format(ext))
 
-        if not loaded_file:
-            return
-        else:
-            self.__fileName.append(loaded_file)
-            if browseButton_id == 1:
-                self.vfkFileLineEdit.setText(self.__fileName[0])
+            if not loaded_file:
+                return
             else:
-                self.__vfkLineEdits['vfkLineEdit_{}'.format(len(self.__vfkLineEdits))].setText(
-                    self.__fileName[browseButton_id - 1])
+                self.__fileName.append(loaded_file)
+                if browseButton_id == 1:
+                    self.vfkFileLineEdit.setText(self.__fileName[0])
+                else:
+                    self.__vfkLineEdits['vfkLineEdit_{}'.format(len(self.__vfkLineEdits))].setText(
+                        self.__fileName[browseButton_id - 1])
+        elif self.__source_for_data == 'directory':
+            loaded_file = QFileDialog.getExistingDirectory(self, u"Vyberte adresář s daty VFK")
+            if not loaded_file:
+                return
+            else:
+                self.__fileName.append(loaded_file)
+                self.vfkFileLineEdit.setText(self.__fileName[0])
+        else:
+            qDebug('(VFK) Not valid source')
 
         self.loadVfkButton.setEnabled(True)
 
@@ -665,23 +675,31 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         )  # count of rows in gridLayout
 
         # export objects from gridLayout
-        item_label = self.gridLayout_12.itemAtPosition(rows_count - 2, 0)
-        item_par = self.gridLayout_12.itemAtPosition(rows_count - 2, 1)
-        item_bud = self.gridLayout_12.itemAtPosition(rows_count - 1, 1)
+        item_label = self.gridLayout_12.itemAtPosition(rows_count - 3, 0)
+        item_par = self.gridLayout_12.itemAtPosition(rows_count - 3, 1)
+        item_bud = self.gridLayout_12.itemAtPosition(rows_count - 2, 1)
+        item_settings = self.gridLayout_12.itemAtPosition(rows_count - 1, 0)
+        item_rewrite_db = self.gridLayout_12.itemAtPosition(rows_count - 1, 1)
 
         # remove objects from gridLayout
         self.gridLayout_12.removeItem(
-            self.gridLayout_12.itemAtPosition(rows_count - 2, 0))
+            self.gridLayout_12.itemAtPosition(rows_count - 3, 0))
+        self.gridLayout_12.removeItem(
+            self.gridLayout_12.itemAtPosition(rows_count - 3, 1))
         self.gridLayout_12.removeItem(
             self.gridLayout_12.itemAtPosition(rows_count - 2, 1))
+        self.gridLayout_12.removeItem(
+            self.gridLayout_12.itemAtPosition(rows_count - 1, 0))
         self.gridLayout_12.removeItem(
             self.gridLayout_12.itemAtPosition(rows_count - 1, 1))
 
         # re-build gridLayout
-        self.gridLayout_12.addLayout(horizontalLayout, rows_count - 2, 1)
-        self.gridLayout_12.addItem(item_label, rows_count - 1, 0)
-        self.gridLayout_12.addItem(item_par, rows_count - 1, 1)
-        self.gridLayout_12.addItem(item_bud, rows_count, 1)
+        self.gridLayout_12.addLayout(horizontalLayout, rows_count - 3, 1)
+        self.gridLayout_12.addItem(item_label, rows_count - 2, 0)
+        self.gridLayout_12.addItem(item_par, rows_count - 2, 1)
+        self.gridLayout_12.addItem(item_bud, rows_count - 1, 1)
+        self.gridLayout_12.addItem(item_settings, rows_count, 0)
+        self.gridLayout_12.addItem(item_rewrite_db, rows_count, 1)
 
         self.__browseButtons['browseButton_{}'.format(len(self.__vfkLineEdits))].clicked.\
             connect(lambda: self.browseButton_clicked(
@@ -789,14 +807,29 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         """
         Check which radio button is checked
         """
+        self.vfkFileLineEdit.setText('')
+        self.__fileName = []
+        self.loadVfkButton.setEnabled(False)
+
         if self.rb_file.isChecked():
             self.__source_for_data = 'file'
             self.pb_nextFile.show()
+            self.label.setText('VFK soubor:')
         elif self.rb_directory.isChecked():
             self.__source_for_data = 'directory'
             self.pb_nextFile.hide()
+            self.label.setText(u'Adresář:')
 
-        print self.__source_for_data
+            # delete
+            if len(self.__browseButtons) > 1:
+                for i, button in enumerate(self.__browseButtons):
+                    if i > 0:
+                        self.__browseButtons[button].hide()
+
+            if len(self.__vfkLineEdits) > 1:
+                for i, le in enumerate(self.__vfkLineEdits):
+                    if i > 0:
+                        self.__vfkLineEdits[le].hide()
 
     def __createToolbarsAndConnect(self):
 
