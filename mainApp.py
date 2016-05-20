@@ -99,6 +99,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             self.pb_nextFile.setToolTip(
                 u'Není možné načíst více souborů, verze GDAL je nižší než 2.2.0.')
             self.actionZpracujZmeny.setToolTip(u'Zpracování změn není povoleno, verze GDAL je nižší než 2.2.0.')
+            self.groupBox.setEnabled(False)
 
         # settings
         self.loadVfkButton.setDisabled(True)
@@ -189,6 +190,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             if not loaded_file:
                 return
             else:
+                self.__fileName = []
                 self.__fileName.append(loaded_file)
                 self.vfkFileLineEdit.setText(self.__fileName[0])
         else:
@@ -300,6 +302,11 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         """
         After click method starts loading all inserted files
         """
+        # check the source of data
+        if self.__source_for_data == 'directory':
+            dir_path = self.__fileName[0]
+            self.__fileName = self.__findVFKFilesInDirectory(dir_path)
+
         # check if first file is amendment
         amendment_file = self.__checkIfAmendmentFile(self.__fileName[0])
 
@@ -830,6 +837,22 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                 for i, le in enumerate(self.__vfkLineEdits):
                     if i > 0:
                         self.__vfkLineEdits[le].hide()
+
+    def __findVFKFilesInDirectory(self, dir_path):
+        """
+        Finds all files with extension '.vfk' in given directory including subdirectories
+        :param dir_path: Path to directory.
+        :type dir_path: str
+        :return: List of VFK files
+        """
+        file_paths = []
+        for root, dirs, files in os.walk(dir_path):
+            for file in files:
+                if file.endswith(".vfk"):
+                    file_paths.append(os.path.join(root, file))
+
+        return file_paths
+
 
     def __createToolbarsAndConnect(self):
 
