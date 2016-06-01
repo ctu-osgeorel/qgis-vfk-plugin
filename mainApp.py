@@ -990,3 +990,4 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         # connect radio boxes
         self.rb_file.clicked.connect(self.radioButtonValue)
         self.rb_directory.clicked.connect(self.radioButtonValue)
+    
