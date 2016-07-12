@@ -384,7 +384,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         connectionName = QUuid.createUuid().toString()
         db = QSqlDatabase.addDatabase("QSQLITE", connectionName)
-        qDebug(dbPath)
+        #qDebug(dbPath)
         db.setDatabaseName(dbPath)
         if not db.open():
             raise VFKError(u"Nepodařilo se otevřít databázi {}".format(dbPath))
