@@ -1,25 +1,23 @@
 Instalace
 ---------
 
-Nejprve je nutné v QGISu registrovat repositáø GeoForAll ÈVUT v Praze:
-http://geo.fsv.cvut.cz/geoforall/qgis-plugins.xml
+Nejprve je nutnÃ© v QGISu registrovat repositÃ¡Å™ laboratoÅ™e GeoForAll
+ÄŒVUT v Praze: http://geo.fsv.cvut.cz/geoforall/qgis-plugins.xml
 
 .. image:: images/ctu-geoforall-repo-add.png
-   :width: 600
 
 .. image:: images/ctu-geoforall-repo.png
    :width: 350
 
-.. note:: V souèasné dobì je plugin distribuován jako experimentální. V
-          nastavení je tedy nutné aktivovat *Zobrazit také
-          experimentální zásuvné moduly*.
+.. note:: V souÄasnÃ© dobÄ› je plugin distribuovÃ¡n jako experimentÃ¡lnÃ­. V
+          nastavenÃ­ je tedy nutnÃ© aktivovat *Zobrazit takÃ©
+          experimentÃ¡lnÃ­ zÃ¡suvnÃ© moduly*.
           
-Poté vyberte *VFK Plugin* a kliknìte na tlaèítko ``Instalovat zásuvnı modul``.
+PotÃ© vyberte *VFK Plugin* a kliknÄ›te na tlaÄÃ­tko
+``Instalovat zÃ¡suvnÃ½ modul``.
 
 .. image:: images/install.png
-   :width: 600
            
-Po instalaci se v nástrojové lištì objeví nová ikona:
+Po instalaci se v nÃ¡strojovÃ© liÅ¡tÄ› objevÃ­ novÃ¡ ikona:
 
 .. image:: images/icon.png
-   :width: 600

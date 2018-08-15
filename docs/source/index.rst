@@ -6,9 +6,9 @@ výměnném formátu katastru** označovaném **VFK** či **NVF** (`Výměnný f
 Plugin umožňuje vyhledávání, zobrazování a export informací vedených v 
 katastru nemovitostí. 
 
-První prototyp (verze 1.x) byl napsán v jazyce C++, ve verzi 2.x byl 
-portován do jazyka Python. K datům v souborech přistupuje plugin pomocí (`knihovny GDAL <http://freegis.fsv.cvut.cz/gwiki/VFK_/_GDAL>`__). 
-
+.. important:: V současnosti je dostupný plugin pouze pro verzi **QGIS
+   2.x**. Nová verze pro QGIS 3 je v přípravě, v případě zájmu se
+   nezdráhejte oslovit autory.
 
 .. toctree::
    :maxdepth: 2
@@ -16,3 +16,8 @@ portován do jazyka Python. K datům v souborech přistupuje plugin pomocí (`kn
    instalace
    popis
    dodatek
+
+.. note:: První prototyp (verze 1.x) byl napsán v jazyce C++, ve verzi 2.x byl
+          portován do jazyka Python. K datům v souborech přistupuje plugin
+          pomocí `knihovny GDAL
+          <http://freegis.fsv.cvut.cz/gwiki/VFK_/_GDAL>`__.
