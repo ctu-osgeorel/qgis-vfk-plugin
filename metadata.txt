@@ -8,7 +8,7 @@
 
 [general]
 name=VFK Plugin
-qgisMinimumVersion=2.8
+qgisMinimumVersion=2.14
 description=Plugin umoznujici praci s daty ceskeho katastru nemovitosti ve formatu VFK. Plugin podporuje vyhledavani parcel, budov, vlastniku a jednotek. Vysledky vyhledavani je nasledne mozne exportovat a zobrazit v mape.
 version=2.0.1
 author=Anna Petrasova, Vaclav Petras, Stepan Bambula, Martin Landa
@@ -22,13 +22,13 @@ author=Anna Petrasova, Vaclav Petras, Stepan Bambula, Martin Landa
 # Tags are comma separated with spaces allowed
 tags=vfk, cuzk, iskn, katastr nemovitosti, cadastre
 
-homepage=http://freegis.fsv.cvut.cz/gwiki/VFK_/_QGIS_plugin
+homepage=https://ctu-geoforall-lab.github.io/qgis-vfk-plugin/
 tracker=https://github.com/ctu-geoforall-lab/qgis-vfk-plugin/issues
 repository=https://github.com/ctu-geoforall-lab/qgis-vfk-plugin.git
 category=Plugins
 icon=vfkPluginIcon.png
 # experimental flag
-experimental=True
+experimental=False
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
