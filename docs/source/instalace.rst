@@ -9,10 +9,6 @@ Nejprve je nutné v QGISu registrovat repositář laboratoře GeoForAll
 .. image:: images/ctu-geoforall-repo.png
    :width: 350
 
-.. note:: V současné době je plugin distribuován jako experimentální. V
-          nastavení je tedy nutné aktivovat *Zobrazit také
-          experimentální zásuvné moduly*.
-          
 Poté vyberte *VFK Plugin* a klikněte na tlačítko
 ``Instalovat zásuvný modul``.
 
