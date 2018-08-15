@@ -1,0 +1,255 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="cs" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="cs" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Zásuvný modul QGIS pro práci s katastrálními daty ve formátu VFK &mdash; Dokumentace pro QGIS VFK Plugin 2.0</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="search" title="Vyhledávání" href="search.html" />
+    <link rel="next" title="Instalace" href="instalace.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> QGIS VFK Plugin
+          
+
+          
+            
+            <img src="_static/icon.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="instalace.html">Instalace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="popis.html">Návod k použití</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dodatek.html">Autoři</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">QGIS VFK Plugin</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>Zásuvný modul QGIS pro práci s katastrálními daty ve formátu VFK</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="zasuvny-modul-qgis-pro-praci-s-katastralnimi-daty-ve-formatu-vfk">
+<h1>Zásuvný modul QGIS pro práci s katastrálními daty ve formátu VFK<a class="headerlink" href="#zasuvny-modul-qgis-pro-praci-s-katastralnimi-daty-ve-formatu-vfk" title="Trvalý odkaz na tento nadpis">¶</a></h1>
+<p>QGIS VFK Plugin pracuje s daty českého katastru nemovitostí a to v takzvaném <strong>novém
+výměnném formátu katastru</strong> označovaném <strong>VFK</strong> či <strong>NVF</strong> (<a class="reference external" href="http://freegis.fsv.cvut.cz/gwiki/V%C3%BDm%C4%9Bnn%C3%BD_form%C3%A1t_ISKN">Výměnný formát ISKN</a>).
+Plugin umožňuje vyhledávání, zobrazování a export informací vedených v
+katastru nemovitostí.</p>
+<div class="admonition important">
+<p class="first admonition-title">Důležité</p>
+<p class="last">V současnosti je dostupný plugin pouze pro verzi <strong>QGIS
+2.x</strong>. Nová verze pro QGIS 3 je v přípravě, v případě zájmu se
+nezdráhejte oslovit autory.</p>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="instalace.html">Instalace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="popis.html">Návod k použití</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="popis.html#uzivatelske-rozhrani">Uživatelské rozhraní</a></li>
+<li class="toctree-l2"><a class="reference internal" href="popis.html#import-vfk-souboru">Import VFK souboru</a></li>
+<li class="toctree-l2"><a class="reference internal" href="popis.html#prohlizeni-dat">Prohlížení dat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="popis.html#export-dat">Export dat</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dodatek.html">Autoři</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dodatek.html#licence">Licence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dodatek.html#hlaseni-chyb">Hlášení chyb</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Poznámka</p>
+<p class="last">První prototyp (verze 1.x) byl napsán v jazyce C++, ve verzi 2.x byl
+portován do jazyka Python. K datům v souborech přistupuje plugin
+pomocí <a class="reference external" href="http://freegis.fsv.cvut.cz/gwiki/VFK_/_GDAL">knihovny GDAL</a>.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="instalace.html" class="btn btn-neutral float-right" title="Instalace" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-2018, CTU GeoForAll Lab.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'2.0',
+            LANGUAGE:'cs',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/translations.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
