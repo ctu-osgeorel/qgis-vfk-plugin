@@ -22,8 +22,10 @@
 """
 
 from PyQt4.QtSql import QSqlQueryModel, QSqlRecord, QSqlField, QSqlDatabase
-from PyQt4.QtCore import qDebug, QTime, QObject
+from PyQt4.QtCore import QTime, QObject
 
+from qgis.utils import iface
+from qgis.core import QgsMessageLog
 
 class VfkTableModel(QSqlQueryModel):
 
@@ -956,17 +958,19 @@ class VfkTableModel(QSqlQueryModel):
         t = QTime()
         t.start()
 
-        qDebug("\n(VFK) SQL: {}\n".format(query))
+        QgsMessageLog.logMessage("(VFK) SQL: {}\n".format(query))
         self.setQuery(query, QSqlDatabase.database(self.__mConnectionName))
 
         while self.canFetchMore():
             self.fetchMore()
 
         if t.elapsed() > 500:
-            qDebug("\n(VFK) Time elapsed: {} ms\n".format(t.elapsed()))
+            QgsMessageLog.logMessage("(VFK) Time elapsed: {} ms\n".format(t.elapsed()))
 
         if self.lastError().isValid():
-            qDebug('\n(VFK) SQL ERROR: {}'.format(self.lastError().text()))
+            iface.messageBar().pushWarning(
+                u'SQL ERROR: {}'.format(self.lastError().text())
+            )
             return False
 
         return True

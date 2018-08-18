@@ -25,20 +25,22 @@
 from PyQt4 import QtCore, QtGui
 from re import search
 import os
+import time
 
 from PyQt4.QtGui import QMainWindow, QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup, QDockWidget, QToolButton, QMenu, QPalette, QDesktopServices
-from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, qDebug, QThread, QSettings
+from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, QThread, QSettings
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import *
 from qgis.gui import *
+from qgis.utils import iface
+from qgis.core import QgsMessageLog
+
 from osgeo import ogr, gdal
-import time
 
 from ui_MainApp import Ui_MainApp
 from searchFormController import *
 from openThread import *
 from applyChanges import *
-
 
 class VFKError(StandardError):
     pass
@@ -194,7 +196,9 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                 self.__fileName.append(loaded_file)
                 self.vfkFileLineEdit.setText(self.__fileName[0])
         else:
-            qDebug('(VFK) Not valid source')
+            iface.messageBar().pushWarning(
+                u'ERROR: not valid source'
+            )
 
         self.loadVfkButton.setEnabled(True)
 
@@ -259,7 +263,9 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             error = ''
             fIds = self.__search(vectorLayer, searchString, error)
             if error:
-                qDebug('\n (VFK) ERROR in showInMap: {}'.format(error))
+                iface.messageBar().pushWarning(
+                    u'ERROR in showInMap: {}'.format(error)
+                )
                 return
             else:
                 vectorLayer.setSelectedFeatures(fIds)
@@ -293,7 +299,9 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                 fIds.append(f.id())
             # check if there were errors during evaluating
             if search.hasEvalError():
-                qDebug('\n (VFK) Evaluate error: {}'.format(error))
+                iface.messageBar().pushWarning(
+                    u'Evaluate error: {}'.format(error)
+                )
                 break
 
         return fIds
@@ -407,16 +415,19 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type vfkLayerName: str
         :return:
         """
-        qDebug("\n(VFK) Loading vfk layer {}".format(vfkLayerName))
+        QgsMessageLog.logMessage(u"(VFK) Loading vfk layer {}".format(vfkLayerName))
         if vfkLayerName in self.__mLoadedLayers:
-            qDebug(
-                "\n(VFK) Vfk layer {} is already loaded".format(vfkLayerName))
+            QgsMessageLog.logMessage(
+                "(VFK) Vfk layer {} is already loaded".format(vfkLayerName)
+            )
             return
 
         composedURI = self.__mDataSourceName + "|layername=" + vfkLayerName
         layer = QgsVectorLayer(composedURI, vfkLayerName, "ogr")
         if not layer.isValid():
-            qDebug("\n(VFK) Layer failed to load!")
+            iface.messageBar().pushWarning(
+                u"ERROR: Layer failed to load!"
+            )
 
         self.__mLoadedLayers[vfkLayerName] = layer.id()
 
@@ -433,11 +444,12 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type vfkLayerName: str
         :return:
         """
-        qDebug("\n(VFK) Unloading vfk layer {}".format(vfkLayerName))
+        QgsMessageLog.logMessage("(VFK) Unloading vfk layer {}".format(vfkLayerName))
 
         if vfkLayerName not in self.__mLoadedLayers:
-            qDebug(
-                "\n(VFK) Vfk layer {} is already unloaded".format(vfkLayerName))
+            QgsMessageLog.logMessage(
+                "(VFK) Vfk layer {} is already unloaded".format(vfkLayerName)
+            )
             return
 
         QgsMapLayerRegistry.instance().removeMapLayer(
@@ -472,7 +484,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type dbPath: str
         :return:
         """
-        qDebug("\n(VFK) Open DB: {}".format(dbPath))
+        QgsMessageLog.logMessage("(VFK) Open DB: {}".format(dbPath))
         if not QSqlDatabase.isDriverAvailable('QSQLITE'):
             raise VFKError(u'Databázový ovladač QSQLITE není dostupný.')
 
@@ -496,7 +508,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         # overwrite database
         if fileName == self.__fileName[0]:
             if self.overwriteCheckBox.isChecked():
-                qDebug('\n (VFK) Database will be overwritten')
+                QgsMessageLog.logMessage(u'(VFK) Database will be overwritten')
                 os.environ['OGR_VFK_DB_OVERWRITE'] = '1'
 
         if self.__mOgrDataSource:
@@ -990,4 +1002,3 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         # connect radio boxes
         self.rb_file.clicked.connect(self.radioButtonValue)
         self.rb_directory.clicked.connect(self.radioButtonValue)
-    
