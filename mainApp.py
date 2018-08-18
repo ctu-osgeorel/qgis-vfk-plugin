@@ -162,39 +162,49 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         self.vfkBrowser.showHelpPage()
 
+        # settings
+        self.settings = QtCore.QSettings()
+
     def browseButton_clicked(self, browseButton_id=1):
         """
         :param browseButton_id: ID of clicked browse button.
         :return:
         """
-        title = u'Načti soubor VFK'
-        settings = QSettings()
-        lastUsedDir = ''
+        sender = '{}-lastUsedDir'.format(self.sender().objectName())
+        lastUsedDir = self.settings.value(sender, '')
 
         if self.__source_for_data == 'file':
             ext = '*.vfk'
             if self.__gdal_version >= 2020000:
                 ext += ' *.db'
             loaded_file = QFileDialog.getOpenFileName(
-                self, title, lastUsedDir, u'Soubory podporované ovladačem VFK GDAL ({})'.format(ext))
+                self, u'Načti soubor VFK', lastUsedDir,
+                u'Soubory podporované ovladačem VFK GDAL ({})'.format(ext)
+            )
 
             if not loaded_file:
                 return
+
+            self.__fileName.append(loaded_file)
+            if browseButton_id == 1:
+                self.vfkFileLineEdit.setText(self.__fileName[0])
             else:
-                self.__fileName.append(loaded_file)
-                if browseButton_id == 1:
-                    self.vfkFileLineEdit.setText(self.__fileName[0])
-                else:
-                    self.__vfkLineEdits['vfkLineEdit_{}'.format(len(self.__vfkLineEdits))].setText(
-                        self.__fileName[browseButton_id - 1])
+                self.__vfkLineEdits['vfkL1ineEdit_{}'.format(
+                    len(self.__vfkLineEdits))].setText(
+                        self.__fileName[browseButton_id - 1]
+                    )
+            self.settings.setValue(sender, os.path.dirname(loaded_file))
         elif self.__source_for_data == 'directory':
-            loaded_file = QFileDialog.getExistingDirectory(self, u"Vyberte adresář s daty VFK")
+            loaded_file = QFileDialog.getExistingDirectory(
+                self, u"Vyberte adresář s daty VFK", lastUsedDir
+            )
             if not loaded_file:
                 return
-            else:
-                self.__fileName = []
-                self.__fileName.append(loaded_file)
-                self.vfkFileLineEdit.setText(self.__fileName[0])
+
+            self.__fileName = []
+            self.__fileName.append(loaded_file)
+            self.vfkFileLineEdit.setText(self.__fileName[0])
+            self.settings.setValue(sender, loaded_file)
         else:
             iface.messageBar().pushWarning(
                 u'ERROR: not valid source'
