@@ -428,11 +428,11 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type vfkLayerName: str
         :return:
         """
-        QgsMessageLog.logMessage(u"(VFK) Loading vfk layer {}".format(vfkLayerName))
+        # QgsMessageLog.logMessage(u"(VFK) Loading vfk layer {}".format(vfkLayerName))
         if vfkLayerName in self.__mLoadedLayers:
-            QgsMessageLog.logMessage(
-                "(VFK) Vfk layer {} is already loaded".format(vfkLayerName)
-            )
+            # QgsMessageLog.logMessage(
+            #     "(VFK) Vfk layer {} is already loaded".format(vfkLayerName)
+            # )
             return
 
         composedURI = self.__mDataSourceName + "|layername=" + vfkLayerName
@@ -457,12 +457,12 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type vfkLayerName: str
         :return:
         """
-        QgsMessageLog.logMessage("(VFK) Unloading vfk layer {}".format(vfkLayerName))
+        # QgsMessageLog.logMessage("(VFK) Unloading vfk layer {}".format(vfkLayerName))
 
         if vfkLayerName not in self.__mLoadedLayers:
-            QgsMessageLog.logMessage(
-                "(VFK) Vfk layer {} is already unloaded".format(vfkLayerName)
-            )
+            # QgsMessageLog.logMessage(
+            #     "(VFK) Vfk layer {} is already unloaded".format(vfkLayerName)
+            # )
             return
 
         QgsMapLayerRegistry.instance().removeMapLayer(
@@ -497,7 +497,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :type dbPath: str
         :return:
         """
-        QgsMessageLog.logMessage("(VFK) Open DB: {}".format(dbPath))
+        # QgsMessageLog.logMessage("(VFK) Open DB: {}".format(dbPath))
         if not QSqlDatabase.isDriverAvailable('QSQLITE'):
             raise VFKError(u'Databázový ovladač QSQLITE není dostupný.')
 
@@ -521,7 +521,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         # overwrite database
         if fileName == self.__fileName[0]:
             if self.overwriteCheckBox.isChecked():
-                QgsMessageLog.logMessage(u'(VFK) Database will be overwritten')
+                # QgsMessageLog.logMessage(u'(VFK) Database will be overwritten')
                 gdal.SetConfigOption('OGR_VFK_DB_OVERWRITE', 'YES')
 
         if self.__mOgrDataSource:

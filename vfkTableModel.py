@@ -958,14 +958,14 @@ class VfkTableModel(QSqlQueryModel):
         t = QTime()
         t.start()
 
-        QgsMessageLog.logMessage("(VFK) SQL: {}\n".format(query))
+        # QgsMessageLog.logMessage("(VFK) SQL: {}\n".format(query))
         self.setQuery(query, QSqlDatabase.database(self.__mConnectionName))
 
         while self.canFetchMore():
             self.fetchMore()
 
-        if t.elapsed() > 500:
-            QgsMessageLog.logMessage("(VFK) Time elapsed: {} ms\n".format(t.elapsed()))
+        # if t.elapsed() > 500:
+        #     QgsMessageLog.logMessage("(VFK) Time elapsed: {} ms\n".format(t.elapsed()))
 
         if self.lastError().isValid():
             iface.messageBar().pushWarning(
