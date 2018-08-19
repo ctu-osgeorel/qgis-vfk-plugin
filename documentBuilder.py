@@ -1362,8 +1362,8 @@ class DocumentBuilder:
         ok = model.searchJed(
             cisloJednotky, domovniCislo, naParcele, zpusobVyuziti, lv)
         if not ok:
-            iface.messageBar().pushWarning(
-                u"ERROR: Nemohu najit dane jednotky, nekde se stala nejaka chyba"
+            iface.messageBar().pushWarning(u'ERROR',
+                u"Nemohu najit dane jednotky, nekde se stala nejaka chyba"
             )
             return
 
@@ -1583,8 +1583,8 @@ class DocumentBuilder:
 
         st = u''
         if not model.value(row, u"drupoz_stavebni_parcela"):
-            iface.messageBar().pushWarning(
-                "ERROR: neni drupoz_stavebni_parcela"
+            iface.messageBar().pushWarning(u'ERROR',
+                "Neni k dispozici tabulka drupoz_stavebni_parcela"
             )
         if self.__mDveRadyCislovani and Domains.anoNe(model.value(row, u"drupoz_stavebni_parcela")):
             st = u"st."
