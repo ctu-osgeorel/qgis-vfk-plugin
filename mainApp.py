@@ -206,8 +206,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             self.vfkFileLineEdit.setText(self.__fileName[0])
             self.settings.setValue(sender, loaded_file)
         else:
-            iface.messageBar().pushWarning(
-                u'ERROR: not valid source'
+            iface.messageBar().pushWarning(u'ERROR',
+                u'Not valid data source'
             )
 
         self.loadVfkButton.setEnabled(True)
@@ -273,8 +273,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             error = ''
             fIds = self.__search(vectorLayer, searchString, error)
             if error:
-                iface.messageBar().pushWarning(
-                    u'ERROR in showInMap: {}'.format(error)
+                iface.messageBar().pushWarning(u'ERROR',
+                    u'In showInMap: {}'.format(error)
                 )
                 return
             else:
@@ -309,7 +309,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                 fIds.append(f.id())
             # check if there were errors during evaluating
             if search.hasEvalError():
-                iface.messageBar().pushWarning(
+                iface.messageBar().pushWarning(u'ERROR',
                     u'Evaluate error: {}'.format(error)
                 )
                 break
@@ -435,8 +435,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         composedURI = self.__mDataSourceName + "|layername=" + vfkLayerName
         layer = QgsVectorLayer(composedURI, vfkLayerName, "ogr")
         if not layer.isValid():
-            iface.messageBar().pushWarning(
-                u"ERROR: Layer failed to load!"
+            iface.messageBar().pushWarning(u'ERROR',
+                u"Layer failed to load!"
             )
 
         self.__mLoadedLayers[vfkLayerName] = layer.id()
