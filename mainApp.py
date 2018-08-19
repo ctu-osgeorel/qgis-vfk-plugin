@@ -334,9 +334,11 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         else:
             new_database_name = '{}_stav.db'.format(os.path.basename(self.__fileName[0]).split('.')[0])
 
-        os.environ['OGR_VFK_DB_NAME'] = os.path.join(
-            os.path.dirname(os.path.dirname(self.__fileName[0])), new_database_name)
-        self.__mDataSourceName = self.__fileName[0]     # os.environ['OGR_VFK_DB_NAME']
+        gdal.SetConfigOption(
+            'OGR_VFK_DB_NAME',
+            str(os.path.join(os.path.dirname(self.__fileName[0]), new_database_name))
+        )
+        self.__mDataSourceName = self.__fileName[0]
 
         QgsApplication.processEvents()
 
@@ -376,7 +378,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         """
         try:
             self.__openDatabase(
-                os.environ['OGR_VFK_DB_NAME'])  # self.__mDataSourceName)
+                gdal.GetConfigOption('OGR_VFK_DB_NAME')
+            )
         except VFKError as e:
             QMessageBox.critical(
                 self, u'Chyba', u'{}'.format(e), QMessageBox.Ok)
@@ -519,7 +522,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         if fileName == self.__fileName[0]:
             if self.overwriteCheckBox.isChecked():
                 QgsMessageLog.logMessage(u'(VFK) Database will be overwritten')
-                os.environ['OGR_VFK_DB_OVERWRITE'] = '1'
+                gdal.SetConfigOption('OGR_VFK_DB_OVERWRITE', 'YES')
 
         if self.__mOgrDataSource:
             self.__mOgrDataSource.Destroy()
@@ -532,7 +535,6 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         QgsApplication.processEvents()
 
-        #os.environ['OGR_VFK_DB_READ_ALL_BLOCKS'] = 'NO'
         self.labelLoading.setText(
             u'Načítám soubor {} (může nějaký čas trvat...)'.format(label_text))
 
@@ -575,7 +577,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.labelLoading.setText(
             u'Soubor {} úspěšně načten.'.format(label_text))
 
-        os.environ['OGR_VFK_DB_OVERWRITE'] = '0'
+        gdal.SetConfigOption('OGR_VFK_DB_OVERWRITE', 'NO')
         self.__mOgrDataSource.Destroy()
         self.__mOgrDataSource = None
 

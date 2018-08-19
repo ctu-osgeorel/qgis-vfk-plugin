@@ -968,8 +968,9 @@ class VfkTableModel(QSqlQueryModel):
             QgsMessageLog.logMessage("(VFK) Time elapsed: {} ms\n".format(t.elapsed()))
 
         if self.lastError().isValid():
-            iface.messageBar().pushWarning(u'ERROR',
-                u'SQL: {}'.format(self.lastError().text())
+            iface.messageBar().pushWarning(
+                u'ERROR',
+                u'SQL ({}): {}'.format(query, self.lastError().text())
             )
             return False
 
