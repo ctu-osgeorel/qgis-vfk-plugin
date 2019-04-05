@@ -23,8 +23,9 @@
 """
 from builtins import str
 
-from PyQt4.QtGui import *
+from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtWidgets import QWidget
 
 from .ui_vlastnicisearchform import *
 
