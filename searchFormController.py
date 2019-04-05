@@ -20,11 +20,15 @@
  *                                                                         *
  ***************************************************************************/
 """
+from __future__ import absolute_import
+from builtins import range
+from builtins import object
 
-from PyQt4.QtCore import QObject, QUrl, QRegExp, QModelIndex, SIGNAL, SLOT, Qt, pyqtSignal, qDebug
-from PyQt4.QtGui import QStandardItemModel, QStackedWidget, QStandardItem, QApplication
+from qgis.PyQt.QtCore import QObject, QUrl, QRegExp, QModelIndex, Qt, pyqtSignal, qDebug
+from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
+from qgis.PyQt.QtWidgets import QStackedWidget, QApplication
 
-from vfkTableModel import *
+from .vfkTableModel import *
 
 
 class SearchFormController(QObject):
@@ -35,12 +39,12 @@ class SearchFormController(QObject):
         budovy = None
         jednotky = None
 
-    class MainControls:
+    class MainControls(object):
         formCombobox = None
         searchForms = None
         searchButton = None
 
-    class Form:
+    class Form(object):
         Vlastnici = 0
         Parcely = 1
         Budovy = 2
@@ -78,8 +82,7 @@ class SearchFormController(QObject):
             self.__controls.formCombobox, SIGNAL(
                 "activated(int)"), self.__controls.searchForms,
                      SLOT("setCurrentIndex(int)"))
-        self.connect(self.__controls.searchButton,
-                     SIGNAL("clicked()"), self.search)
+        self.__controls.searchButton.clicked.connect(self.search)
 
         self.__controls.searchForms.setCurrentIndex(0)
         self.__controls.searchButton.setEnabled(False)
@@ -221,10 +224,10 @@ class SearchFormController(QObject):
 
         model.appendRow(items)
 
-        for i in xrange(oldModel.rowCount()):
+        for i in range(oldModel.rowCount()):
             items = []
 
-            for j in xrange(oldModel.columnCount()):
+            for j in range(oldModel.columnCount()):
                 index = QModelIndex(oldModel.index(i, j))
                 data = oldModel.data(index)
                 item = QStandardItem(data)

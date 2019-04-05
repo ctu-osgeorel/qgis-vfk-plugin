@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from builtins import object
 # -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'ui_MainApp.ui'
@@ -7,7 +9,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
+from qgis.PyQt import QtCore, QtGui
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -485,9 +487,9 @@ class Ui_MainApp(object):
         self.actionZpracujZmeny.setToolTip(_translate("MainApp", "Aplikuj změny na stavová data", None))
         self.actionZpracujZmeny.setShortcut(_translate("MainApp", "Ctrl+A", None))
 
-from vlastniciSearchForm import VlastniciSearchForm
-from vfkTextBrowser import VfkTextBrowser
-from jednotkySearchForm import JednotkySearchForm
-from budovySearchForm import BudovySearchForm
-from parcelySearchForm import ParcelySearchForm
-import resources_rc
+from .vlastniciSearchForm import VlastniciSearchForm
+from .vfkTextBrowser import VfkTextBrowser
+from .jednotkySearchForm import JednotkySearchForm
+from .budovySearchForm import BudovySearchForm
+from .parcelySearchForm import ParcelySearchForm
+from . import resources_rc

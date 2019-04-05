@@ -20,9 +20,10 @@
  *                                                                         *
  ***************************************************************************/
 """
+from builtins import object
 
 
-class Domains:
+class Domains(object):
 
     @staticmethod
     def anoNe(an):

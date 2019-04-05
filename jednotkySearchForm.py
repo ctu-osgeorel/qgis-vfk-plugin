@@ -21,11 +21,12 @@
  *                                                                         *
  ***************************************************************************/
 """
+from builtins import str
 
 from PyQt4.QtGui import *
-from PyQt4.QtCore import QAbstractItemModel, QModelIndex
+from qgis.PyQt.QtCore import QAbstractItemModel, QModelIndex
 
-from ui_jednotkysearchform import *
+from .ui_jednotkysearchform import *
 
 
 class JednotkySearchForm(QWidget):
@@ -40,16 +41,16 @@ class JednotkySearchForm(QWidget):
         self.__mZpusobVyuzitiModel = QAbstractItemModel
 
     def cisloJednotky(self):
-        return unicode(self.ui.mCisloJednotkyLineEdit.text()).strip()
+        return str(self.ui.mCisloJednotkyLineEdit.text()).strip()
 
     def domovniCislo(self):
-        return unicode(self.ui.mCisloDomovniLineEdit.text()).strip()
+        return str(self.ui.mCisloDomovniLineEdit.text()).strip()
 
     def naParcele(self):
-        return unicode(self.ui.mNaParceleLineEdit.text()).strip()
+        return str(self.ui.mNaParceleLineEdit.text()).strip()
 
     def lv(self):
-        return unicode(self.ui.mLvJednotkyLineEdit.text()).strip()
+        return str(self.ui.mLvJednotkyLineEdit.text()).strip()
 
     def setZpusobVyuzitiModel(self, model):
         self.__mZpusobVyuzitiModel = model

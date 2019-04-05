@@ -20,27 +20,29 @@
  *                                                                         *
  ***************************************************************************/
 """
+from builtins import str
+from builtins import object
 
-from PyQt4.QtSql import QSqlQueryModel, QSqlRecord, QSqlField, QSqlDatabase
-from PyQt4.QtCore import QTime, QObject
+from qgis.PyQt.QtSql import QSqlField, QSqlDatabase
+from qgis.PyQt.QtCore import QTime, QObject
 
 from qgis.utils import iface
 from qgis.core import QgsMessageLog
 
 class VfkTableModel(QSqlQueryModel):
 
-    class Nemovitost:
+    class Nemovitost(object):
         NParcela = 0
         NBudova = 1
         NJednotka = 2
 
-    class OpravnenyPovinny:
+    class OpravnenyPovinny(object):
         OPParcela = 0
         OPBudova = 1
         OPJednotka = 2
         OPOsoba = 3
 
-    class Pravo:
+    class Pravo(object):
         Opravneni = 0
         Povinnost = 1
 
@@ -899,13 +901,13 @@ class VfkTableModel(QSqlQueryModel):
         :type name: unicode
         :return: OpravnenyPovinny
         """
-        if unicode(name).find(u"par") > -1:
+        if str(name).find(u"par") > -1:
             return self.OpravnenyPovinny.OPParcela
-        if unicode(name).find(u"bud") > -1:
+        if str(name).find(u"bud") > -1:
             return self.OpravnenyPovinny.OPBudova
-        if unicode(name).find(u"jed") > -1:
+        if str(name).find(u"jed") > -1:
             return self.OpravnenyPovinny.OPJednotka
-        if unicode(name).find(u"opsub") > -1:
+        if str(name).find(u"opsub") > -1:
             return self.OpravnenyPovinny.OPOsoba
 
         return self.OpravnenyPovinny.OPParcela
@@ -983,9 +985,9 @@ class VfkTableModel(QSqlQueryModel):
         :type column:
         :return: str
         """
-        value = unicode(self.record(row).field(column).value())
+        value = str(self.record(row).field(column).value())
 
         if value == u"NULL" or value == u'None':
             return u''
         else:
-            return unicode(value)
+            return str(value)

@@ -20,7 +20,9 @@
  *                                                                         *
  ***************************************************************************/
 """
+from builtins import object
 from abc import ABCMeta, abstractmethod
+from future.utils import with_metaclass
 
 
 class TPair(object):
@@ -30,9 +32,7 @@ class TPair(object):
         self.second = second
 
 
-class VfkDocument:
-
-    __metaclass__ = ABCMeta
+class VfkDocument(with_metaclass(ABCMeta, object)):
 
     def __init__(self):
         pass
