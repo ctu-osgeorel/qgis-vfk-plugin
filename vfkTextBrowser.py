@@ -25,10 +25,12 @@ from __future__ import absolute_import
 from builtins import str
 from builtins import object
 
-from qgis.PyQt import QtCore, QtGui
-from PyQt4.QtGui import *
-from qgis.PyQt.QtCore import QFile, QIODevice, QUrl, QObject, pyqtSlot, pyqtSignal, QTextStream, qWarning, qDebug
+from qgis.PyQt import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import *
+from qgis.PyQt.QtCore import QFile, QIODevice, QUrl, QUrlQuery, QObject, pyqtSlot, pyqtSignal, QTextStream, qWarning, qDebug
 from qgis.PyQt.QtSql import QSqlDatabase
+from qgis.PyQt.QtWidgets import QTextBrowser, QApplication
+
 
 from .documentBuilder import *
 from .htmlDocument import *
@@ -146,9 +148,9 @@ class VfkTextBrowser(QTextBrowser):
         :return: dict
         """
         taskMap = {u'action': task.path()}
-
-        for key, value in task.encodedQueryItems():
-            taskMap[str(key)] = QUrl.fromPercentEncoding(str(value))
+        
+        for key, value in QUrlQuery(task).queryItems(task.PrettyDecoded):
+            taskMap[str(key)] = QUrl.toPercentEncoding((value))
 
         return taskMap
 

@@ -27,14 +27,14 @@ from builtins import range
 from builtins import object
 
 # Import the PyQt, QGIS libraries and classes
-from qgis.PyQt import QtCore, QtGui
+from qgis.PyQt import QtCore, QtGui, QtWidgets
 from re import search
 import os
 import time
 
-from qgis.PyQt.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup, QDockWidget, QToolButton, QMenu
+from qgis.PyQt.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup, QDockWidget, QToolButton, QMenu, QHBoxLayout, QPushButton, QLineEdit
 from qgis.PyQt.QtGui import QPalette, QDesktopServices
-from qgis.PyQt.QtCore import QFileInfo, QDir, Qt, QObject, pyqtSignal, QThread, QSettings
+from qgis.PyQt.QtCore import QFileInfo, QDir, Qt, QObject, pyqtSignal, QThread, QSettings, QUuid
 from qgis.PyQt.QtSql import QSqlDatabase
 from qgis.core import *
 from qgis.gui import *
@@ -168,7 +168,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             ext = '*.vfk'
             if self.__gdal_version >= 2020000:
                 ext += ' *.db'
-            loaded_file, __, __ = QFileDialog.getOpenFileName(
+            loaded_file, __ = QFileDialog.getOpenFileName(
                 self, u'Načti soubor VFK', lastUsedDir,
                 u'Soubory podporované ovladačem VFK GDAL ({})'.format(ext)
             )
@@ -241,7 +241,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         """
         for layer in self.__mLoadedLayers:
             id = self.__mLoadedLayers[layer]
-            vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
+            vectorLayer = QgsProject.instance().mapLayer(id)
 
             if connected:
                 vectorLayer.selectionChanged.connect(self.showInfoAboutSelection)
@@ -257,7 +257,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         """
         if layerName in self.__mLoadedLayers:
             id = self.__mLoadedLayers[layerName]
-            vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
+            vectorLayer = QgsProject.instance().mapLayer(id)
             searchString = "ID IN ({})".format(", ".join(ids))
             error = ''
             fIds = self.__search(vectorLayer, searchString, error)
@@ -438,7 +438,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         except VFKWarning as e:
             QMessageBox.information(self, 'Load Style', e, QMessageBox.Ok)
 
-        QgsMapLayerRegistry.instance().addMapLayer(layer)
+        QgsProject.instance().addMapLayer(layer)
 
     def __unLoadVfkLayer(self, vfkLayerName):
         """
@@ -454,7 +454,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             # )
             return
 
-        QgsMapLayerRegistry.instance().removeMapLayer(
+        QgsProject.instance().removeMapLayer(
             self.__mLoadedLayers[vfkLayerName])
         del self.__mLoadedLayers[vfkLayerName]
 
@@ -590,7 +590,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         for layer in layers:
             if layer in self.__mLoadedLayers:
                 id = str(self.__mLoadedLayers[layer])
-                vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
+                vectorLayer = QgsProject.instance().mapLayer(id)
                 layerIds[layer] = self.__selectedIds(vectorLayer)
 
         self.vfkBrowser.showInfoAboutSelection(
@@ -677,13 +677,13 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.label.setText('VFK soubory:')
 
         # new layout
-        horizontalLayout = QtGui.QHBoxLayout()
+        horizontalLayout = QtWidgets.QHBoxLayout()
 
         # create new objects
         self.__browseButtons['browseButton_{}'.format(
-            len(self.__vfkLineEdits) + 1)] = QtGui.QPushButton(u"Procházet")
+            len(self.__vfkLineEdits) + 1)] = QtWidgets.QPushButton(u"Procházet")
         self.__vfkLineEdits['vfkLineEdit_{}'.format(
-            len(self.__vfkLineEdits) + 1)] = QtGui.QLineEdit()
+            len(self.__vfkLineEdits) + 1)] = QtWidgets.QLineEdit()
 
         horizontalLayout.addWidget(self.__vfkLineEdits[
                                    'vfkLineEdit_{}'.format(len(self.__vfkLineEdits))])
@@ -744,13 +744,13 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             self.__databases[database_type] = QFileDialog.getOpenFileName(self, title, lastUsedDir, u'Datábaze (*.db)')
             if not self.__databases[database_type]:
                 return
-            self.le_mainDb.setText(self.__databases[database_type])
+            self.le_mainDb.setText(str(self.__databases[database_type]))
 
         elif database_type == 'amendmentDb':
             self.__databases[database_type] = QFileDialog.getOpenFileName(self, title, lastUsedDir, u'Datábaze (*.db)')
             if not self.__databases[database_type]:
                 return
-            self.le_amendmentDb.setText(self.__databases[database_type])
+            self.le_amendmentDb.setText(str(self.__databases[database_type]))
 
         elif database_type == 'exportDb':
             title = u'Zadej jméno výstupní databáze'
@@ -758,7 +758,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                                                                           ".db", u"Databáze (*.db)")
             if not self.__databases[database_type]:
                 return
-            self.le_exportDb.setText(self.__databases[database_type])
+            self.le_exportDb.setText(str(self.__databases[database_type]))
 
         if len(self.__databases) == 3:
             self.pb_applyChanges.setEnabled(True)
@@ -809,7 +809,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :return: bool
         """
         if file_name.endswith(".vfk"):
-            with open(file_name, 'r') as f:
+            with open(file_name, 'rb') as f:
                 for line in f:
 
                     line_splited = str(line).split(';')
@@ -876,15 +876,11 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         actionGroup.addAction(self.actionZpracujZmeny)
 
         # QSignalMapper
-        self.signalMapper = QSignalMapper(self)
+        self.signalMapper = QtCore.QSignalMapper(self)
 
-        # connect to 'clicked' on all buttons
-        self.connect(self.actionImport, SIGNAL(
-            "triggered()"), self.signalMapper, SLOT("map()"))
-        self.connect(self.actionVyhledavani, SIGNAL(
-            "triggered()"), self.signalMapper, SLOT("map()"))
-        self.connect(self.actionZpracujZmeny, SIGNAL(
-            "triggered()"), self.signalMapper, SLOT("map()"))
+        self.actionImport.triggered.connect(self.signalMapper.map)
+        self.actionVyhledavani.triggered.connect(self.signalMapper.map)
+        self.actionZpracujZmeny.triggered.connect(self.signalMapper.map)
 
         # setMapping on each button to the QStackedWidget index we'd like to
         # switch to
@@ -893,9 +889,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.signalMapper.setMapping(self.actionZpracujZmeny, 1)
 
         # connect mapper to stackedWidget
-        self.connect(self.signalMapper, SIGNAL("mapped(int)"),
-                     self.stackedWidget, SLOT("setCurrentIndex(int)"))
-        self.actionImport.trigger()
+        self.signalMapper.mapped.connect(self.stackedWidget.setCurrentIndex)
+        
 
         self.vfkBrowser.switchToPanelImport.connect(self.switchToImport)
         self.vfkBrowser.switchToPanelSearch.connect(self.switchToSearch)

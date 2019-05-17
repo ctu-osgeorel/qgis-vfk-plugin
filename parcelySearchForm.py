@@ -23,7 +23,9 @@
 """
 from builtins import str
 
-from PyQt4.QtGui import *
+from qgis.PyQt import QtGui, QtWidgets
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 from qgis.PyQt.QtCore import QAbstractItemModel, QRegExp
 
 from .ui_parcelysearchform import *

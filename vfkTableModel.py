@@ -23,13 +23,14 @@
 from builtins import str
 from builtins import object
 
-from qgis.PyQt.QtSql import QSqlField, QSqlDatabase
+from qgis.PyQt.QtSql import QSqlField, QSqlDatabase, QSqlQueryModel
 from qgis.PyQt.QtCore import QTime, QObject
 
 from qgis.utils import iface
 from qgis.core import QgsMessageLog
 
 class VfkTableModel(QSqlQueryModel):
+
 
     class Nemovitost(object):
         NParcela = 0

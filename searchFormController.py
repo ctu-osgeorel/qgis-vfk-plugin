@@ -77,11 +77,9 @@ class SearchFormController(QObject):
         self.__controls.formCombobox.addItem(u"parcely", self.Form.Parcely)
         self.__controls.formCombobox.addItem(u"budovy", self.Form.Budovy)
         self.__controls.formCombobox.addItem(u"jednotky", self.Form.Jednotky)
-
-        self.connect(
-            self.__controls.formCombobox, SIGNAL(
-                "activated(int)"), self.__controls.searchForms,
-                     SLOT("setCurrentIndex(int)"))
+		
+        self.__controls.formCombobox.activated.connect(self.__controls.searchForms.setCurrentIndex)
+		
         self.__controls.searchButton.clicked.connect(self.search)
 
         self.__controls.searchForms.setCurrentIndex(0)
