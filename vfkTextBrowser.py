@@ -37,7 +37,6 @@ from .htmlDocument import *
 from .latexDocument import *
 from .richTextDocument import *
 
-
 class TPair(object):
 
     def __init__(self, first=u'', second=u''):
@@ -124,6 +123,7 @@ class VfkTextBrowser(QTextBrowser):
             return False
 
         taskMap = self.__parseTask(task)
+
         text = self.__documentContent(taskMap, format)
         streamFileOut = QTextStream(fileOut)
         streamFileOut.setCodec("UTF-8")
@@ -150,7 +150,7 @@ class VfkTextBrowser(QTextBrowser):
         taskMap = {u'action': task.path()}
         
         for key, value in QUrlQuery(task).queryItems(task.PrettyDecoded):
-            taskMap[str(key)] = QUrl.toPercentEncoding((value))
+            taskMap[str(key)] = str(value) # QUrl.toPercentEncoding((value))
 
         return taskMap
 

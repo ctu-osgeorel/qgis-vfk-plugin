@@ -809,7 +809,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :return: bool
         """
         if file_name.endswith(".vfk"):
-            with open(file_name, 'rb').read().decode('unicode_escape').encode('latin-1').decode('utf-8') as f:
+            with open(file_name, 'rb') as f:
                 for line in f:
 
                     line_splited = str(line).split(';')
