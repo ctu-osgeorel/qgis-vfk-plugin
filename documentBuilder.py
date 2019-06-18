@@ -142,7 +142,7 @@ class DocumentBuilder(object):
         opsubIds = []
 
         self.partTelesoHlavicka(id)
-        self.partTelesoVlastnici(id, opsubIds, True)
+        # self.partTelesoVlastnici(id, opsubIds, True)
         self.partTelesoNemovitosti(id, parIds, budIds, jedIds)
 
         self.partTelesoB1(parIds, budIds, jedIds, opsubIds, True)
@@ -922,8 +922,8 @@ class DocumentBuilder(object):
 
         self.__mDocument.paragraph(link)
         opsubIds = []
-        self.partTelesoVlastnici(
-            telesoModel.value(0, u"tel_id"), opsubIds, False)
+        # self.partTelesoVlastnici(
+        #     telesoModel.value(0, u"tel_id"), opsubIds, False)
         self.partNemovitostOchrana(id, VfkTableModel.Nemovitost.NParcela)
 
         parIds = [id]
@@ -941,82 +941,83 @@ class DocumentBuilder(object):
         :type forLV: bool
         :return:
         """
-        vlastniciModel = VfkTableModel(self.__mConnectionName)
-        ok = vlastniciModel.telesoVlastnici(id)
-        if not ok:
-            return
+        # vlastniciModel = VfkTableModel(self.__mConnectionName)
+        # ok = vlastniciModel.telesoVlastnici(id)
+        # if not ok:
+            # return
         if forLV:
             self.__mDocument.heading2(u"A – Vlastníci, jiní oprávnění")
         else:
             self.__mDocument.heading2(u"Vlastníci, jiní oprávnění")
+        
+        self.mDocument.text(u"Informace o vlastníkovi není dostupná.")
+    #     orderedPrava = []
+    #     for i in range(vlastniciModel.rowCount()):
+    #         orderedPrava.append(vlastniciModel.value(i, u"typrav_nazev"))
 
-        orderedPrava = []
-        for i in range(vlastniciModel.rowCount()):
-            orderedPrava.append(vlastniciModel.value(i, u"typrav_nazev"))
+    #     orderedPrava = list(set(orderedPrava))
 
-        orderedPrava = list(set(orderedPrava))
+    #     # tables =  {[[]]}
+    #     tables = {}
+    #     header = [u"Jméno", u"Adresa", u"Identifikátor", u"Podíl"]
 
-        # tables =  {[[]]}
-        tables = {}
-        header = [u"Jméno", u"Adresa", u"Identifikátor", u"Podíl"]
+    #     for i, item in enumerate(orderedPrava):
+    #         table = [header]
+    #         tables[orderedPrava[i]] = table
 
-        for i, item in enumerate(orderedPrava):
-            table = [header]
-            tables[orderedPrava[i]] = table
+    #     for i in range(vlastniciModel.rowCount()):
+    #         typravNazev = vlastniciModel.value(i, u"typrav_nazev")
+    #         opsubId = vlastniciModel.value(i, u"vla_opsub_id")
+    #         vlaPodilCitatel = vlastniciModel.value(i, u"vla_podil_citatel")
+    #         vlaPodilJmenovatel = vlastniciModel.value(
+    #             i, u"vla_podil_jmenovatel")
+    #         podil = u''
 
-        for i in range(vlastniciModel.rowCount()):
-            typravNazev = vlastniciModel.value(i, u"typrav_nazev")
-            opsubId = vlastniciModel.value(i, u"vla_opsub_id")
-            vlaPodilCitatel = vlastniciModel.value(i, u"vla_podil_citatel")
-            vlaPodilJmenovatel = vlastniciModel.value(
-                i, u"vla_podil_jmenovatel")
-            podil = u''
+    #         if vlaPodilCitatel and vlaPodilJmenovatel and vlaPodilJmenovatel != u'1':
+    #             podil += u"{}/{}".format(vlaPodilCitatel, vlaPodilJmenovatel)
 
-            if vlaPodilCitatel and vlaPodilJmenovatel and vlaPodilJmenovatel != u'1':
-                podil += u"{}/{}".format(vlaPodilCitatel, vlaPodilJmenovatel)
+    #         vlastnikModel = VfkTableModel(self.__mConnectionName)
+    #         ok = vlastnikModel.vlastnik(opsubId, True)
+    #         if not ok:
+    #             return
 
-            vlastnikModel = VfkTableModel(self.__mConnectionName)
-            ok = vlastnikModel.vlastnik(opsubId, True)
-            if not ok:
-                return
+    #         opsub_type = vlastnikModel.value(0, u"opsub_opsub_type")
+    #         nazev = self.makeJmeno(vlastnikModel, 0)
 
-            opsub_type = vlastnikModel.value(0, u"opsub_opsub_type")
-            nazev = self.makeJmeno(vlastnikModel, 0)
+    #         if opsub_type != u"BSM":
+    #             content = []
+    #             adresa = self.makeAdresa(vlastnikModel, 0)
+    #             identifikator = self.makeIdentifikator(vlastnikModel, 0)
+    #             content.append(nazev)
+    #             content.append(adresa)
+    #             content.append(identifikator)
+    #             content.append(podil)
+    #             tables[typravNazev].append(content)
+    #         else:
+    #             nazev += u" ({})".format(
+    #                 vlastnikModel.value(0, u"charos_zkratka"))
+    #             rowContent = [nazev, u'', u'', podil]
+    #             tables[typravNazev].append(rowContent)
 
-            if opsub_type != u"BSM":
-                content = []
-                adresa = self.makeAdresa(vlastnikModel, 0)
-                identifikator = self.makeIdentifikator(vlastnikModel, 0)
-                content.append(nazev)
-                content.append(adresa)
-                content.append(identifikator)
-                content.append(podil)
-                tables[typravNazev].append(content)
-            else:
-                nazev += u" ({})".format(
-                    vlastnikModel.value(0, u"charos_zkratka"))
-                rowContent = [nazev, u'', u'', podil]
-                tables[typravNazev].append(rowContent)
+    #             manzeleId = [vlastnikModel.value(
+    #                 0, u"opsub_id_je_1_partner_bsm"),
+    #                 vlastnikModel.value(0, u"opsub_id_je_2_partner_bsm")]
 
-                manzeleId = [vlastnikModel.value(
-                    0, u"opsub_id_je_1_partner_bsm"),
-                    vlastnikModel.value(0, u"opsub_id_je_2_partner_bsm")]
+    #             sjmModel = VfkTableModel(self.__mConnectionName)
+    #             for j in range(len(manzeleId)):
+    #                 ok = sjmModel.vlastnik(manzeleId[j])
+    #                 if not ok:
+    #                     break
 
-                sjmModel = VfkTableModel(self.__mConnectionName)
-                for j in range(len(manzeleId)):
-                    ok = sjmModel.vlastnik(manzeleId[j])
-                    if not ok:
-                        break
+    #                 identifikatorSJM = sjmModel.value(0, u"opsub_rodne_cislo")
+    #                 rowContent = [self.makeJmeno(sjmModel, 0), self.makeAdresa(
+    #                     sjmModel, 0), identifikatorSJM, u'']
+    #                 tables[typravNazev].append(rowContent)
 
-                    identifikatorSJM = sjmModel.value(0, u"opsub_rodne_cislo")
-                    rowContent = [self.makeJmeno(sjmModel, 0), self.makeAdresa(
-                        sjmModel, 0), identifikatorSJM, u'']
-                    tables[typravNazev].append(rowContent)
-
-            opsubIds.append(opsubId)
-        for i in range(len(orderedPrava)):
-            self.__mDocument.heading3(orderedPrava[i])
-            self.__mDocument.table(tables[orderedPrava[i]], True)
+    #         opsubIds.append(opsubId)
+    #     for i in range(len(orderedPrava)):
+    #         self.__mDocument.heading3(orderedPrava[i])
+    #         self.__mDocument.table(tables[orderedPrava[i]], True)
 
     def partNemovitostOchrana(self, id, nemovitost):
         """
@@ -1095,8 +1096,8 @@ class DocumentBuilder(object):
         self.__mDocument.keyValueTable(content)
 
         opsubIds = []
-        self.partTelesoVlastnici(
-            telesoModel.value(0, u"tel_id"), opsubIds, False)
+        # self.partTelesoVlastnici(
+        #     telesoModel.value(0, u"tel_id"), opsubIds, False)
         self.partNemovitostOchrana(id, VfkTableModel.Nemovitost.NBudova)
 
         budIds = [id]
@@ -1144,8 +1145,8 @@ class DocumentBuilder(object):
         self.__mDocument.keyValueTable(content)
 
         opsubIds = []
-        self.partTelesoVlastnici(
-            telesoModel.value(0, u"tel_id"), opsubIds, False)
+        # self.partTelesoVlastnici(
+        #     telesoModel.value(0, u"tel_id"), opsubIds, False)
         self.partNemovitostOchrana(id, VfkTableModel.Nemovitost.NJednotka)
 
         jedIds = [id]
@@ -1245,20 +1246,21 @@ class DocumentBuilder(object):
         :type ids: list
         """
         self.__mDocument.heading2(u"Seznam osob")
-        self.__mDocument.beginItemize()
+        self.__mDocument.text(u"Seznam osob není v tuto chvíli dostupný.")
+        # self.__mDocument.beginItemize()
 
-        self.__mCurrentPageParIds = ids
+        # self.__mCurrentPageParIds = ids
 
-        for id in ids:
-            model = VfkTableModel(self.__mConnectionName)
-            ok = model.opravnenySubjekt(id, True)
-            if not ok:
-                continue
+        # for id in ids:
+        #     model = VfkTableModel(self.__mConnectionName)
+        #     ok = model.opravnenySubjekt(id, True)
+        #     if not ok:
+        #         continue
 
-            self.__mDocument.item(self.makeLongDescription(
-                id, VfkTableModel.OpravnenyPovinny.OPOsoba))
+        #     self.__mDocument.item(self.makeLongDescription(
+        #         id, VfkTableModel.OpravnenyPovinny.OPOsoba))
 
-        self.__mDocument.endItemize()
+        # self.__mDocument.endItemize()
 
     def pageSeznamBudov(self, ids):
         """
@@ -1391,10 +1393,11 @@ class DocumentBuilder(object):
         text += u"Následně lze vyhledávat:"
         self.__mDocument.paragraph(text)
 
-        self.__mDocument.beginItemize()
+        self.__mDocument.beginItemize()      
         link = self.__mDocument.link(
             u"switchPanel?panel=search&type=0", u"oprávněné osoby")
-        self.__mDocument.item(link)
+        text = u"{} (tato možnost je momentálně nedostupná)".format(link)
+        self.__mDocument.item(text)
         link = self.__mDocument.link(
             u"switchPanel?panel=search&type=1", u"parcely")
         self.__mDocument.item(link)

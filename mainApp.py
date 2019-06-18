@@ -216,7 +216,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.showInMap(self.vfkBrowser.currentBudIds(), "BUD")
 
     def latexExport(self):
-        fileName, __, __ = QFileDialog.getSaveFileName(
+        fileName, __ = QFileDialog.getSaveFileName(
             self, u"Jméno exportovaného souboru", ".tex", "LaTeX (*.tex)")
         if fileName:
             export_succesfull = self.vfkBrowser.exportDocument(
@@ -225,7 +225,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                 self.succesfullExport("LaTeX")
 
     def htmlExport(self):
-        fileName, __, __ = QFileDialog.getSaveFileName(
+        fileName, __ = QFileDialog.getSaveFileName(
             self, u"Jméno exportovaného souboru", ".html", "HTML (*.html)")
         if fileName:
             export_succesfull = self.vfkBrowser.exportDocument(
@@ -285,7 +285,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         if search.hasParserError():
             error += "Parsing error:" + search.parserErrorString()
             return fIds
-        if not search.prepare(layer.pendingFields()):
+        if not search.prepare(layer.fields()):
             error + "Evaluation error:" + search.evalErrorString()
 
         layer.select(rect, False)

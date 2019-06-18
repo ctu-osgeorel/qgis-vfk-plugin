@@ -118,7 +118,7 @@ class VfkTableModel(QSqlQueryModel):
                 "JOIN par ON par.tel_id = tel.id " \
                 "LEFT JOIN drupoz ON par.drupoz_kod = drupoz.kod " \
                 "LEFT JOIN zpvypo ON par.zpvypa_kod = zpvypo.kod " \
-                "WHERE opsub.id = {};".format(columns, opsubId)
+                "WHERE opsub.id = \"{}\";".format(columns, opsubId)
         return self.__evaluate(query)
 
     def telesoBudovy(self, cisloTel, extended):
@@ -158,7 +158,7 @@ class VfkTableModel(QSqlQueryModel):
                 "LEFT JOIN zpvybu ON zpvybu.kod = bud.zpvybu_kod " \
                 "LEFT JOIN casobc ON casobc.kod = bud.caobce_kod " \
                 "LEFT JOIN drupoz ON drupoz.kod = par.drupoz_kod " \
-                "WHERE opsub.id = {};".format(columns, opsubId)
+                "WHERE opsub.id = \"{}\";".format(columns, opsubId)
         return self.__evaluate(query)
 
     def telesoJednotky(self, cisloTel, extended):
@@ -199,7 +199,7 @@ class VfkTableModel(QSqlQueryModel):
             "LEFT JOIN zpvyje ON zpvyje.kod = jed.zpvyje_kod " \
             "JOIN par ON par.bud_id = bud.id " \
             "LEFT JOIN drupoz ON drupoz.kod = par.drupoz_kod " \
-            "WHERE opsub.id = {};".format(columns, opsubId)
+            "WHERE opsub.id = \"{}\";".format(columns, opsubId)
 
         return self.__evaluate(query)
 
@@ -308,7 +308,7 @@ class VfkTableModel(QSqlQueryModel):
         query = "SELECT {} " \
                 "FROM opsub " \
                 "JOIN charos ON charos.kod = opsub.charos_kod " \
-                "WHERE opsub.id = {};".format(columns, id)
+                "WHERE opsub.id = \"{}\";".format(columns, id)
 
         return self.__evaluate(query)
 
@@ -380,7 +380,7 @@ class VfkTableModel(QSqlQueryModel):
                 "LEFT JOIN par ON par.tel_id = tel.id " \
                 "LEFT JOIN bud ON bud.tel_id = tel.id " \
                 "LEFT JOIN jed ON jed.tel_id = tel.id " \
-                "WHERE opsub.id = {};".format(id)
+                "WHERE opsub.id = \"{}\";".format(id)
 
         return self.__evaluate(query)
 
@@ -475,7 +475,7 @@ class VfkTableModel(QSqlQueryModel):
         query = "SELECT {} " \
                 "FROM opsub " \
                 "JOIN charos ON opsub.charos_kod = charos.kod " \
-                "WHERE opsub.id = {};".format(columns, id)
+                "WHERE opsub.id = \"{}\";".format(columns, id)
         return self.__evaluate(query)
 
     def dveRadyCislovani(self):
