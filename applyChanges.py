@@ -21,6 +21,9 @@
  *                                                                         *
  ***************************************************************************/
 """
+from __future__ import print_function
+from builtins import str
+from builtins import zip
 
 import sqlite3
 import sys
@@ -29,8 +32,8 @@ import shutil
 import argparse
 from datetime import datetime
 
-from PyQt4.QtGui import QWidget, QApplication
-from PyQt4.QtCore import qDebug, pyqtSignal, SIGNAL
+from qgis.PyQt.QtWidgets import QWidget, QApplication
+from qgis.PyQt.QtCore import qDebug, pyqtSignal
 
 
 class ApplyChanges(QWidget):
@@ -58,7 +61,7 @@ class ApplyChanges(QWidget):
         :type db_amendment: str
         :type db_updated: str
         """
-        self.emit(SIGNAL('preprocessingDatabase'))
+        self.preprocessingDatabase.emit()
 
         db_full = os.path.abspath(db_full)
         db_amendment = os.path.abspath(db_amendment)
@@ -82,18 +85,18 @@ class ApplyChanges(QWidget):
 
             self.__applyChanges()
 
-        self.emit(SIGNAL('finishedStatus'))
+        self.finishedStatus.emit()
 
     def __applyChanges(self):
         """
         Method updates rows in main database by rows from databse with amendment data.
         """
         table_names = self.__findTablesWithChanges()
-        self.emit(SIGNAL("maxRangeProgressBar"), len(table_names))
+        self.maxRangeProgressBar.emit(len(table_names))
 
         # process all relevant tables
         for i, table in enumerate(table_names):
-            self.emit(SIGNAL("updateStatus"), i+1, table)
+            self.updateStatus.emit(i+1, table)
 
             # Delete data which are in both databases --> there are updates in amendment database
             query = 'DELETE FROM main.{table} ' \
@@ -138,7 +141,7 @@ class ApplyChanges(QWidget):
                     for item in row:
                         tmp.append(item)
 
-                    data_rows.append(dict(zip(columns, tmp)))
+                    data_rows.append(dict(list(zip(columns, tmp))))
 
                 # sort data according to the date 'DATUM_VZNIKU'
                 if 'DATUM_VZNIKU' in data_rows[0]:

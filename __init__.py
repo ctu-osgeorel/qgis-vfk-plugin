@@ -21,8 +21,9 @@
  ***************************************************************************/
  This script initializes the plugin, making it known to QGIS.
 """
+from __future__ import absolute_import
 
 
 def classFactory(iface):
-    from vfkPlugin import vfkPlugin
+    from .vfkPlugin import vfkPlugin
     return vfkPlugin(iface)

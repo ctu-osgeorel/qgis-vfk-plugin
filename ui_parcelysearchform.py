@@ -1,3 +1,4 @@
+from builtins import object
 # -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'ui_parcelysearchform.ui'
@@ -7,7 +8,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
+from qgis.PyQt import QtCore, QtGui, QtWidgets
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -16,13 +17,13 @@ except AttributeError:
         return s
 
 try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
+    _encoding = QtWidgets.QApplication.UnicodeUTF8
 
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+        return QtWidgets.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+        return QtWidgets.QApplication.translate(context, text, disambig)
 
 
 class Ui_ParcelySearchForm(object):
@@ -30,21 +31,21 @@ class Ui_ParcelySearchForm(object):
     def setupUi(self, ParcelySearchForm):
         ParcelySearchForm.setObjectName(_fromUtf8("ParcelySearchForm"))
         ParcelySearchForm.resize(269, 168)
-        self.gridLayout = QtGui.QGridLayout(ParcelySearchForm)
+        self.gridLayout = QtWidgets.QGridLayout(ParcelySearchForm)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        self.label_3 = QtGui.QLabel(ParcelySearchForm)
+        self.label_3 = QtWidgets.QLabel(ParcelySearchForm)
         self.label_3.setObjectName(_fromUtf8("label_3"))
         self.gridLayout.addWidget(self.label_3, 0, 0, 1, 1)
-        self.parCisloLineEdit = QtGui.QLineEdit(ParcelySearchForm)
+        self.parCisloLineEdit = QtWidgets.QLineEdit(ParcelySearchForm)
         self.parCisloLineEdit.setInputMask(_fromUtf8(""))
         self.parCisloLineEdit.setObjectName(_fromUtf8("parCisloLineEdit"))
         self.gridLayout.addWidget(self.parCisloLineEdit, 0, 1, 1, 1)
-        self.label_5 = QtGui.QLabel(ParcelySearchForm)
+        self.label_5 = QtWidgets.QLabel(ParcelySearchForm)
         self.label_5.setObjectName(_fromUtf8("label_5"))
         self.gridLayout.addWidget(self.label_5, 1, 0, 1, 1)
-        self.typParcelyCombo = QtGui.QComboBox(ParcelySearchForm)
-        sizePolicy = QtGui.QSizePolicy(
-            QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
+        self.typParcelyCombo = QtWidgets.QComboBox(ParcelySearchForm)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
@@ -55,12 +56,12 @@ class Ui_ParcelySearchForm(object):
         self.typParcelyCombo.addItem(_fromUtf8(""))
         self.typParcelyCombo.addItem(_fromUtf8(""))
         self.gridLayout.addWidget(self.typParcelyCombo, 1, 1, 1, 1)
-        self.label_6 = QtGui.QLabel(ParcelySearchForm)
+        self.label_6 = QtWidgets.QLabel(ParcelySearchForm)
         self.label_6.setObjectName(_fromUtf8("label_6"))
         self.gridLayout.addWidget(self.label_6, 2, 0, 1, 1)
-        self.druhPozemkuCombo = QtGui.QComboBox(ParcelySearchForm)
-        sizePolicy = QtGui.QSizePolicy(
-            QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Fixed)
+        self.druhPozemkuCombo = QtWidgets.QComboBox(ParcelySearchForm)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
@@ -68,13 +69,13 @@ class Ui_ParcelySearchForm(object):
         self.druhPozemkuCombo.setSizePolicy(sizePolicy)
         self.druhPozemkuCombo.setObjectName(_fromUtf8("druhPozemkuCombo"))
         self.gridLayout.addWidget(self.druhPozemkuCombo, 2, 1, 1, 1)
-        spacerItem = QtGui.QSpacerItem(
-            20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        spacerItem = QtWidgets.QSpacerItem(
+            20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem, 4, 1, 1, 1)
-        self.lvParcelyLineEdit = QtGui.QLineEdit(ParcelySearchForm)
+        self.lvParcelyLineEdit = QtWidgets.QLineEdit(ParcelySearchForm)
         self.lvParcelyLineEdit.setObjectName(_fromUtf8("lvParcelyLineEdit"))
         self.gridLayout.addWidget(self.lvParcelyLineEdit, 3, 1, 1, 1)
-        self.label = QtGui.QLabel(ParcelySearchForm)
+        self.label = QtWidgets.QLabel(ParcelySearchForm)
         self.label.setObjectName(_fromUtf8("label"))
         self.gridLayout.addWidget(self.label, 3, 0, 1, 1)
 

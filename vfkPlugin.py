@@ -20,13 +20,16 @@
  *                                                                         *
  ***************************************************************************/
 """
+from __future__ import absolute_import
+from builtins import object
 
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt, qDebug
-from PyQt4.QtGui import QAction, QIcon, QToolButton, QMenu
+from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt, qDebug
+from qgis.PyQt.QtWidgets import QAction, QToolButton, QMenu
+from qgis.PyQt.QtGui import QIcon
 # Initialize Qt resources from file resources.py
-import resources_rc
+from . import resources_rc
 # Import the code for the dialog
-from mainApp import MainApp
+from .mainApp import MainApp
 import os.path
 
 

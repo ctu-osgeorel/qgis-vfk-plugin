@@ -21,11 +21,14 @@
  *                                                                         *
  ***************************************************************************/
 """
+from builtins import str
 
-from PyQt4.QtGui import *
-from PyQt4.QtCore import QAbstractItemModel
+from qgis.PyQt import QtGui, QtWidgets
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from qgis.PyQt.QtCore import QAbstractItemModel
 
-from ui_budovysearchform import *
+from .ui_budovysearchform import *
 
 
 class BudovySearchForm(QWidget):
@@ -40,13 +43,13 @@ class BudovySearchForm(QWidget):
         self.__mZpusobVyuzitiModel = QAbstractItemModel
 
     def domovniCislo(self):
-        return unicode(self.ui.cisloDomovniLineEdit.text()).strip()
+        return str(self.ui.cisloDomovniLineEdit.text()).strip()
 
     def naParcele(self):
-        return unicode(self.ui.naParceleLineEdit.text()).strip()
+        return str(self.ui.naParceleLineEdit.text()).strip()
 
     def lv(self):
-        return unicode(self.ui.lvBudovyLineEdit.text()).strip()
+        return str(self.ui.lvBudovyLineEdit.text()).strip()
 
     def setZpusobVyuzitiModel(self, model):
         """

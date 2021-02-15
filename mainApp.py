@@ -20,16 +20,22 @@
  *                                                                         *
  ***************************************************************************/
 """
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import str
+from builtins import range
+from builtins import object
 
 # Import the PyQt, QGIS libraries and classes
-from PyQt4 import QtCore, QtGui
+from qgis.PyQt import QtCore, QtGui, QtWidgets
 from re import search
 import os
 import time
 
-from PyQt4.QtGui import QMainWindow, QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup, QDockWidget, QToolButton, QMenu, QPalette, QDesktopServices
-from PyQt4.QtCore import QUuid, QFileInfo, QDir, Qt, QObject, QSignalMapper, SIGNAL, SLOT, pyqtSignal, QThread, QSettings
-from PyQt4.QtSql import QSqlDatabase
+from qgis.PyQt.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QProgressDialog, QToolBar, QActionGroup, QDockWidget, QToolButton, QMenu, QHBoxLayout, QPushButton, QLineEdit
+from qgis.PyQt.QtGui import QPalette, QDesktopServices
+from qgis.PyQt.QtCore import QFileInfo, QDir, Qt, QObject, pyqtSignal, QThread, QSettings, QUuid
+from qgis.PyQt.QtSql import QSqlDatabase
 from qgis.core import *
 from qgis.gui import *
 from qgis.utils import iface
@@ -37,12 +43,12 @@ from qgis.core import QgsMessageLog
 
 from osgeo import ogr, gdal
 
-from ui_MainApp import Ui_MainApp
-from searchFormController import *
-from openThread import *
-from applyChanges import *
+from .ui_MainApp import Ui_MainApp
+from .searchFormController import *
+from .openThread import *
+from .applyChanges import *
 
-class VFKError(StandardError):
+class VFKError(Exception):
     pass
 
 
@@ -121,44 +127,29 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.__mSearchController = SearchFormController(
             self.searchFormMainControls, self.searchForms, self)
 
-        self.connect(self.__mSearchController, SIGNAL(
-            "actionTriggered(QUrl)"), self.vfkBrowser.processAction)
-        self.connect(
-            self, SIGNAL("enableSearch"), self.searchButton.setEnabled)
+        self.__mSearchController.actionTriggered.connect(self.vfkBrowser.processAction)
+        self.enableSearch.connect(self.searchButton.setEnabled)
 
-        self.connect(self.vfkBrowser, SIGNAL("showParcely"), self.showParInMap)
-        self.connect(self.vfkBrowser, SIGNAL("showBudovy"), self.showBudInMap)
+        self.vfkBrowser.showParcely.connect(self.showParInMap)
+        self.vfkBrowser.showBudovy.connect(self.showBudInMap)
 
         # connect lineEdits and returnPressed action
-        self.connect(self.vfkFileLineEdit, SIGNAL(
-            "returnPressed()"), self.loadVfkButton_clicked)
-        self.connect(self.vlastniciSearchForm.ui.jmenoLineEdit,
-                     SIGNAL("returnPressed()"), self.__mSearchController.search)
-        self.connect(self.vlastniciSearchForm.ui.rcIcoLineEdit,
-                     SIGNAL("returnPressed()"), self.__mSearchController.search)
-        self.connect(self.vlastniciSearchForm.ui.lvVlastniciLineEdit,
-                     SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.vfkFileLineEdit.returnPressed.connect(self.loadVfkButton_clicked)
+        self.vlastniciSearchForm.ui.jmenoLineEdit.returnPressed.connect(self.__mSearchController.search)
+        self.vlastniciSearchForm.ui.rcIcoLineEdit.returnPressed.connect(self.__mSearchController.search)
+        self.vlastniciSearchForm.ui.lvVlastniciLineEdit.returnPressed.connect(self.__mSearchController.search)
 
-        self.connect(self.parcelySearchForm.ui.parCisloLineEdit,
-                     SIGNAL("returnPressed()"), self.__mSearchController.search)
-        self.connect(self.parcelySearchForm.ui.lvParcelyLineEdit,
-                     SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.parcelySearchForm.ui.parCisloLineEdit.returnPressed.connect(self.__mSearchController.search)
+        self.parcelySearchForm.ui.lvParcelyLineEdit.returnPressed.connect(self.__mSearchController.search)
 
-        self.connect(self.budovySearchForm.ui.cisloDomovniLineEdit,
-                     SIGNAL("returnPressed()"), self.__mSearchController.search)
-        self.connect(self.budovySearchForm.ui.naParceleLineEdit,
-                     SIGNAL("returnPressed()"), self.__mSearchController.search)
-        self.connect(self.budovySearchForm.ui.lvBudovyLineEdit,
-                     SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.budovySearchForm.ui.cisloDomovniLineEdit.returnPressed.connect(self.__mSearchController.search)
+        self.budovySearchForm.ui.naParceleLineEdit.returnPressed.connect(self.__mSearchController.search)
+        self.budovySearchForm.ui.lvBudovyLineEdit.returnPressed.connect(self.__mSearchController.search)
 
-        self.connect(self.jednotkySearchForm.ui.mCisloJednotkyLineEdit,
-                     SIGNAL("returnPressed()"), self.__mSearchController.search)
-        self.connect(self.jednotkySearchForm.ui.mCisloDomovniLineEdit,
-                     SIGNAL("returnPressed()"), self.__mSearchController.search)
-        self.connect(self.jednotkySearchForm.ui.mNaParceleLineEdit,
-                     SIGNAL("returnPressed()"), self.__mSearchController.search)
-        self.connect(self.jednotkySearchForm.ui.mLvJednotkyLineEdit,
-                     SIGNAL("returnPressed()"), self.__mSearchController.search)
+        self.jednotkySearchForm.ui.mCisloJednotkyLineEdit.returnPressed.connect(self.__mSearchController.search)
+        self.jednotkySearchForm.ui.mCisloDomovniLineEdit.returnPressed.connect(self.__mSearchController.search)
+        self.jednotkySearchForm.ui.mNaParceleLineEdit.returnPressed.connect(self.__mSearchController.search)
+        self.jednotkySearchForm.ui.mLvJednotkyLineEdit.returnPressed.connect(self.__mSearchController.search)
 
         self.vfkBrowser.showHelpPage()
 
@@ -177,7 +168,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             ext = '*.vfk'
             if self.__gdal_version >= 2020000:
                 ext += ' *.db'
-            loaded_file = QFileDialog.getOpenFileName(
+            loaded_file, __ = QFileDialog.getOpenFileName(
                 self, u'Načti soubor VFK', lastUsedDir,
                 u'Soubory podporované ovladačem VFK GDAL ({})'.format(ext)
             )
@@ -225,7 +216,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.showInMap(self.vfkBrowser.currentBudIds(), "BUD")
 
     def latexExport(self):
-        fileName = QFileDialog.getSaveFileName(
+        fileName, __ = QFileDialog.getSaveFileName(
             self, u"Jméno exportovaného souboru", ".tex", "LaTeX (*.tex)")
         if fileName:
             export_succesfull = self.vfkBrowser.exportDocument(
@@ -234,7 +225,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                 self.succesfullExport("LaTeX")
 
     def htmlExport(self):
-        fileName = QFileDialog.getSaveFileName(
+        fileName, __ = QFileDialog.getSaveFileName(
             self, u"Jméno exportovaného souboru", ".html", "HTML (*.html)")
         if fileName:
             export_succesfull = self.vfkBrowser.exportDocument(
@@ -250,14 +241,12 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         """
         for layer in self.__mLoadedLayers:
             id = self.__mLoadedLayers[layer]
-            vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
+            vectorLayer = QgsProject.instance().mapLayer(id)
 
             if connected:
-                self.connect(
-                    vectorLayer, SIGNAL("selectionChanged()"), self.showInfoAboutSelection)
+                vectorLayer.selectionChanged.connect(self.showInfoAboutSelection)
             else:
-                self.disconnect(
-                    vectorLayer, SIGNAL("selectionChanged()"), self.showInfoAboutSelection)
+                vectorLayer.selectionChanged.disconnect(self.showInfoAboutSelection)
 
     def showInMap(self, ids, layerName):
         """
@@ -268,7 +257,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         """
         if layerName in self.__mLoadedLayers:
             id = self.__mLoadedLayers[layerName]
-            vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
+            vectorLayer = QgsProject.instance().mapLayer(id)
             searchString = "ID IN ({})".format(", ".join(ids))
             error = ''
             fIds = self.__search(vectorLayer, searchString, error)
@@ -296,7 +285,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         if search.hasParserError():
             error += "Parsing error:" + search.parserErrorString()
             return fIds
-        if not search.prepare(layer.pendingFields()):
+        if not search.prepare(layer.fields()):
             error + "Evaluation error:" + search.evalErrorString()
 
         layer.select(rect, False)
@@ -362,7 +351,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             except VFKError as e:
                 QMessageBox.critical(
                     self, u'Chyba', u'{}'.format(e), QMessageBox.Ok)
-                self.emit(SIGNAL("enableSearch"), False)
+                self.enableSearch.emit(False)
                 return
 
             self.__mLastVfkFile.append(fileName)
@@ -383,14 +372,14 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         except VFKError as e:
             QMessageBox.critical(
                 self, u'Chyba', u'{}'.format(e), QMessageBox.Ok)
-            self.emit(SIGNAL("enableSearch"), False)
+            self.enableSearch.emit(False)
             return
 
         self.vfkBrowser.setConnectionName(self.property("connectionName"))
         self.__mSearchController.setConnectionName(
             self.property("connectionName"))
 
-        self.emit(SIGNAL("enableSearch"), True)
+        self.enableSearch.emit(True)
         self.__mLoadedLayers.clear()
 
         if self.parCheckBox.isChecked():
@@ -449,7 +438,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         except VFKWarning as e:
             QMessageBox.information(self, 'Load Style', e, QMessageBox.Ok)
 
-        QgsMapLayerRegistry.instance().addMapLayer(layer)
+        QgsProject.instance().addMapLayer(layer)
 
     def __unLoadVfkLayer(self, vfkLayerName):
         """
@@ -465,7 +454,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             # )
             return
 
-        QgsMapLayerRegistry.instance().removeMapLayer(
+        QgsProject.instance().removeMapLayer(
             self.__mLoadedLayers[vfkLayerName])
         del self.__mLoadedLayers[vfkLayerName]
 
@@ -489,7 +478,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             raise VFKWarning(u'Load style: {}'.format(errorMsg))
 
         layer.triggerRepaint()
-        self.emit(SIGNAL("refreshLegend"), layer)
+        self.refreshLegend.emit(layer)
 
     def __openDatabase(self, dbPath):
         """
@@ -551,7 +540,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         layers_names = []
 
-        for i in xrange(layerCount):
+        for i in range(layerCount):
             layers_names.append(
                 self.__mOgrDataSource.GetLayer(i).GetLayerDefn().GetName())
 
@@ -564,7 +553,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
 
         # load all layers
         self.progressBar.setRange(0, layerCount - 1)
-        for i in xrange(layerCount):
+        for i in range(layerCount):
             self.progressBar.setValue(i)
             theLayerName = self.__mOgrDataSource.GetLayer(
                 i).GetLayerDefn().GetName()
@@ -601,7 +590,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         for layer in layers:
             if layer in self.__mLoadedLayers:
                 id = str(self.__mLoadedLayers[layer])
-                vectorLayer = QgsMapLayerRegistry.instance().mapLayer(id)
+                vectorLayer = QgsProject.instance().mapLayer(id)
                 layerIds[layer] = self.__selectedIds(vectorLayer)
 
         self.vfkBrowser.showInfoAboutSelection(
@@ -688,13 +677,13 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.label.setText('VFK soubory:')
 
         # new layout
-        horizontalLayout = QtGui.QHBoxLayout()
+        horizontalLayout = QtWidgets.QHBoxLayout()
 
         # create new objects
         self.__browseButtons['browseButton_{}'.format(
-            len(self.__vfkLineEdits) + 1)] = QtGui.QPushButton(u"Procházet")
+            len(self.__vfkLineEdits) + 1)] = QtWidgets.QPushButton(u"Procházet")
         self.__vfkLineEdits['vfkLineEdit_{}'.format(
-            len(self.__vfkLineEdits) + 1)] = QtGui.QLineEdit()
+            len(self.__vfkLineEdits) + 1)] = QtWidgets.QLineEdit()
 
         horizontalLayout.addWidget(self.__vfkLineEdits[
                                    'vfkLineEdit_{}'.format(len(self.__vfkLineEdits))])
@@ -755,13 +744,13 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
             self.__databases[database_type] = QFileDialog.getOpenFileName(self, title, lastUsedDir, u'Datábaze (*.db)')
             if not self.__databases[database_type]:
                 return
-            self.le_mainDb.setText(self.__databases[database_type])
+            self.le_mainDb.setText(str(self.__databases[database_type]))
 
         elif database_type == 'amendmentDb':
             self.__databases[database_type] = QFileDialog.getOpenFileName(self, title, lastUsedDir, u'Datábaze (*.db)')
             if not self.__databases[database_type]:
                 return
-            self.le_amendmentDb.setText(self.__databases[database_type])
+            self.le_amendmentDb.setText(str(self.__databases[database_type]))
 
         elif database_type == 'exportDb':
             title = u'Zadej jméno výstupní databáze'
@@ -769,7 +758,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                                                                           ".db", u"Databáze (*.db)")
             if not self.__databases[database_type]:
                 return
-            self.le_exportDb.setText(self.__databases[database_type])
+            self.le_exportDb.setText(str(self.__databases[database_type]))
 
         if len(self.__databases) == 3:
             self.pb_applyChanges.setEnabled(True)
@@ -820,7 +809,7 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         :return: bool
         """
         if file_name.endswith(".vfk"):
-            with open(file_name, 'r') as f:
+            with open(file_name, 'rb') as f:
                 for line in f:
 
                     line_splited = str(line).split(';')
@@ -831,7 +820,8 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
                         else:
                             return False
         else:
-            print 'database'
+            # fix_print_with_import
+            print('database')
             # TODO: dopsat kontrolu, zda se jedna o stavovou, nebo zmenovou databazi
 
     def radioButtonValue(self):
@@ -886,15 +876,11 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         actionGroup.addAction(self.actionZpracujZmeny)
 
         # QSignalMapper
-        self.signalMapper = QSignalMapper(self)
+        self.signalMapper = QtCore.QSignalMapper(self)
 
-        # connect to 'clicked' on all buttons
-        self.connect(self.actionImport, SIGNAL(
-            "triggered()"), self.signalMapper, SLOT("map()"))
-        self.connect(self.actionVyhledavani, SIGNAL(
-            "triggered()"), self.signalMapper, SLOT("map()"))
-        self.connect(self.actionZpracujZmeny, SIGNAL(
-            "triggered()"), self.signalMapper, SLOT("map()"))
+        self.actionImport.triggered.connect(self.signalMapper.map)
+        self.actionVyhledavani.triggered.connect(self.signalMapper.map)
+        self.actionZpracujZmeny.triggered.connect(self.signalMapper.map)
 
         # setMapping on each button to the QStackedWidget index we'd like to
         # switch to
@@ -903,41 +889,28 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.signalMapper.setMapping(self.actionZpracujZmeny, 1)
 
         # connect mapper to stackedWidget
-        self.connect(self.signalMapper, SIGNAL("mapped(int)"),
-                     self.stackedWidget, SLOT("setCurrentIndex(int)"))
-        self.actionImport.trigger()
+        self.signalMapper.mapped.connect(self.stackedWidget.setCurrentIndex)
+        
 
-        self.connect(self.vfkBrowser, SIGNAL(
-            "switchToPanelImport"), self.switchToImport)
-        self.connect(self.vfkBrowser, SIGNAL(
-            "switchToPanelSearch"), self.switchToSearch)
-        self.connect(self.vfkBrowser, SIGNAL(
-            "switchToPanelChanges"), self.switchToChanges)
+        self.vfkBrowser.switchToPanelImport.connect(self.switchToImport)
+        self.vfkBrowser.switchToPanelSearch.connect(self.switchToSearch)
+        self.vfkBrowser.switchToPanelChanges.connect(self.switchToChanges)
 
         # Browser toolbar
         # ---------------
         self.__mBrowserToolbar = QToolBar(self)
-        self.connect(self.actionBack, SIGNAL(
-            "triggered()"), self.vfkBrowser.goBack)
-        self.connect(self.actionForward, SIGNAL(
-            "triggered()"), self.vfkBrowser.goForth)
+        self.actionBack.triggered.connect(self.vfkBrowser.goBack)
+        self.actionForward.triggered.connect(self.vfkBrowser.goForth)
 
-        self.connect(self.actionSelectBudInMap,
-                     SIGNAL("triggered()"), self.selectBudInMap)
-        self.connect(self.actionSelectParInMap,
-                     SIGNAL("triggered()"), self.selectParInMap)
-        self.connect(self.actionCuzkPage,
-                     SIGNAL("triggered()"), self.showOnCuzk)
+        self.actionSelectBudInMap.triggered.connect(self.selectBudInMap)
+        self.actionSelectParInMap.triggered.connect(self.selectParInMap)
+        self.actionCuzkPage.triggered.connect(self.showOnCuzk)
 
-        self.connect(self.actionExportLatex,
-                     SIGNAL("triggered()"), self.latexExport)
-        self.connect(self.actionExportHtml,
-                     SIGNAL("triggered()"), self.htmlExport)
+        self.actionExportLatex.triggered.connect(self.latexExport)
+        self.actionExportHtml.triggered.connect(self.htmlExport)
 
-        self.connect(self.actionShowInfoaboutSelection, SIGNAL(
-            "toggled(bool)"), self.setSelectionChangedConnected)
-        self.connect(self.actionShowHelpPage, SIGNAL(
-            "triggered()"), self.vfkBrowser.showHelpPage)
+        self.actionShowInfoaboutSelection.toggled.connect(self.setSelectionChangedConnected)
+        self.actionShowHelpPage.triggered.connect(self.vfkBrowser.showHelpPage)
 
         self.loadVfkButton.clicked.connect(self.loadVfkButton_clicked)
 
@@ -976,16 +949,11 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.rightWidgetLayout.insertWidget(0, self.__mBrowserToolbar)
 
         # connect signals from vfkbrowser when changing history
-        self.connect(self.vfkBrowser, SIGNAL(
-            "currentParIdsChanged"), self.actionSelectParInMap.setEnabled)
-        self.connect(self.vfkBrowser, SIGNAL("currentBudIdsChanged"),
-                     self.actionSelectBudInMap.setEnabled)
-        self.connect(self.vfkBrowser, SIGNAL(
-            "historyBefore"), self.actionBack.setEnabled)
-        self.connect(self.vfkBrowser, SIGNAL(
-            "historyAfter"), self.actionForward.setEnabled)
-        self.connect(self.vfkBrowser, SIGNAL(
-            "definitionPointAvailable"), self.actionCuzkPage.setEnabled)
+        self.vfkBrowser.currentParIdsChanged.connect(self.actionSelectParInMap.setEnabled)
+        self.vfkBrowser.currentBudIdsChanged.connect(self.actionSelectBudInMap.setEnabled)
+        self.vfkBrowser.historyBefore.connect(self.actionBack.setEnabled)
+        self.vfkBrowser.historyAfter.connect(self.actionForward.setEnabled)
+        self.vfkBrowser.definitionPointAvailable.connect(self.actionCuzkPage.setEnabled)
 
         # add toolTips
         self.pb_nextFile.setToolTip(u'Přidej další soubor VFK')
@@ -1006,10 +974,10 @@ class MainApp(QDockWidget, QMainWindow, Ui_MainApp):
         self.pb_applyChanges.clicked.connect(self.applyChanges)
         self.pb_applyChanges.setEnabled(False)
 
-        self.connect(self.changes_instance, SIGNAL("maxRangeProgressBar"), self.__setRangeProgressBarChanges)
-        self.connect(self.changes_instance, SIGNAL("updateStatus"), self.__updateProgressBarChanges)
-        self.connect(self.changes_instance, SIGNAL("finishedStatus"), self.__changesApplied)
-        self.connect(self.changes_instance, SIGNAL("preprocessingDatabase"), self.__changesPreprocessingDatabase)
+        self.changes_instance.maxRangeProgressBar.connect(self.__setRangeProgressBarChanges)
+        self.changes_instance.updateStatus.connect(self.__updateProgressBarChanges)
+        self.changes_instance.finishedStatus.connect(self.__changesApplied)
+        self.changes_instance.preprocessingDatabase.connect(self.__changesPreprocessingDatabase)
 
         # connect radio boxes
         self.rb_file.clicked.connect(self.radioButtonValue)

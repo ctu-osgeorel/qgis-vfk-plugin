@@ -20,27 +20,30 @@
  *                                                                         *
  ***************************************************************************/
 """
+from builtins import str
+from builtins import object
 
-from PyQt4.QtSql import QSqlQueryModel, QSqlRecord, QSqlField, QSqlDatabase
-from PyQt4.QtCore import QTime, QObject
+from qgis.PyQt.QtSql import QSqlField, QSqlDatabase, QSqlQueryModel
+from qgis.PyQt.QtCore import QTime, QObject
 
 from qgis.utils import iface
 from qgis.core import QgsMessageLog
 
 class VfkTableModel(QSqlQueryModel):
 
-    class Nemovitost:
+
+    class Nemovitost(object):
         NParcela = 0
         NBudova = 1
         NJednotka = 2
 
-    class OpravnenyPovinny:
+    class OpravnenyPovinny(object):
         OPParcela = 0
         OPBudova = 1
         OPJednotka = 2
         OPOsoba = 3
 
-    class Pravo:
+    class Pravo(object):
         Opravneni = 0
         Povinnost = 1
 
@@ -115,7 +118,7 @@ class VfkTableModel(QSqlQueryModel):
                 "JOIN par ON par.tel_id = tel.id " \
                 "LEFT JOIN drupoz ON par.drupoz_kod = drupoz.kod " \
                 "LEFT JOIN zpvypo ON par.zpvypa_kod = zpvypo.kod " \
-                "WHERE opsub.id = {};".format(columns, opsubId)
+                "WHERE opsub.id = \"{}\";".format(columns, opsubId)
         return self.__evaluate(query)
 
     def telesoBudovy(self, cisloTel, extended):
@@ -155,7 +158,7 @@ class VfkTableModel(QSqlQueryModel):
                 "LEFT JOIN zpvybu ON zpvybu.kod = bud.zpvybu_kod " \
                 "LEFT JOIN casobc ON casobc.kod = bud.caobce_kod " \
                 "LEFT JOIN drupoz ON drupoz.kod = par.drupoz_kod " \
-                "WHERE opsub.id = {};".format(columns, opsubId)
+                "WHERE opsub.id = \"{}\";".format(columns, opsubId)
         return self.__evaluate(query)
 
     def telesoJednotky(self, cisloTel, extended):
@@ -196,7 +199,7 @@ class VfkTableModel(QSqlQueryModel):
             "LEFT JOIN zpvyje ON zpvyje.kod = jed.zpvyje_kod " \
             "JOIN par ON par.bud_id = bud.id " \
             "LEFT JOIN drupoz ON drupoz.kod = par.drupoz_kod " \
-            "WHERE opsub.id = {};".format(columns, opsubId)
+            "WHERE opsub.id = \"{}\";".format(columns, opsubId)
 
         return self.__evaluate(query)
 
@@ -305,7 +308,7 @@ class VfkTableModel(QSqlQueryModel):
         query = "SELECT {} " \
                 "FROM opsub " \
                 "JOIN charos ON charos.kod = opsub.charos_kod " \
-                "WHERE opsub.id = {};".format(columns, id)
+                "WHERE opsub.id = \"{}\";".format(columns, id)
 
         return self.__evaluate(query)
 
@@ -377,7 +380,7 @@ class VfkTableModel(QSqlQueryModel):
                 "LEFT JOIN par ON par.tel_id = tel.id " \
                 "LEFT JOIN bud ON bud.tel_id = tel.id " \
                 "LEFT JOIN jed ON jed.tel_id = tel.id " \
-                "WHERE opsub.id = {};".format(id)
+                "WHERE opsub.id = \"{}\";".format(id)
 
         return self.__evaluate(query)
 
@@ -472,7 +475,7 @@ class VfkTableModel(QSqlQueryModel):
         query = "SELECT {} " \
                 "FROM opsub " \
                 "JOIN charos ON opsub.charos_kod = charos.kod " \
-                "WHERE opsub.id = {};".format(columns, id)
+                "WHERE opsub.id = \"{}\";".format(columns, id)
         return self.__evaluate(query)
 
     def dveRadyCislovani(self):
@@ -513,49 +516,49 @@ class VfkTableModel(QSqlQueryModel):
         :type lv: str
         :return:
         """
-        whereJmeno = u''
-        join = u''
+        whereJmeno = ''
+        join = ''
 
         if jmeno:
             if ofo:
-                whereJmeno += u"opsub.jmeno LIKE ('%{}%') OR opsub.prijmeni LIKE ('%{}%') OR ".format(
+                whereJmeno += "opsub.jmeno LIKE ('%{}%') OR opsub.prijmeni LIKE ('%{}%') OR ".format(
                     jmeno, jmeno)
             if sjm or opo:
-                whereJmeno += u"opsub.nazev LIKE ('%{}%') OR ".format(jmeno)
-            whereJmeno += u"0 "
+                whereJmeno += "opsub.nazev LIKE ('%{}%') OR ".format(jmeno)
+            whereJmeno += "0 "
 
-        whereIdent = u''
+        whereIdent = ''
         if identifikator:
             if ofo:
-                whereIdent += u"opsub.rodne_cislo = {} OR ".format(
+                whereIdent += "opsub.rodne_cislo = {} OR ".format(
                     identifikator)
             if opo:
-                whereIdent += u"opsub.ico = {} OR ".format(identifikator)
-            whereIdent += u'0 '
+                whereIdent += "opsub.ico = {} OR ".format(identifikator)
+            whereIdent += '0 '
 
         opsubType = []
-        if ofo == u'1':
+        if ofo == '1':
             opsubType.append("'OFO'")
-        if opo == u'1':
+        if opo == '1':
             opsubType.append("'OPO'")
-        if sjm == u'1':
+        if sjm == '1':
             opsubType.append("'BSM'")
-        where = u"WHERE "
+        where = "WHERE "
         if whereJmeno:
-            where += u"({}) AND ".format(whereJmeno)
+            where += "({}) AND ".format(whereJmeno)
         if whereIdent:
-            where += u"({}) AND ".format(whereIdent)
+            where += "({}) AND ".format(whereIdent)
 
         if lv:
-            where += u"tel.cislo_tel = {} AND ".format(lv)
-            join += u"JOIN vla ON vla.opsub_id = opsub.id " \
-                    u"JOIN tel ON vla.tel_id = tel.id "
+            where += "tel.cislo_tel = {} AND ".format(lv)
+            join += "JOIN vla ON vla.opsub_id = opsub.id " \
+                    "JOIN tel ON vla.tel_id = tel.id "
 
-        where += u"opsub.opsub_type IN ({}) ".format(", ".join(opsubType))
-        query = u"SELECT DISTINCT opsub.id opsub_id " \
-                u"FROM opsub " \
-                u"{} {} " \
-                u"ORDER BY opsub.prijmeni, opsub.nazev;".format(join, where)
+        where += "opsub.opsub_type IN ({}) ".format(", ".join(opsubType))
+        query = "SELECT DISTINCT opsub.id opsub_id " \
+                "FROM opsub " \
+                "{} {} " \
+                "ORDER BY opsub.prijmeni, opsub.nazev;".format(join, where)
         return self.__evaluate(query)
 
     def searchPar(self, parcelniCislo, typIndex, druhKod, lv):
@@ -567,41 +570,41 @@ class VfkTableModel(QSqlQueryModel):
         :type lv: str
         :return:
         """
-        where = u"WHERE "
-        join = u''
+        where = "WHERE "
+        join = ''
 
         if parcelniCislo:
             kmenAPoddeleni = parcelniCislo.split('/')
-            where += u"par.kmenove_cislo_par = {} AND ".format(
+            where += "par.kmenove_cislo_par = {} AND ".format(
                 kmenAPoddeleni[0])
 
-            if len(kmenAPoddeleni) == 2 and kmenAPoddeleni[1] != u"":
-                where += u"par.poddeleni_cisla_par = {} AND ".format(
+            if len(kmenAPoddeleni) == 2 and kmenAPoddeleni[1] != "":
+                where += "par.poddeleni_cisla_par = {} AND ".format(
                     kmenAPoddeleni[1])
 
         if druhKod:
-            where += u"drupoz.zkratka = '{}' AND ".format(druhKod)
+            where += "drupoz.zkratka = '{}' AND ".format(druhKod)
 
-        if typIndex == u'1':
-            where += u"drupoz.stavebni_parcela = 'n' AND "
-        elif typIndex == u'2':
-            where += u"drupoz.stavebni_parcela = 'a' AND "
+        if typIndex == '1':
+            where += "drupoz.stavebni_parcela = 'n' AND "
+        elif typIndex == '2':
+            where += "drupoz.stavebni_parcela = 'a' AND "
 
         if druhKod:
-            # where += u"par.drupoz_kod = '{}' AND ".format(druhKod)
-            where += u"par.drupoz_kod = (SELECT kod FROM drupoz WHERE zkratka='{}') AND ".format(
+            # where += "par.drupoz_kod = '{}' AND ".format(druhKod)
+            where += "par.drupoz_kod = (SELECT kod FROM drupoz WHERE zkratka='{}') AND ".format(
                 druhKod)
 
         if lv:
-            where += u"tel.cislo_tel = {} AND ".format(lv)
-            join += u"JOIN tel ON tel.id = par.tel_id "
+            where += "tel.cislo_tel = {} AND ".format(lv)
+            join += "JOIN tel ON tel.id = par.tel_id "
 
-        where += u'1 '
+        where += '1 '
 
-        query = u"SELECT DISTINCT par.id par_id " \
-                u"FROM par " \
-                u"JOIN drupoz ON par.drupoz_kod = drupoz.kod " \
-                u"{} {};".format(join, where)
+        query = "SELECT DISTINCT par.id par_id " \
+                "FROM par " \
+                "JOIN drupoz ON par.drupoz_kod = drupoz.kod " \
+                "{} {};".format(join, where)
         return self.__evaluate(query)
 
     def searchBud(self, domovniCislo, naParcele, zpusobVyuzitiKod, lv):
@@ -613,37 +616,37 @@ class VfkTableModel(QSqlQueryModel):
         :type lv: str
         :return:
         """
-        where = u"WHERE "
-        join = u""
+        where = "WHERE "
+        join = ""
 
         if domovniCislo:
-            where += u"bud.cislo_domovni = {} AND ".format(domovniCislo)
+            where += "bud.cislo_domovni = {} AND ".format(domovniCislo)
 
         if naParcele:
             kmenAPoddeleni = str(naParcele).split("/")
-            where += u"par.kmenove_cislo_par = {} AND ".format(
+            where += "par.kmenove_cislo_par = {} AND ".format(
                 kmenAPoddeleni[0])
 
-            if len(kmenAPoddeleni) == 2 and kmenAPoddeleni[1] != u"":
-                where += u"par.poddeleni_cisla_par = {} AND ".format(
+            if len(kmenAPoddeleni) == 2 and kmenAPoddeleni[1] != "":
+                where += "par.poddeleni_cisla_par = {} AND ".format(
                     kmenAPoddeleni[1])
 
-            join += u"JOIN par ON bud.id = par.bud_id "
+            join += "JOIN par ON bud.id = par.bud_id "
 
         if lv:
-            where += u"tel.cislo_tel = {} AND ".format(lv)
-            join += u"JOIN tel ON tel.id = bud.tel_id "
+            where += "tel.cislo_tel = {} AND ".format(lv)
+            join += "JOIN tel ON tel.id = bud.tel_id "
 
         if zpusobVyuzitiKod:
-            where += u"zpvybu.kod = (SELECT kod FROM zpvybu WHERE zkratka='{}') AND ".format(
+            where += "zpvybu.kod = (SELECT kod FROM zpvybu WHERE zkratka='{}') AND ".format(
                 zpusobVyuzitiKod)
-            join += u"JOIN zpvybu ON zpvybu.kod = bud.zpvybu_kod "
+            join += "JOIN zpvybu ON zpvybu.kod = bud.zpvybu_kod "
 
-        where += u"1 "
+        where += "1 "
 
-        query = u"SELECT DISTINCT bud.id bud_id " \
-                u"FROM bud " \
-                u"{} {};".format(join, where)
+        query = "SELECT DISTINCT bud.id bud_id " \
+                "FROM bud " \
+                "{} {};".format(join, where)
 
         return self.__evaluate(query)
 
@@ -657,40 +660,40 @@ class VfkTableModel(QSqlQueryModel):
         :type lv: str
         :return:
         """
-        where = u"WHERE "
-        join = u''
+        where = "WHERE "
+        join = ''
 
         if cisloJednotky:
-            where += u"jed.cislo_jednotky = {} AND ".format(cisloJednotky)
+            where += "jed.cislo_jednotky = {} AND ".format(cisloJednotky)
 
         if domovniCislo:
-            where += u"bud.cislo_domovni = {} AND ".format(domovniCislo)
+            where += "bud.cislo_domovni = {} AND ".format(domovniCislo)
 
         if naParcele:
-            kmenAPoddeleni = str(naParcele).split(u"/")
-            where += u"par.kmenove_cislo_par = {} AND ".format(
+            kmenAPoddeleni = str(naParcele).split("/")
+            where += "par.kmenove_cislo_par = {} AND ".format(
                 kmenAPoddeleni[0])
 
-            if len(kmenAPoddeleni) == 2 and kmenAPoddeleni[1] != u"":
-                where += u"par.poddeleni_cisla_par = {} AND ".format(
+            if len(kmenAPoddeleni) == 2 and kmenAPoddeleni[1] != "":
+                where += "par.poddeleni_cisla_par = {} AND ".format(
                     kmenAPoddeleni[1])
 
-            join += u"JOIN par ON bud.id = par.bud_id "
+            join += "JOIN par ON bud.id = par.bud_id "
 
         if lv:
-            where += u"tel.cislo_tel = {} AND ".format(lv)
-            join += u"JOIN tel ON tel.id = jed.tel_id "
+            where += "tel.cislo_tel = {} AND ".format(lv)
+            join += "JOIN tel ON tel.id = jed.tel_id "
 
         if zpusobVyuzitiKod:
-            where += u"zpvyje.nazev = '{}' AND ".format(zpusobVyuzitiKod)
-            join += u"JOIN zpvyje ON zpvyje.kod = jed.zpvyje_kod "
+            where += "zpvyje.nazev = '{}' AND ".format(zpusobVyuzitiKod)
+            join += "JOIN zpvyje ON zpvyje.kod = jed.zpvyje_kod "
 
-        where += u"1 "
+        where += "1 "
 
-        query = u"SELECT DISTINCT jed.id jed_id " \
-                u"FROM jed " \
-                u"JOIN bud ON bud.id = jed.bud_id " \
-                u"{} {};".format(join, where)
+        query = "SELECT DISTINCT jed.id jed_id " \
+                "FROM jed " \
+                "JOIN bud ON bud.id = jed.bud_id " \
+                "{} {};".format(join, where)
 
         return self.__evaluate(query)
 
@@ -701,24 +704,24 @@ class VfkTableModel(QSqlQueryModel):
         :return: []
         """
         columns = [
-            u"par.id par_id", u"par.kmenove_cislo_par par_kmenove_cislo_par",
-                   u"par.poddeleni_cisla_par par_poddeleni_cisla_par", u"par.vymera_parcely par_vymera_parcely",
-                   u"tel.id tel_id", u"tel.cislo_tel tel_cislo_tel", u"drupoz.nazev drupoz_nazev",
-                   u"drupoz.stavebni_parcela drupoz_stavebni_parcela", u"zpvypo.nazev zpvypo_nazev"]
+            "par.id par_id", "par.kmenove_cislo_par par_kmenove_cislo_par",
+                   "par.poddeleni_cisla_par par_poddeleni_cisla_par", "par.vymera_parcely par_vymera_parcely",
+                   "tel.id tel_id", "tel.cislo_tel tel_cislo_tel", "drupoz.nazev drupoz_nazev",
+                   "drupoz.stavebni_parcela drupoz_stavebni_parcela", "zpvypo.nazev zpvypo_nazev"]
 
         if extended:
-            columns.append(u"par.stav_dat par_stav_dat")
-            columns.append(u"par.par_type par_par_type")
-            columns.append(u"par.katuze_kod par_katuze_kod")
-            columns.append(u"katuze.nazev katuze_nazev")
+            columns.append("par.stav_dat par_stav_dat")
+            columns.append("par.par_type par_par_type")
+            columns.append("par.katuze_kod par_katuze_kod")
+            columns.append("katuze.nazev katuze_nazev")
             columns.append(
-                u"maplis.oznaceni_mapoveho_listu maplis_oznaceni_mapoveho_listu")
-            columns.append(u"zpurvy.nazev zpurvy_nazev")
-            columns.append(u"par.cena_nemovitosti par_cena_nemovitosti")
-            columns.append(u"bud_id bud_id")
-            columns.append(u"bud.cislo_domovni bud_cislo_domovni")
-            columns.append(u"typbud.nazev typbud_nazev")
-            columns.append(u"typbud.zkratka typbud_zkratka")
+                "maplis.oznaceni_mapoveho_listu maplis_oznaceni_mapoveho_list")
+            columns.append("zpurvy.nazev zpurvy_nazev")
+            columns.append("par.cena_nemovitosti par_cena_nemovitosti")
+            columns.append("bud_id bud_id")
+            columns.append("bud.cislo_domovni bud_cislo_domovni")
+            columns.append("typbud.nazev typbud_nazev")
+            columns.append("typbud.zkratka typbud_zkratka")
 
         return columns
 
@@ -729,17 +732,17 @@ class VfkTableModel(QSqlQueryModel):
         :return: []
         """
         columns = [
-            u"bud.id bud_id", u"bud.typbud_kod bud_typbud_kod", u"casobc.nazev casobc_nazev",
-                   u"casobc.kod casobc_kod", u"bud.cislo_domovni bud_cislo_domovni", u"par.id par_id", u"tel.id tel_id",
-                   u"tel.cislo_tel tel_cislo_tel", u"par.kmenove_cislo_par par_kmenove_cislo_par",
-                   u"par.poddeleni_cisla_par par_poddeleni_cisla_par", u"drupoz.stavebni_parcela drupoz_stavebni_parcela",
-                   u"zpvybu.kod zpvybu_kod", u"zpvybu.nazev zpvybu_nazev", u"typbud.nazev typbud_nazev",
-                   u"typbud.zkratka typbud_zkratka", u"typbud.zadani_cd typbud_zadani_cd"]
+            "bud.id bud_id", "bud.typbud_kod bud_typbud_kod", "casobc.nazev casobc_nazev",
+                   "casobc.kod casobc_kod", "bud.cislo_domovni bud_cislo_domovni", "par.id par_id", "tel.id tel_id",
+                   "tel.cislo_tel tel_cislo_tel", "par.kmenove_cislo_par par_kmenove_cislo_par",
+                   "par.poddeleni_cisla_par par_poddeleni_cisla_par", "drupoz.stavebni_parcela drupoz_stavebni_parcela",
+                   "zpvybu.kod zpvybu_kod", "zpvybu.nazev zpvybu_nazev", "typbud.nazev typbud_nazev",
+                   "typbud.zkratka typbud_zkratka", "typbud.zadani_cd typbud_zadani_cd"]
 
         if extended:
-            columns.append(u"bud.cena_nemovitosti bud_cena_nemovitosti")
-            columns.append(u"par.katuze_kod par_katuze_kod")
-            columns.append(u"katuze.nazev katuze_nazev")
+            columns.append("bud.cena_nemovitosti bud_cena_nemovitosti")
+            columns.append("par.katuze_kod par_katuze_kod")
+            columns.append("katuze.nazev katuze_nazev")
 
         return columns
 
@@ -750,23 +753,23 @@ class VfkTableModel(QSqlQueryModel):
         :return: []
         """
         columns = [
-            u"jed.id jed_id", u"bud.id bud_id", u"bud.cislo_domovni bud_cislo_domovni", u"typjed.nazev typjed_nazev",
-                   u"jed.cislo_jednotky jed_cislo_jednotky", u"zpvyje.nazev zpvyje_nazev",
-                   u"jed.podil_citatel jed_podil_citatel", u"jed.podil_jmenovatel jed_podil_jmenovatel", u"tel.id tel_id",
-                   u"tel.cislo_tel tel_cislo_tel"]
+            "jed.id jed_id", "bud.id bud_id", "bud.cislo_domovni bud_cislo_domovni", "typjed.nazev typjed_nazev",
+                   "jed.cislo_jednotky jed_cislo_jednotky", "zpvyje.nazev zpvyje_nazev",
+                   "jed.podil_citatel jed_podil_citatel", "jed.podil_jmenovatel jed_podil_jmenovatel", "tel.id tel_id",
+                   "tel.cislo_tel tel_cislo_tel"]
 
         if extended:
-            columns.append(u"jed.cena_nemovitosti jed_cena_nemovitosti")
-            columns.append(u"jed.popis jed_popis")
-            columns.append(u"typbud.zkratka typbud_zkratka")
-            columns.append(u"par.katuze_kod par_katuze_kod")
-            columns.append(u"par.id par_id")
-            columns.append(u"drupoz.stavebni_parcela drupoz_stavebni_parcela")
-            columns.append(u"par.kmenove_cislo_par par_kmenove_cislo_par")
-            columns.append(u"par.poddeleni_cisla_par par_poddeleni_cisla_par")
-            columns.append(u"tel.id tel_id")
-            columns.append(u"tel.cislo_tel tel_cislo_tel")
-            columns.append(u"katuze.nazev katuze_nazev")
+            columns.append("jed.cena_nemovitosti jed_cena_nemovitosti")
+            columns.append("jed.popis jed_popis")
+            columns.append("typbud.zkratka typbud_zkratka")
+            columns.append("par.katuze_kod par_katuze_kod")
+            columns.append("par.id par_id")
+            columns.append("drupoz.stavebni_parcela drupoz_stavebni_parcela")
+            columns.append("par.kmenove_cislo_par par_kmenove_cislo_par")
+            columns.append("par.poddeleni_cisla_par par_poddeleni_cisla_par")
+            columns.append("tel.id tel_id")
+            columns.append("tel.cislo_tel tel_cislo_tel")
+            columns.append("katuze.nazev katuze_nazev")
 
         return columns
 
@@ -777,24 +780,24 @@ class VfkTableModel(QSqlQueryModel):
         :return: []
         """
         columns = [
-            u"opsub.opsub_type opsub_opsub_type", u"opsub.id opsub_id", u"charos.zkratka charos_zkratka",
-                   u"charos.nazev charos_nazev", u"opsub.nazev opsub_nazev",
-                   u"opsub.titul_pred_jmenem opsub_titul_pred_jmenem", u"opsub.jmeno opsub_jmeno",
-                   u"opsub.prijmeni opsub_prijmeni", u"opsub.titul_za_jmenem opsub_titul_za_jmenem"]
+            "opsub.opsub_type opsub_opsub_type", "opsub.id opsub_id", "charos.zkratka charos_zkratka",
+                   "charos.nazev charos_nazev", "opsub.nazev opsub_nazev",
+                   "opsub.titul_pred_jmenem opsub_titul_pred_jmenem", "opsub.jmeno opsub_jmeno",
+                   "opsub.prijmeni opsub_prijmeni", "opsub.titul_za_jmenem opsub_titul_za_jmenem"]
 
         if extended:
             columns.append(
-                u"opsub.id_je_1_partner_bsm opsub_id_je_1_partner_bsm")
+                "opsub.id_je_1_partner_bsm opsub_id_je_1_partner_bsm")
             columns.append(
-                u"opsub.id_je_2_partner_bsm opsub_id_je_2_partner_bsm")
-            columns.append(u"opsub.ico opsub_ico")
-            columns.append(u"opsub.rodne_cislo opsub_rodne_cislo")
-            columns.append(u"opsub.cislo_orientacni opsub_cislo_orientacni")
-            columns.append(u"opsub.nazev_ulice opsub_nazev_ulice")
-            columns.append(u"opsub.cast_obce opsub_cast_obce")
-            columns.append(u"opsub.obec opsub_obec")
-            columns.append(u"opsub.psc opsub_psc")
-            columns.append(u"opsub.mestska_cast opsub_mestska_cast")
+                "opsub.id_je_2_partner_bsm opsub_id_je_2_partner_bsm")
+            columns.append("opsub.ico opsub_ico")
+            columns.append("opsub.rodne_cislo opsub_rodne_cislo")
+            columns.append("opsub.cislo_orientacni opsub_cislo_orientacni")
+            columns.append("opsub.nazev_ulice opsub_nazev_ulice")
+            columns.append("opsub.cast_obce opsub_cast_obce")
+            columns.append("opsub.obec opsub_obec")
+            columns.append("opsub.psc opsub_psc")
+            columns.append("opsub.mestska_cast opsub_mestska_cast")
         return columns
 
     def jpvColumns(self, extended):
@@ -804,10 +807,10 @@ class VfkTableModel(QSqlQueryModel):
         :return: []
         """
         columns = [
-            u"typrav.nazev typrav_nazev", u"jpv.id jpv_id", u"jpv.popis_pravniho_vztahu jpv_popis_pravniho_vztahu",
-                   u"jpv.par_id_k jpv_par_id_k", u"jpv.par_id_pro jpv_par_id_pro", u"jpv.bud_id_k jpv_bud_id_k",
-                   u"jpv.bud_id_pro jpv_bud_id_pro", u"jpv.jed_id_k jpv_jed_id_k", u"jpv.jed_id_pro jpv_jed_id_pro",
-                   u"jpv.opsub_id_k jpv_opsub_id_k", u"jpv.opsub_id_pro jpv_opsub_id_pro"]
+            "typrav.nazev typrav_nazev", "jpv.id jpv_id", "jpv.popis_pravniho_vztahu jpv_popis_pravniho_vztah",
+                   "jpv.par_id_k jpv_par_id_k", "jpv.par_id_pro jpv_par_id_pro", "jpv.bud_id_k jpv_bud_id_k",
+                   "jpv.bud_id_pro jpv_bud_id_pro", "jpv.jed_id_k jpv_jed_id_k", "jpv.jed_id_pro jpv_jed_id_pro",
+                   "jpv.opsub_id_k jpv_opsub_id_k", "jpv.opsub_id_pro jpv_opsub_id_pro"]
 
         if extended:
             pass
@@ -819,8 +822,8 @@ class VfkTableModel(QSqlQueryModel):
         :return: []
         """
         columns = [
-            u"rl.listin_id rl_listin_id", u"rl.opsub_id rl_opsub_id", u"typlis.nazev typlis_nazev",
-                   u"dul.nazev dul_nazev"]
+            "rl.listin_id rl_listin_id", "rl.opsub_id rl_opsub_id", "typlis.nazev typlis_nazev",
+                   "dul.nazev dul_nazev"]
 
         return columns
 
@@ -830,9 +833,9 @@ class VfkTableModel(QSqlQueryModel):
         :return: []
         """
         columns = [
-            u"bdp.bpej_kod bdp_bpej_kod", u"bdp.vymera bdp_vymera", u"par.id par_id",
-                   u"par.kmenove_cislo_par par_kmenove_cislo_par", u"par.poddeleni_cisla_par par_poddeleni_cisla_par",
-                   u"drupoz.stavebni_parcela drupoz_stavebni_parcela"]
+            "bdp.bpej_kod bdp_bpej_kod", "bdp.vymera bdp_vymera", "par.id par_id",
+                   "par.kmenove_cislo_par par_kmenove_cislo_par", "par.poddeleni_cisla_par par_poddeleni_cisla_par",
+                   "drupoz.stavebni_parcela drupoz_stavebni_parcela"]
 
         return columns
 
@@ -842,14 +845,14 @@ class VfkTableModel(QSqlQueryModel):
         :type nemovitost: Nemovitost
         :return: str
         """
-        table = u''
+        table = ''
 
         if nemovitost == self.Nemovitost.NParcela:
-            table = u"par"
+            table = "par"
         elif nemovitost == self.Nemovitost.NBudova:
-            table = u"bud"
+            table = "bud"
         elif nemovitost == self.Nemovitost.NJednotka:
-            table = u"jed"
+            table = "jed"
         else:
             pass
 
@@ -861,16 +864,16 @@ class VfkTableModel(QSqlQueryModel):
         :type opravnenyPovinny: OpravnenyPovinny
         :return: str
         """
-        table = u''
+        table = ''
 
         if opravnenyPovinny == self.OpravnenyPovinny.OPParcela:
-            table = u"par"
+            table = "par"
         elif opravnenyPovinny == self.OpravnenyPovinny.OPBudova:
-            table = u"bud"
+            table = "bud"
         elif opravnenyPovinny == self.OpravnenyPovinny.OPJednotka:
-            table = u"jed"
+            table = "jed"
         elif opravnenyPovinny == self.OpravnenyPovinny.OPOsoba:
-            table = u"opsub"
+            table = "opsub"
         else:
             pass
 
@@ -882,12 +885,12 @@ class VfkTableModel(QSqlQueryModel):
         :type pravo: Pravo
         :return: str
         """
-        columnNameSuffix = u''
+        columnNameSuffix = ''
 
         if pravo == self.Pravo.Opravneni:
-            columnNameSuffix = u"pro"
+            columnNameSuffix = "pro"
         elif pravo == self.Pravo.Povinnost:
-            columnNameSuffix = u"k"
+            columnNameSuffix = "k"
         else:
             pass
 
@@ -899,13 +902,13 @@ class VfkTableModel(QSqlQueryModel):
         :type name: unicode
         :return: OpravnenyPovinny
         """
-        if unicode(name).find(u"par") > -1:
+        if str(name).find("par") > -1:
             return self.OpravnenyPovinny.OPParcela
-        if unicode(name).find(u"bud") > -1:
+        if str(name).find("bud") > -1:
             return self.OpravnenyPovinny.OPBudova
-        if unicode(name).find(u"jed") > -1:
+        if str(name).find("jed") > -1:
             return self.OpravnenyPovinny.OPJednotka
-        if unicode(name).find(u"opsub") > -1:
+        if str(name).find("opsub") > -1:
             return self.OpravnenyPovinny.OPOsoba
 
         return self.OpravnenyPovinny.OPParcela
@@ -969,8 +972,8 @@ class VfkTableModel(QSqlQueryModel):
 
         if self.lastError().isValid():
             iface.messageBar().pushWarning(
-                u'ERROR',
-                u'SQL ({}): {}'.format(query, self.lastError().text())
+                'ERROR',
+                'SQL ({}): {}'.format(query, self.lastError().text())
             )
             return False
 
@@ -983,9 +986,9 @@ class VfkTableModel(QSqlQueryModel):
         :type column:
         :return: str
         """
-        value = unicode(self.record(row).field(column).value())
+        value = str(self.record(row).field(column).value())
 
-        if value == u"NULL" or value == u'None':
-            return u''
+        if value == "NULL" or value == 'None':
+            return ''
         else:
-            return unicode(value)
+            return str(value)

@@ -21,7 +21,7 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtCore import QThread, pyqtSignal, qDebug
+from qgis.PyQt.QtCore import QThread, pyqtSignal, qDebug
 
 
 class OpenThread(QThread):

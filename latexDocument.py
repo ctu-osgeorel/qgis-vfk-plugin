@@ -21,9 +21,12 @@
  *                                                                         *
  ***************************************************************************/
 """
+from __future__ import absolute_import
+from builtins import map
+from builtins import range
 
-from PyQt4.QtCore import qDebug
-from vfkDocument import VfkDocument
+from qgis.PyQt.QtCore import qDebug
+from .vfkDocument import VfkDocument
 
 
 class LatexDocument(VfkDocument):
@@ -91,7 +94,7 @@ class LatexDocument(VfkDocument):
             endTable = u"\end{tabulary}\n"
             header = self.__mLastTableHeader + u"\\\\ \hline \hline\n"
 
-            for i in xrange(self.__mLastColumnNumber):
+            for i in range(self.__mLastColumnNumber):
                 beginTable += u"L"
             beginTable += u"}\n"
 
@@ -102,7 +105,7 @@ class LatexDocument(VfkDocument):
                     table += beginTable
                     table += header
 
-                    for i in xrange(rows, rows + self.__mMaxRows):
+                    for i in range(rows, rows + self.__mMaxRows):
                         table += self.__mLastTableContent[i]
                         table += u"\\\\ \n"
 
@@ -113,7 +116,7 @@ class LatexDocument(VfkDocument):
                 table += beginTable
                 table += header
 
-                for i in xrange(rows, len(self.__mLastTableContent)):
+                for i in range(rows, len(self.__mLastTableContent)):
                     table += self.__mLastTableContent[i]
                     table += u"\\\\ \n"
 
@@ -122,7 +125,7 @@ class LatexDocument(VfkDocument):
                 table += beginTable
                 table += header
                 table += u"\\\\ \n".join(
-                    map(unicode, self.__mLastTableContent))
+                    map(str, self.__mLastTableContent))
                 table += endTable
         self.__mPage += table
 
@@ -188,7 +191,7 @@ class LatexDocument(VfkDocument):
             self.tableHeader(content[0])
             i += 1
 
-        for j in xrange(i, len(content)):
+        for j in range(i, len(content)):
             self.tableRow(content[j])
 
         self.endTable()

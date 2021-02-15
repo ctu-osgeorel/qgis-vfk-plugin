@@ -21,11 +21,14 @@
  *                                                                         *
  ***************************************************************************/
 """
+from builtins import str
 
-from PyQt4.QtGui import *
-from PyQt4.QtCore import QAbstractItemModel, QRegExp, SIGNAL
+from qgis.PyQt import QtGui, QtWidgets
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from qgis.PyQt.QtCore import QAbstractItemModel, QRegExp
 
-from ui_parcelysearchform import *
+from .ui_parcelysearchform import *
 
 
 class ParcelySearchForm(QWidget):
@@ -40,17 +43,16 @@ class ParcelySearchForm(QWidget):
         self.__stavebniModel = QAbstractItemModel
         self.__pozemkovaModel = QAbstractItemModel
 
-        self.connect(self.ui.typParcelyCombo, SIGNAL(
-            "currentIndexChanged(int)"), self.__setDruhModel)
+        self.ui.typParcelyCombo.currentIndexChanged.connect(self.__setDruhModel)
         self.rx = QRegExp("[0-9]*/?[0-9]*")
         self.validator = QRegExpValidator(self.rx)
         self.ui.parCisloLineEdit.setValidator(self.validator)
 
     def parcelniCislo(self):
-        return unicode(self.ui.parCisloLineEdit.text()).strip()
+        return str(self.ui.parCisloLineEdit.text()).strip()
 
     def lv(self):
-        return unicode(self.ui.lvParcelyLineEdit.text()).strip()
+        return str(self.ui.lvParcelyLineEdit.text()).strip()
 
     def setDruhPozemkuModel(self, model):
         """
